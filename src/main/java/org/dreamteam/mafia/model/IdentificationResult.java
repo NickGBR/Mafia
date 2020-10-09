@@ -8,7 +8,7 @@ import java.util.Optional;
  *  identificationMessage - текстовое описание результата идентификации
  */
 public class IdentificationResult {
-
+//user
     Optional<User> user;
     String identificationMessage;
 
