@@ -1,4 +1,4 @@
-package org.dreamteam.mafia.repositories.implementation;
+package org.dreamteam.mafia.repository.implementation;
 
 
 // Этот класс просто держит место, чтобы пакет запушился в Git

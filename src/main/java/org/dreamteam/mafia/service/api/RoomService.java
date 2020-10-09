@@ -1,4 +1,4 @@
-package org.dreamteam.mafia.services.api;
+package org.dreamteam.mafia.service.api;
 
 import org.dreamteam.mafia.model.Game;
 import org.dreamteam.mafia.model.Room;
