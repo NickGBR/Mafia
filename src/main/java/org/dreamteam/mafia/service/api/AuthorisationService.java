@@ -1,6 +1,7 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.model.IdentificationResult;
+import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.util.OptionalWithMessage;
 
 public interface AuthorisationService {
     /**
@@ -15,7 +16,7 @@ public interface AuthorisationService {
      * Пытается найти пользователя по заданным учетным данным.
      * @param login - логин искомого пользователя
      * @param password - пароль искомого пользователя
-     * @return - результат идентификации
+     * @return - результат идентификации: пользователя или пустой Optional с сообщением об ошибке
      */
-    IdentificationResult identifyUser(String login, String password);
+    OptionalWithMessage<User> identifyUser(String login, String password);
 }
