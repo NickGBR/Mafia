@@ -22,6 +22,10 @@ function connect() {
             draw("left", data.message);
         });
     });
+    // Включаем кнопки отправки\отключения и отключаем кнопку подключения
+    document.getElementById("connect").disabled = true;
+    document.getElementById("send").disabled = false;
+    document.getElementById("disconnect").disabled = false;
 }
 
 function draw(side, text) {
@@ -37,8 +41,18 @@ function draw(side, text) {
 }
 function disconnect(){
     stompClient.disconnect();
+    // Отключаем кнопки отправки\отключения и включаем кнопку подключения
+    document.getElementById("connect").disabled = false;
+    document.getElementById("send").disabled = true;
+    document.getElementById("disconnect").disabled = true;
 }
 function sendMessage(){
-    stompClient.send("http://localhost:8080/app/message", {}, JSON.stringify({'message': $("#message_input_value").val()}));
+    stompClient.send("http://localhost:8080/app/message", {},
+        JSON.stringify({
+            // Это работает на JQuery
+            // 'message': $("#message_input_value").val()
+            // А это на чистом JavaScript
+            'message': document.getElementById("message_input_value").value
+        }));
 
 }
