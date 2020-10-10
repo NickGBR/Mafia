@@ -12,7 +12,7 @@ function connect() {
         stompClient = Stomp.over(socket);
     } else { // Используем  SockJS, если WebSocket не поддерживается
         const socket = new SockJS("http://localhost:8080/chat-messaging");
-        stompClient = Stomp.over(socketSJS);
+        stompClient = Stomp.over(socket);
     }
 
     stompClient.connect({}, function(frame) {
