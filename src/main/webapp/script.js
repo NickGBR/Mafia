@@ -1,12 +1,24 @@
+let stompClient;
 
 function connect() {
-    var socket = new SockJS("/chat-messaging");
-    var URL = "ws://localhost:8080/chat-messaging";
-    stompClient = Stomp.client(URL);
+
+    if (
+        // Проверяем поддержку WebSocket в бразуере. Первое условие проверяет наличие объекта
+        // Второе проверяет его на соответствие стандарту, т. к. некоторые браузеры предоставляют
+        // mock-реализацию. См. https://stackoverflow.com/a/40662794
+        'WebSocket' in window && window.WebSocket.CLOSING === 2
+    ) {
+        const socket = new WebSocket("ws://localhost:8080/chat-messaging/websocket");
+        stompClient = Stomp.over(socket);
+    } else { // Используем  SockJS, если WebSocket не поддерживается
+        const socket = new SockJS("http://localhost:8080/chat-messaging");
+        stompClient = Stomp.over(socketSJS);
+    }
+
     stompClient.connect({}, function(frame) {
         console.log("connected: " + frame);
         stompClient.subscribe("http://localhost:8080/chat/messages", function(response) {
-            var data = JSON.parse(response.body);
+            const data = JSON.parse(response.body);
             draw("left", data.message);
         });
     });
@@ -14,7 +26,7 @@ function connect() {
 
 function draw(side, text) {
     console.log("drawing...");
-    var $message;
+    let $message;
     $message = $($('.message_template').clone().html());
     $message.addClass(side).find('.text').html(text);
     $('.messages').append($message);
@@ -27,6 +39,6 @@ function disconnect(){
     stompClient.disconnect();
 }
 function sendMessage(){
-    stompClient.send("http://localhost:8080 /app/message", {}, JSON.stringify({'message': $("#message_input_value").val()}));
+    stompClient.send("http://localhost:8080/app/message", {}, JSON.stringify({'message': $("#message_input_value").val()}));
 
 }
