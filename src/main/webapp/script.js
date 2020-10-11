@@ -48,7 +48,7 @@ function disconnect(){
     document.getElementById("disconnect").disabled = true;
 }
 function sendMessage(){
-    stompClient.send("http://localhost:8080/app/message", {},
+    stompClient.send("/app/message", {},
         JSON.stringify({
             // Это работает на JQuery
             // 'message': $("#message_input_value").val()
