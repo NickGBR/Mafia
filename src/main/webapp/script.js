@@ -1,53 +1,61 @@
 let stompClient;
 
+
 function connect() {
+    // Подключается через SockJS. Он сам решит использовать ли WebSocket
+    // или имитировать их другими средствами
+    const socket = new SockJS("http://localhost:8080/chat-messaging");
+    stompClient = Stomp.over(socket);
 
-   // if (
-        // Проверяем поддержку WebSocket в бразуере. Первое условие проверяет наличие объекта
-        // Второе проверяет его на соответствие стандарту, т. к. некоторые браузеры предоставляют
-        // mock-реализацию. См. https://stackoverflow.com/a/40662794
-   //     'WebSocket' in window && window.WebSocket.CLOSING === 2
-   // ) {
-   //     const socket = new WebSocket("ws://localhost:8080/chat-messaging/websocket");
-   //     stompClient = Stomp.over(socket);
-   // } else { // Используем  SockJS, если WebSocket не поддерживается
-        const socket = new SockJS("http://localhost:8080/chat-messaging");
-        stompClient = Stomp.over(socket);
-   // }
-
-    stompClient.connect({}, function(frame) {
-        console.log("connected: " + frame);
-        stompClient.subscribe("http://localhost:8080/chat/messages", function(response) {
-            const data = JSON.parse(response.body);
-            console.log("Получено сообщение" + data.message);
-            draw("left", data.message);
-        });
-    });
-    // Включаем кнопки отправки\отключения и отключаем кнопку подключения
+    // Пытаемся подключиться, передавая пустой список заголовков - {}
+    // И две функции: одну для обработки успешного подключения,
+    // и вторую для обработки ошибки подключения
+    stompClient.connect({}, afterConnect, onError);
+    // Отключаем кнопку подключения, чтобы пользователь не
+    // начинал несколько попыток подключения за раз
     document.getElementById("connect").disabled = true;
+}
+
+// Будем вызвано после установления соединения
+function afterConnect(connection) {
+    console.log("Успешное подключение: " + connection);
+    stompClient.subscribe("/chat/messages", function (response) {
+        const data = JSON.parse(response.body);
+        console.log("Получено сообщение: " + data.message);
+        addToChat(data.message);
+    });
+    // Теперь когда подключение установлено
+    // Включаем кнопки для отправки сообщений и отключения от сервера
     document.getElementById("send").disabled = false;
     document.getElementById("disconnect").disabled = false;
 }
 
-function draw(side, text) {
-    console.log("drawing...");
-    let $message;
-    $message = $($('.message_template').clone().html());
-    $message.addClass(side).find('.text').html(text);
-    $('.messages').append($message);
-    return setTimeout(function () {
-        return $message.addClass('appeared');
-    }, 0);
-
+// Будет вызвано при ошибке установления соединения
+function onError(error) {
+    console.log("Не удалось установить подключение: " + error);
+    // Включаем кнопку подключения обратно.
+    // Вдруг в следующий раз подключиться получиться
+    document.getElementById("connect").disabled = false;
 }
-function disconnect(){
+
+
+function addToChat(text) {
+    const node = document.createElement("LI");  // Создаем элемент списка <li>
+    node.setAttribute("class", "message");
+    const textNode = document.createTextNode(text);  // Создаем текстовый элемент
+    node.appendChild(textNode); // Вставляем текстовый внутрь элемента списка
+    document.getElementById("messages-list").appendChild(node); // А элемент внутрь самого списка
+}
+
+function disconnect() {
     stompClient.disconnect();
     // Отключаем кнопки отправки\отключения и включаем кнопку подключения
     document.getElementById("connect").disabled = false;
     document.getElementById("send").disabled = true;
     document.getElementById("disconnect").disabled = true;
 }
-function sendMessage(){
+
+function sendMessage() {
     stompClient.send("/app/message", {},
         JSON.stringify({
             // Это работает на JQuery
