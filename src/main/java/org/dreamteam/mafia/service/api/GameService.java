@@ -1,19 +1,24 @@
 package org.dreamteam.mafia.service.api;
 
+import org.dreamteam.mafia.dto.CharacterDTO;
+import org.dreamteam.mafia.exceptions.*;
 import org.dreamteam.mafia.model.*;
 import org.dreamteam.mafia.model.Character;
 
 import java.util.List;
 
+/**
+ * Интерфейс сервиса, обеспечивающего ведение самой игры.
+ */
 public interface GameService {
 
     /**
-     * Возвращает роль персонажа пользователя в данной игре
-     * @param game - игра
-     * @param user - пользователь
-     * @return - роль пользователя
+     * Находит игру, идущую в указанной комнате
+     * @param room - комната
+     * @return - игра, идущая в комнате
+     * @throws GameNotStartedException - если игра в комнате еще не началась
      */
-    Role getRole(Game game, User user);
+    Game getGameInRoom(Room room) throws GameNotStartedException;
 
     /**
      * Возвращает список всех персонажей в игре
@@ -29,18 +34,29 @@ public interface GameService {
      */
     List<Message> getMessageLog(Game game);
 
-    /**
-     * Возвращает список всех живых персонажей в игре
-     * @param game - игра
-     * @return - список
-     */
-    List<Character> getAliveCharactersInGame(Game game);
 
     /**
-     * Возвращает игрока, который будет выступать следующим в ходе дневных выступлений
+     * Переводит игру в следующую фазу
      * @param game - игра
-     * @return - пользователь, который будет выступать следующим
+     * @throws GameIsOverException - если игра уже окончена
      */
-    User getNextSpeaker(Game game);
+    void advancePhase(Game game) throws GameIsOverException;
+
+    /**
+     *  Выдвигает персонажа на голосование
+     * @param user - выдвигающий игрок
+     * @param characterDTO - выдвигаемый персонаж
+     * @throws IllegalMoveException - если выдвижение нарушает правила игры
+     */
+    void nominateCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException;
+
+    /**
+     *  Голосует против персонажа
+     * @param user - голосующий игрок
+     * @param characterDTO - голосуемый против персонаж
+     * @throws IllegalMoveException - если голосование нарушает правила игры
+     */
+    void voteCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException;
+
 
 }

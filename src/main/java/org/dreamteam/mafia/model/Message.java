@@ -1,5 +1,8 @@
 package org.dreamteam.mafia.model;
 
+/**
+ * Сообщение - набор данных, описывающих  отдельное сообщение в чате
+ */
 public class Message {
 
     private String from;
