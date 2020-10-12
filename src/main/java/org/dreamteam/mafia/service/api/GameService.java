@@ -59,4 +59,5 @@ public interface GameService {
     void voteCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException;
 
 
+
 }
