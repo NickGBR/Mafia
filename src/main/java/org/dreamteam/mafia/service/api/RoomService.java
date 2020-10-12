@@ -1,61 +1,51 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.model.Game;
+import org.dreamteam.mafia.dto.RoomDTO;
+import org.dreamteam.mafia.exceptions.NoSuchRoomException;
+import org.dreamteam.mafia.exceptions.NotEnoughRightsException;
 import org.dreamteam.mafia.model.Room;
 import org.dreamteam.mafia.model.User;
-import org.dreamteam.mafia.util.OptionalWithMessage;
 
 import java.util.List;
-import java.util.Optional;
 
+/**
+ * Интерфейс с ервиса, обслуживающего систему комнат
+ */
 public interface RoomService {
 
     /**
-     * Создает приватную комнату с заданным число игроков
-     * @param creator - игрок, создающий комнату
-     * @param name - имя комнаты
-     * @param Description - описание комнаты
-     * @param password - пароль для приватной комнаты
-     * @param playerCount - число игроков необходимое для начала игры
-     * @return - созданная комната
+     *  Находит комнату по описанию, переданному из интерфейса
+     * @param roomDTO - описание комнаты, полученное из интерфейса
+     * @return - найденная комната
+     * @throws NoSuchRoomException - если описываемая комната не существует
      */
-    Room createRoom(User creator, String name, String Description,
-                    String password, int playerCount);
+    Room getRoomFromDTO(RoomDTO roomDTO) throws NoSuchRoomException;
 
     /**
-     * Создает приватную комнату с число игроков по умолчанию (10)
-     * @param creator - игрок, создающий комнату
-     * @param name - имя комнаты
-     * @param Description - описание комнаты
-     * @param password - пароль для приватной комнаты
-     * @return - созданная комната
+     *  Возвращает комнату, в которой находится указанный пользователь
+     * @param user - пользователь, комнату которого нужно найти
+     * @return - найденная комната
+     * @throws NoSuchRoomException - если пользователь не находится в комнате
      */
-    Room createRoom(User creator, String name, String Description,
-                    String password);
+    Room getUsersRoom(User user) throws NoSuchRoomException;
 
     /**
-     * Создает публичную комнату с заданным число игроков
-     * @param creator - игрок, создающий комнату
-     * @param name - имя комнаты
-     * @param Description - описание комнаты
-     * @param playerCount - число игроков необходимое для начала игры
-     * @return - созданная комната
+     * Возвращает администратора заданной комнаты
+     * @param room - комната
+     * @return - пользователь - администратор комнаты.
      */
-    Room createRoom(User creator, String name, String Description,
-                    int playerCount);
+    User getRoomAdmin(Room room);
 
     /**
-     * Создает публичную комнату  с число игроков по умолчанию (10)
-     * @param creator - игрок, создающий комнату
-     * @param name - имя комнаты
-     * @param Description - описание комнаты
+     * Создает новую комнату
+     * @param roomDTO - описание комнаты, полученние из интерфейса
      * @return - созданная комната
      */
-    Room createRoom(User creator, String name, String Description);
+    Room createRoom(RoomDTO roomDTO);
 
     /**
      * Проверяет является ли заданная комната приватной
-     * @param room - комната для проверки
+     * @param room  - описание комнаты, полученние из интерфейса
      * @return - true, если комната приватна, false - иначе
      */
     boolean isRoomPrivate(Room room);
@@ -94,10 +84,10 @@ public interface RoomService {
      * Пытается убрать пользователя из комнаты
      * @param admin - пользователь, запросивший изгнанине
      * @param target - изгоняемый пользователь
-     * @param room - комната
-     * @return - true, если изгнание было проведено успешно, false - иначе
+     * @throws NoSuchRoomException - если оба пользователя не находятся в одной и той же комнате
+     * @throws NotEnoughRightsException - если запросивший пользователь не является администратором своей комнаты
      */
-    boolean kickUser(User admin, User target, Room room);
+    void kickUser(User admin, User target) throws  NoSuchRoomException, NotEnoughRightsException;
 
     /**
      * Проверяет заполнена ли комната
@@ -107,12 +97,12 @@ public interface RoomService {
     boolean isRoomFull(Room room);
 
     /**
-     * Подтверждает\отменяет готовность пользователя для начала игры в комнате
+     * Подтверждает\отменяет готовность пользователя для начала игры в комнате, в которой он сейчас находится
      * @param user - пользователь
-     * @param room - комната
      * @param ready - состояния, на которое нужно изменить готовность
+     * @throws NoSuchRoomException - если данный пользователь не находится сейчас в комнате
      */
-    void setReady(User user, Room room, boolean ready);
+    void setReady(User user, boolean ready) throws NoSuchRoomException;
 
     /**
      * Проверяет готовы ли все пользователи  в комнате для начала игры
@@ -124,10 +114,10 @@ public interface RoomService {
     /**
      *  Запускает игру в комнате
      * @param user - игрок, запускающий игру (должен быть адмнистратором комнаты)
-     * @param room - комната
-     * @return - созданную игру или пустой Optional и  сообщение об ошибкке
+     * @throws NoSuchRoomException - если данный пользователь не находится сейчас в комнате
+     * @throws NotEnoughRightsException - если данный пользователь не является администратором своей комнаты
      */
-    OptionalWithMessage<Game> startGame(User user, Room room);
+    void startGame(User user) throws  NoSuchRoomException, NotEnoughRightsException;
 
 
 }
