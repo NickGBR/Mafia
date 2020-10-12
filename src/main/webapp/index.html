@@ -25,13 +25,14 @@
 <div id="mafia_chat" class="tabcontent">
     <div id="chatbox_mafia"></div>
     <input id="message_input_mafia_value" class="message_input" placeholder="Введите сообщение..."/>
-    <button id="send_mafia" onclick="sendMessage()" class="text" disabled>Отправить сообщение</button>
+    <button id="send_mafia" onclick="sendMessage('/app/mafia_message','message_input_mafia_value')" class="text" disabled>Отправить сообщение</button>
     <script>
         document.getElementById("message_input_mafia_value")
             .addEventListener("keyup", function (event) {
                 event.preventDefault();
                 if (event.keyCode === 13) {
                     document.getElementById("send_mafia").click();
+                    document.getElementById("message_input_mafia_value").value = "";
                 }
             });
     </script>
@@ -40,7 +41,7 @@
 <div id="civilians_chat" class="tabcontent">
     <div id="chatbox_civilians"></div>
     <input id="message_input_civilians_value" class="message_input" placeholder="Введите сообщение..."/>
-    <button id="send_civilians" onclick="sendMessage()" class="text" disabled>Отправить сообщение</button>
+    <button id="send_civilians" onclick="sendMessage('/app/civ_message','message_input_civilians_value')" class="text" disabled>Отправить сообщение</button>
     <script>
         document.getElementById("message_input_civilians_value")
             .addEventListener("keyup", function (event) {
