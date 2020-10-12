@@ -2,7 +2,7 @@ package org.dreamteam.mafia.service.api;
 
 import org.dreamteam.mafia.dto.UserDTO;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
-import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.dao.User;
 
 import java.util.Optional;
 
@@ -25,5 +25,7 @@ public interface UserService {
      * @return - авторизованного в настоящий момент пользователя или null, если пользователь еще не авторизован,
      * например, при вызове этого метода из контроллера, отвечающего за регистрацию пользователя
      */
-    Optional<User> getCurrentUser();
+    Optional<User> getCurrentUser(User currentUser);
+
+    Optional<User> findByLogin(UserDTO userDTO);
 }
