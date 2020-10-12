@@ -22,14 +22,11 @@ public class Character {
     @JoinColumn(name = "character_id", unique = true, nullable = false)
     private Game game;
 
-    @Column(name = "role_id", nullable = false)
+    @Column(name = "role", nullable = false)
     private String role;
 
-    @Column(name = "status_id", nullable = false)
+    @Column(name = "status", nullable = false)
     private boolean status;
-
-    @Column(name = "character_name", nullable = false)
-    private String name;
 
     @OneToOne(mappedBy = "character")
     private User user;
