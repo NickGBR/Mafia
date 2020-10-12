@@ -7,7 +7,5 @@
         <property name="connection.password">postgres</property>
         <property name="dialect">org.hibernate.dialect.PostgreSQL94Dialect</property>
         <property name="show_sql">true</property>
-
-        <mapping resource="ru/javavision/model/Engine.hbm.xml" />
     </session-factory>
 </hibernate-configuration>

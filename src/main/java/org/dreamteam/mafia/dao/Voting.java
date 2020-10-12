@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,17 +22,17 @@ public class Voting {
     @Column(name = "vote_id", unique = true, nullable = false)
     private int voteId;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
-
-    @Column(name = "character_id", nullable = false)
-    private int characterId;
 
     @Column(name = "day_number", nullable = false)
     private int numberOfDay;
 
     @Column(name = "votes_amount", nullable = false)
     private int votesAmount;
+
+    @OneToMany(mappedBy = "voting")
+    private List<Character> characterList;
 
 }
