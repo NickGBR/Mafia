@@ -7,6 +7,7 @@ public class Message {
 
     private String from;
     private String message;
+    private String role;
     public String getFrom() {
         return from;
     }
@@ -19,10 +20,18 @@ public class Message {
     public void setMessage(String message) {
         this.message = message;
     }
-    @Override
-    public String toString() {
-        return "Message [from=" + from + ", message=" + message + "]";
+
+    public void setRole(Role role) {
+        this.role = role.toString();
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public enum Role{
+        MAFIA,
+        CIVILIAN
+    }
 
 }

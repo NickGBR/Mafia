@@ -16,7 +16,10 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/chat");
+        //Установка префикса для URL
         config.setApplicationDestinationPrefixes("/app");
+        //Установка префикса для отправки сообщений определенным юзерам
+        config.setUserDestinationPrefix("/user");
     }
 
     public void registerStompEndpoints(StompEndpointRegistry registry) {

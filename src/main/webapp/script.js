@@ -1,28 +1,10 @@
+let stompClient;
 
 function connect() {
-    var socket = new SockJS("/chat-messaging");
+    // Подключается через SockJS. Он сам решит использовать ли WebSocket
+    // или имитировать их другими средствами
+    const socket = new SockJS("http://localhost:8080/chat-messaging");
     stompClient = Stomp.over(socket);
-<<<<<<< Updated upstream
-    stompClient.connect({}, function(frame) {
-        console.log("connected: " + frame);
-        stompClient.subscribe("/chat/messages", function(response) {
-            var data = JSON.parse(response.body);
-            draw("left", data.message);
-        });
-    });
-}
-
-function draw(side, text) {
-    console.log("drawing...");
-    var $message;
-    $message = $($('.message_template').clone().html());
-    $message.addClass(side).find('.text').html(text);
-    $('.messages').append($message);
-    return setTimeout(function () {
-        return $message.addClass('appeared');
-    }, 0);
-
-=======
 
     // Пытаемся подключиться, передавая пустой список заголовков - {}
     // И две функции: одну для обработки успешного подключения,
@@ -56,6 +38,11 @@ function onError(error) {
 function getMessage(response){
     const data = JSON.parse(response.body);
     console.log("Получено сообщение: " + data.message);
+    console.log("Роль: " + data.role);
+    if(data.role!="MAFIA"){
+        console.log("LOLOLOLOLOLOLOLO");
+        //document.getElementById("mafia_chat").style.display = "none";
+    }
     addToChat(data.message);
 }
 
@@ -66,15 +53,10 @@ function addToChat(text) {
     const textNode = document.createTextNode(text);  // Создаем текстовый элемент
     node.appendChild(textNode); // Вставляем текстовый внутрь элемента списка
     document.getElementById("chatbox_civilians").appendChild(node); // А элемент внутрь самого списка
->>>>>>> Stashed changes
 }
-function disconnect(){
+
+function disconnect() {
     stompClient.disconnect();
-<<<<<<< Updated upstream
-}
-function sendMessage(){
-    stompClient.send("/app/message", {}, JSON.stringify({'message': $("#message_input_value").val()}));
-=======
     // Отключаем кнопки отправки\отключения и включаем кнопку подключения
     document.getElementById("connect").disabled = false;
     document.getElementById("send_civilians").disabled = true;
@@ -91,7 +73,6 @@ function sendMessage() {
             // А это на чистом JavaScript
             'message': document.getElementById("message_input_civilians_value").value
         }));
->>>>>>> Stashed changes
 
 }
 
