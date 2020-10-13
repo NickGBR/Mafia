@@ -1,4 +1,4 @@
-drop table votings cascade;
+--drop table votings cascade;
 
 create table votings
 (

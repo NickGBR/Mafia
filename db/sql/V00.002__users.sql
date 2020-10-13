@@ -1,4 +1,4 @@
-drop table users cascade;
+--drop table users cascade;
 
 create table users
 (
