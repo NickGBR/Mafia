@@ -53,3 +53,7 @@
     border: 1px solid #ccc;
     border-top: none;
 }
+
+.bodyPadding{
+    padding: 10px;
+}

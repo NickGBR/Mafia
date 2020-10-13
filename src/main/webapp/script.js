@@ -1,5 +1,6 @@
 let stompClient;
 let mafia = false;
+let name;
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -21,6 +22,7 @@ function afterConnect(connection) {
     console.log("Успешное подключение: " + connection);
     stompClient.subscribe("/chat/civ_messages", getMessage);
     stompClient.subscribe("/chat/mafia_messages", getMessage);
+    stompClient.subscribe("/chat/game_stat", getStat);
     // Теперь когда подключение установлено
     // Включаем кнопки для отправки сообщений и отключения от сервера
     document.getElementById("send_mafia").disabled = false;
@@ -36,14 +38,24 @@ function onError(error) {
     document.getElementById("connect").disabled = false;
 }
 
+function getStat(response) {
+    const data = JSON.parse(response.body);
+    const night = data.isNight;
+    console.log("Lolka");
+    if (night == false) console.log("Сейчас ночь.");
+    else console.log("Сейчам день.")
+    addToChat(night);
+}
+
 function getMessage(response) {
     const data = JSON.parse(response.body);
     console.log("Получено сообщение: " + data.message);
     console.log("Роль: " + data.role);
+    console.log("From = " + data.from)
     if (data.role != "MAFIA") {
         //document.getElementById("mafia_chat").style.display = "none";
     }
-    addToChat(data.message);
+    addToChat(data.from + " " + data.message);
 }
 
 
@@ -68,16 +80,26 @@ function disconnect() {
 }
 
 function sendMessage(chat, view) {
-    stompClient.send(chat, {},
-        JSON.stringify({
-            // Это работает на JQuery
-            // 'message': $("#message_input_value").val()
-            // А это на чистом JavaScript
-            'message': document.getElementById(view).value
+    const str = JSON.stringify({
+        // Это работает на JQuery
+        // 'message': $("#message_input_value").val()
+        // А это на чистом JavaScript
+        'message': document.getElementById(view).value,
+        'from': name
 
-        }));
+    });
+    console.log(str);
+    stompClient.send(chat, {}, str);
     if (document.getElementById(view).id == "message_input_mafia_value") mafia = true;
     else mafia = false;
+}
+
+function setName() {
+    name = document.getElementById("name_input").value;
+    console.log("Name " + name + " set!");
+    document.getElementById("set_name").disabled = true;
+    document.getElementById("name_input").disabled = true;
+
 }
 
 function openCity(evt, cityName) {
