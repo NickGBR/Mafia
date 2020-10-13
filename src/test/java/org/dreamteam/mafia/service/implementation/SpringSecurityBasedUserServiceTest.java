@@ -136,27 +136,5 @@ public class SpringSecurityBasedUserServiceTest {
         Assert.assertFalse("Found user, when the authorised one wasn't in repository", user.isPresent());
         SecurityContextHolder.clearContext();
     }
-
-    @Test
-    public void loadUserByUsernamePositive() {
-
-        Mockito.when(mockRepository.getUserByLogin(daoNormal.getLogin())).thenReturn(daoNormal);
-        try {
-            UserDetails userDetails = testedService.loadUserByUsername(daoNormal.getLogin());
-            Mockito.verify(mockRepository, Mockito.times(1)).getUserByLogin(daoNormal.getLogin());
-            Assert.assertEquals("Returned wrong user details", daoNormal.getLogin(), userDetails.getUsername());
-        } catch (UsernameNotFoundException e) {
-            Assert.fail("Failed to load existing user details");
-        }
-    }
-
-    @Test
-    public void loadUserByUsernameNegative() {
-        try {
-            testedService.loadUserByUsername(daoNormal.getLogin());
-            Assert.fail("Failed to load existing user details");
-        } catch (UsernameNotFoundException ignored) {
-        }
-        Mockito.verify(mockRepository, Mockito.times(1)).getUserByLogin(daoNormal.getLogin());
-    }
+    
 }

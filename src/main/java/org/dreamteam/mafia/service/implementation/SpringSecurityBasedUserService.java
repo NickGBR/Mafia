@@ -3,7 +3,6 @@ package org.dreamteam.mafia.service.implementation;
 import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dto.UserDTO;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
-import org.dreamteam.mafia.model.SecurityUserDetails;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.UserService;
@@ -12,21 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 /**
- * Сервис реализующий, сервис работы с пользователями для приложения, так и сервис работы с пользователям
- * для Spring Security. Отвечает за преобразование загруженной из репозитория сущности пользователя
- * в сущность ожидаему либо приложением, либо Spring Security.
+ * Реализация интерфейса сервиса данных пользователей, работающая со Spring Security и репозиторием
  */
 @Service("securityUserService")
-public class SpringSecurityBasedUserService implements UserService, UserDetailsService {
+public class SpringSecurityBasedUserService implements UserService {
 
 
     UserRepository repository;
@@ -70,13 +64,4 @@ public class SpringSecurityBasedUserService implements UserService, UserDetailsS
         return Optional.empty();
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        UserDAO user = repository.getUserByLogin(userName);
-        if (user != null) {
-            return new SecurityUserDetails(user);
-        } else {
-            throw  new UsernameNotFoundException("User '" + userName + "' not found in repository");
-        }
-    }
 }
