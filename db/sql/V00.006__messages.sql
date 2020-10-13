@@ -1,18 +1,15 @@
-drop table Messages;
+-- drop table messages;
 
-create table Messages
+create table messages
 (
-    message_id serial  not null,
-    game_id    integer  not null,
-    --constraint messages_pk primary key,
-    user_id    serial  not null,
-    text       text    not null,
-    addressee  integer not null
+    message_id serial not null primary key,
+    game_id    serial not null,
+    user_id    serial not null,
+    text       text   not null,
+    addressee  serial not null,
+
+    constraint fk_game foreign key (game_id) references games(game_id),
+    constraint fk_user foreign key (user_id) references users(user_id)
 );
 
-/*create index messages_game_id_uindex
-    on Messages (game_id);*/
-
-create unique index messages_message_id_uindex
-    on Messages (message_id);
 

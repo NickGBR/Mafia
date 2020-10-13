@@ -1,20 +1,14 @@
-drop table Rooms;
+drop table rooms cascade;
 
-create table Rooms
+create table rooms
 (
-    room_id       serial      not null
-        constraint rooms_pk primary key,
+    room_id       serial      not null primary key,
     name          varchar(50) not null,
-    password_hash integer,
-    game_id       integer
+    password_hash bigint      not null,
+    game_id       serial,
+    users_amount  integer     not null,
+
+    constraint fk_room2game foreign key (game_id) references games (game_id)
 );
 
-create unique index rooms_game_id_uindex
-    on Rooms (game_id);
-
-create unique index rooms_name_uindex
-    on Rooms (name);
-
-create unique index rooms_room_id_uindex
-    on Rooms (room_id);
 

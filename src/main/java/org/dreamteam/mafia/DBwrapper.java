@@ -1,21 +1,21 @@
 package org.dreamteam.mafia;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
+import org.dreamteam.mafia.dao.User;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 public class DBwrapper {
     public static void main(String[] args) {
 
-        try (SessionFactory factory = new Configuration().configure().buildSessionFactory();
-             Session session = factory.getCurrentSession();) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("PU");
+        EntityManager em = emf.createEntityManager();
 
-            session.beginTransaction();
+        User u = new User();
+        em.merge(u);
 
 
-            session.getTransaction().commit();
-
-        }
 
     }
 }

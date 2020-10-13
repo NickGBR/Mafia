@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "game")
+@Table(name = "games")
 
 public class Game {
 

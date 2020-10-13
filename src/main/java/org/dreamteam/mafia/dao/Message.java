@@ -24,9 +24,6 @@ public class Message {
     @Column(name = "text", nullable = false)
     private String text;
 
-    @Column(name = "type", nullable = false)
-    private String type;
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -35,5 +32,7 @@ public class Message {
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
 
+    @Column(name="addressee", nullable = false)
+    private int addressee;
 
 }

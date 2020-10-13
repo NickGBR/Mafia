@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "room")
+@Table(name = "rooms")
 
 public class Room {
 
@@ -27,11 +27,11 @@ public class Room {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "users_amount", nullable = false)
-    private int usersAmount;
-
     @Column(name = "password_hash")
     private long passwordHash;
+
+    @Column(name = "users_amount", nullable = false)
+    private int usersAmount;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "game_id")
@@ -40,5 +40,9 @@ public class Room {
 
     @OneToMany(mappedBy = "room")
     private List<User> userList;
+
+    public Room(int roomId) {
+        this.roomId = roomId;
+    }
 
 }

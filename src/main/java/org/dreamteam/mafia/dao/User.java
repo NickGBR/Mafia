@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 
 public class User {
 
@@ -22,11 +22,11 @@ public class User {
     @Column(name = "user_id", unique = true, nullable = false)
     private long userId;
 
-    @Column(name = "login", unique = true, nullable = false, length = 100)
-    private String login;
-
     @Column(name = "password_hash", nullable = false)
     private long passwordHash;
+
+    @Column(name = "login", unique = true, nullable = false, length = 100)
+    private String login;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "room_id")
@@ -38,9 +38,5 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Message> messageList;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "character_id")
-    private Character character;
 
 }

@@ -1,22 +1,18 @@
-drop table Characters;
+drop table characters cascade;
 
-create table Characters
+create table characters
 (
-    game_id      serial      not null,
-    user_id      serial      not null,
-    character_id serial      not null
-        constraint characters_pk
-            primary key,
-    role         varchar(30) not null,
-    status       boolean     not null
+    character_id serial  not null primary key,
+    game_id      serial  not null,
+    user_id      serial  not null,
+    role_id      serial  not null,
+    status       boolean not null,
+
+    constraint fk_characters2users foreign key (user_id) references users (user_id),
+    constraint fk_characters2games foreign key (game_id) references games (game_id),
+    constraint fk_character2role foreign key (role_id) references roles (role_id)
 );
 
-create unique index characters_character_id_uindex
-    on Characters (character_id);
 
-/*create unique index characters_game_id_uindex
-    on Characters (game_id);*/
 
-create unique index characters_user_id_uindex
-    on Characters (user_id);
 
