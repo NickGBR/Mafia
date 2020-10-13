@@ -14,7 +14,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <description>db-migrations</description>
+    <description>db</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,12 +22,6 @@
     </properties>
 
     <build>
-        <resources>
-            <resource>
-                <directory>sql</directory>
-            </resource>
-        </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.flywaydb</groupId>
