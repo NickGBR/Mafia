@@ -7,6 +7,7 @@ import org.dreamteam.mafia.model.SecurityUserDetails;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.UserService;
+import org.dreamteam.mafia.util.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,7 +41,7 @@ public class SpringSecurityBasedUserService implements UserService, UserDetailsS
     @Override
     public void registerNewUser(UserDTO userDTO) throws UserRegistrationException {
         if (!userDTO.getPassword().equals(userDTO.getPasswordConfirmation())) {
-            throw  new UserRegistrationException("Password mismatch!");
+            throw  new UserRegistrationException(ResultCode.PASSWORD_MISMATCH, "Password mismatch!");
         }
         UserDAO user = new UserDAO();
         user.setLogin(userDTO.getLogin());
@@ -48,7 +49,7 @@ public class SpringSecurityBasedUserService implements UserService, UserDetailsS
         try {
             repository.saveUser(user);
         } catch (Exception e) {
-            throw new UserRegistrationException("Login is already in the database");
+            throw new UserRegistrationException(ResultCode.USER_ALREADY_EXISTS, "Login is already in the database");
         }
     }
 

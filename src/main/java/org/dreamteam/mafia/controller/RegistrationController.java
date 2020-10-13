@@ -1,8 +1,10 @@
 package org.dreamteam.mafia.controller;
 
+import org.dreamteam.mafia.dto.Response;
 import org.dreamteam.mafia.dto.UserDTO;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
 import org.dreamteam.mafia.service.api.UserService;
+import org.dreamteam.mafia.util.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,15 +19,16 @@ public class RegistrationController {
     @Autowired
     public RegistrationController(UserService userService) {
         this.userService = userService;
+
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String register(UserDTO dto) {
+    public Response register(UserDTO dto) {
         try {
             userService.registerNewUser(dto);
-            return "success";
+            return  new Response(ResultCode.SUCCESS, "Registration is successful");
         } catch (UserRegistrationException e) {
-            return "fail";
+            return new Response(e.getCode(), e.getLocalizedMessage());
         }
     }
 }
