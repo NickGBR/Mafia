@@ -1,4 +1,4 @@
-package org.dreamteam.mafia;
+package org.dreamteam.mafia.dao;
 
 import org.dreamteam.mafia.dao.User;
 
@@ -12,10 +12,9 @@ public class DBwrapper {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PU");
         EntityManager em = emf.createEntityManager();
 
-        User u = new User();
-        em.merge(u);
-
-
+        em.getTransaction();
+        em.merge(new User());
+        em.getTransaction().commit();
 
     }
 }
