@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Repository
+@Profile("no_db")
 public class UserRepositoryInMemory implements UserRepository {
 
     private final Map<String, UserDAO> database = new HashMap<>();
