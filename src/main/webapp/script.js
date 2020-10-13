@@ -1,6 +1,9 @@
+let civiliansChat = "civilians_chat_box"; // Хранит id HTML елемента отвечаючего за отображение сообщений в чате мирных жителей.
+let mafiaChat = "mafia_chat_box"; // Хранит id HTML елемента отвечаючего за отображение сообщений в чате мафии.
 let stompClient;
-let mafia = false;
 let name;
+let isMafia = false;
+let isNight;
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -25,8 +28,8 @@ function afterConnect(connection) {
     stompClient.subscribe("/chat/game_stat", getStat);
     // Теперь когда подключение установлено
     // Включаем кнопки для отправки сообщений и отключения от сервера
-    document.getElementById("send_mafia").disabled = false;
-    document.getElementById("send_civilians").disabled = false;
+    document.getElementById("send_mafia_button").disabled = false;
+    document.getElementById("send_civilians_button").disabled = false;
     document.getElementById("disconnect").disabled = false;
 }
 
@@ -38,43 +41,40 @@ function onError(error) {
     document.getElementById("connect").disabled = false;
 }
 
+//Получает информацию об игре с сервера.
 function getStat(response) {
     const data = JSON.parse(response.body);
-    const night = data.isNight;
-    console.log("Lolka");
-    if (night == false) console.log("Сейчас ночь.");
-    else console.log("Сейчам день.")
-    addToChat(night);
+    isNight = data.night;
+    console.log(isNight);
+    setTimeInterface(isNight);
+    sendTimeMessage(isNight)
 }
 
 function getMessage(response) {
     const data = JSON.parse(response.body);
     console.log("Получено сообщение: " + data.message);
-    console.log("Роль: " + data.role);
+    console.log("Название чата: " + data.role);
     console.log("From = " + data.from)
-    if (data.role != "MAFIA") {
-        //document.getElementById("mafia_chat").style.display = "none";
-    }
-    addToChat(data.from + " " + data.message);
+    if (data.role === "MAFIA") addToChat(data.from + " " + data.message, mafiaChat);
+    else if (data.role === "CIVILIAN")
+        addToChat(data.from + " " + data.message, civiliansChat);
 }
 
 
-function addToChat(text) {
+function addToChat(text, chat) {
     const node = document.createElement("LI");  // Создаем элемент списка <li>
     node.setAttribute("class", "message");
     const textNode = document.createTextNode(text);  // Создаем текстовый элемент
     node.appendChild(textNode); // Вставляем текстовый внутрь элемента списка
-    if (mafia == true) document.getElementById("chatbox_mafia").appendChild(node);
-    else
-        document.getElementById("chatbox_civilians").appendChild(node); // А элемент внутрь самого списка
+    document.getElementById(chat).appendChild(node);
 }
 
 function disconnect() {
     stompClient.disconnect();
     // Отключаем кнопки отправки\отключения и включаем кнопку подключения
     document.getElementById("connect").disabled = false;
-    document.getElementById("send_civilians").disabled = true;
-    document.getElementById("send_mafia").disabled = true;
+    document.getElementById("send_civilians_button").disabled = true;
+    document.getElementById("send_mafia_button").disabled = true;
     document.getElementById("disconnect").disabled = true;
     // document.getElementById()
 }
@@ -86,19 +86,64 @@ function sendMessage(chat, view) {
         // А это на чистом JavaScript
         'message': document.getElementById(view).value,
         'from': name
-
     });
     console.log(str);
     stompClient.send(chat, {}, str);
-    if (document.getElementById(view).id == "message_input_mafia_value") mafia = true;
-    else mafia = false;
 }
 
+//Метод установки ника пользователя в чате.
 function setName() {
     name = document.getElementById("name_input").value;
     console.log("Name " + name + " set!");
     document.getElementById("set_name").disabled = true;
     document.getElementById("name_input").disabled = true;
+}
+
+// Метод устанавливающий начальную конфигурацию пользовательского интерфейса в зависимости от роли игрока.
+function setRoleInterface(isMafia) {
+    console.log(isMafia)
+    if (isMafia === true) document.getElementById("mafia_chat_button").style.visibility = "visible";
+    document.getElementById("civilians_chat_button").style.visibility = "visible";
+    document.getElementById("civilians_chat_button").click();
+}
+
+//Метод выводящий сообщение в зависимости от времени в игре.
+function sendTimeMessage(isNight) {
+    if (isNight === false) {
+        addToChat("День настал!", mafiaChat);
+        addToChat("День настал!", civiliansChat);
+    }
+    if (isNight === true) {
+        addToChat("Ночь настала!", mafiaChat);
+        addToChat("Ночь настала!", civiliansChat);
+
+    }
+}
+
+//Метод меняющий чат в зависимости от премени в игре.
+function setTimeInterface(isNight) {
+    if (isNight === true) {
+        document.body.style.backgroundColor = "#03133C";
+        document.getElementById("send_mafia_button").disabled = false;
+        document.getElementById("send_civilians_button").disabled = true;
+    }
+    if (isNight === false) {
+        document.body.style.backgroundColor = "#FFFFFF";
+        document.getElementById("send_mafia_button").disabled = true;
+        document.getElementById("send_civilians_button").disabled = false;
+    }
+}
+
+//Метод для выбора роли при помощи кнопок.
+function chooseRole(id) {
+    if (id === "mafia_role_button") isMafia = true;
+    else if (id === "civilians_role_button") isMafia = false;
+    document.getElementById("mafia_role_button").disabled = true;
+    document.getElementById("civilians_role_button").disabled = true;
+    setRoleInterface(isMafia);
+}
+
+function startGame(){
 
 }
 

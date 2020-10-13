@@ -1,4 +1,4 @@
-#chatbox_civilians {
+#civilians_chat_box {
     position: relative;
     text-align:left;
     padding:10px;
@@ -8,7 +8,7 @@
     border:3px solid #ACD8F0;
     overflow:auto; }
 
-#chatbox_mafia {
+#mafia_chat_box {
     position: relative;
     text-align:left;
     padding:10px;
