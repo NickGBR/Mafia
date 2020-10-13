@@ -9,7 +9,7 @@ public class UserRegistrationException extends Exception {
         super();
     }
 
-    UserRegistrationException(String msg) {
+    public UserRegistrationException(String msg) {
         super(msg);
     }
 }

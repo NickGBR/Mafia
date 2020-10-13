@@ -14,10 +14,9 @@ public interface UserService {
     /**
      * Регистрирует нового пользователя в приложении
      * @param userDTO - информация о пользователе, полученная из интерфейса
-     * @return - вновь зарегестрированного пользователя
      * @throws UserRegistrationException - если при регистрации возникли проблемы
      */
-    User registerNewUser(UserDTO userDTO) throws UserRegistrationException;
+    void registerNewUser(UserDTO userDTO) throws UserRegistrationException;
 
     /**
      * Возвращает пользователя, авторизованного в данной сессии.
