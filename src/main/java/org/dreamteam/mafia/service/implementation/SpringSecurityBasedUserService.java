@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,14 +24,17 @@ import java.util.Optional;
  * для Spring Security. Отвечает за преобразование загруженной из репозитория сущности пользователя
  * в сущность ожидаему либо приложением, либо Spring Security.
  */
-@Service
+@Service("securityUserService")
 public class SpringSecurityBasedUserService implements UserService, UserDetailsService {
 
+
     UserRepository repository;
+    PasswordEncoder encoder;
 
     @Autowired
-    public SpringSecurityBasedUserService(UserRepository repository) {
+    public SpringSecurityBasedUserService(UserRepository repository, PasswordEncoder encoder) {
         this.repository = repository;
+        this.encoder = encoder;
     }
 
     @Override
@@ -40,7 +44,7 @@ public class SpringSecurityBasedUserService implements UserService, UserDetailsS
         }
         UserDAO user = new UserDAO();
         user.setLogin(userDTO.getLogin());
-        user.setPassword(userDTO.getPassword());
+        user.setPassword(encoder.encode(userDTO.getPassword()));
         try {
             repository.saveUser(user);
         } catch (Exception e) {

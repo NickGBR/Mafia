@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -29,6 +30,8 @@ public class SpringSecurityBasedUserServiceTest {
 
     @Mock
     UserRepository mockRepository;
+    @Mock
+    PasswordEncoder mockEncoder;
 
     UserDTO dtoNormal, dtoPasswordMismatch;
     UserDAO daoNormal;
@@ -36,6 +39,7 @@ public class SpringSecurityBasedUserServiceTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        Mockito.when(mockEncoder.encode(Mockito.anyString())).thenAnswer(i -> i.getArguments()[0]);
 
         daoNormal = new UserDAO();
         daoNormal.setLogin("a");
