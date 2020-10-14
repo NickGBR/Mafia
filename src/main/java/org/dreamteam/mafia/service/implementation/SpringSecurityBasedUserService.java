@@ -52,7 +52,17 @@ public class SpringSecurityBasedUserService implements UserService {
 
     @Override
     public SignedJsonWebToken loginUser(LoginDTO loginDTO) throws UserAuthenticationException {
-        return new SignedJsonWebToken("123");
+        UserDAO user = repository.getUserByLogin(loginDTO.getLogin());
+        if (user != null) {
+            if (!encoder.matches(loginDTO.getPassword(), user.getPassword())) {
+                throw new UserAuthenticationException(ResultCode.INCORRECT_PASSWORD,
+                                                      "Supplied password do not match login");
+            }
+            return new SignedJsonWebToken("123");
+        } else {
+            throw new UserAuthenticationException(ResultCode.USER_NOT_EXISTS,
+                                                  "User '" + loginDTO.getLogin() + "' not found in repository");
+        }
     }
 
     /*TODO Разобрать ситуацию, когда пользователь аутентифицирован,
