@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import java.util.List;
 import java.util.Optional;
 
 import static org.dreamteam.mafia.Application.emf;
@@ -35,12 +34,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> getCurrentUser(User currentUser) {
-        /*return userRepository.findById(currentUser.getUserId());*/
-        return null;
+
+        em.getTransaction().begin();
+        User user = em.find(User.class, currentUser.getUserId());
+        em.getTransaction().commit();
+
+        return Optional.of(user);
     }
 
     @Override
-    public Optional<User> findByLogin(UserDTO userDTO) {
+    public Optional<User> findUserByLogin(UserDTO userDTO) {
 
         em.getTransaction().begin();
 

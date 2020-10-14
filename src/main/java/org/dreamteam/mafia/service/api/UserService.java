@@ -27,6 +27,7 @@ public interface UserService {
      */
     Optional<User> getCurrentUser(User currentUser);
 
-    Optional<User> findByLogin(UserDTO userDTO);
+    Optional<User> findUserByLogin(UserDTO userDTO);
+
 
 }
