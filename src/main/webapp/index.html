@@ -15,20 +15,26 @@
 <p>
     <button id="connect" onclick="connect()">Установить подключение к серверу</button>
     <button id="disconnect" onclick="disconnect()" disabled>Сбросить подключение</button>
-    <input id="name_input" class="message_input" placeholder="Введите имя пользователя"/>
-    <button id="set_name" onclick="setName()" class="text">Установить имя</button>
 </p>
 <p>
-    <button id="mafia_role_button" onclick="chooseRole(this.id)">Играть за мафию</button>
-    <button id="civilians_role_button" onclick="chooseRole(this.id)">Играть за мирного</button>
-    <button id="start_game_button" onclick="startGame(this.id)">Играть за мирного</button>
+    <input id="name_input" class="message_input" placeholder="Введите имя пользователя"/>
+    <button id="set_name_button" onclick="setName()" class="text" disabled="disabled">Установить имя</button>
+</p>
+<p>
+    <input id="room_input" class="message_input" placeholder="Введите название комнаты"/>
+    <button id="set_room_button" onclick="setRoom()" class="text" disabled="disabled">Установть комнату</button>
+</p>
+<p>
+    <button id="civilians_role_button" onclick="chooseRole(this.id)" disabled="disabled">Играть за мирного</button>
+    <button id="mafia_role_button" onclick="chooseRole(this.id)" disabled="disabled">Играть за мафию</button>
 </p>
 
 <div class="tab">
     <button class="tablinks" id="civilians_chat_button" onclick="openCity(event, 'civilians_chat')"
             style="visibility:hidden">Мирные
     </button>
-    <button class="tablinks" id="mafia_chat_button" onclick="openCity(event, 'mafia_chat')" style="visibility:hidden">
+    <button class="tablinks" id="mafia_chat_button" onclick="openCity(event, 'mafia_chat')"
+            style="visibility: hidden">
         Мафия
     </button>
 </div>
@@ -37,8 +43,8 @@
 <div id="mafia_chat" class="tabcontent">
     <div id="mafia_chat_box"></div>
     <input id="message_input_mafia_value" class="message_input" placeholder="Введите сообщение..."/>
-    <button id="send_mafia_button" onclick="sendMessage('/app/mafia_message','message_input_mafia_value')" class="text"
-            disabled>Отправить сообщение
+    <button id="send_mafia_button" onclick="sendMessage('/app/mafia_message','message_input_mafia_value')" class="text">
+        Отправить сообщение
     </button>
     <script>
         document.getElementById("message_input_mafia_value")
@@ -55,8 +61,9 @@
 <div id="civilians_chat" class="tabcontent">
     <div id="civilians_chat_box"></div>
     <input id="message_input_civilians_value" class="message_input" placeholder="Введите сообщение..."/>
-    <button id="send_civilians_button" onclick="sendMessage('/app/civ_message','message_input_civilians_value')" class="text"
-            disabled>Отправить сообщение
+    <button id="send_civilians_button" onclick="sendMessage('/app/civ_message','message_input_civilians_value')"
+            class="text">
+        Отправить сообщение
     </button>
     <script>
         document.getElementById("message_input_civilians_value")

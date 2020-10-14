@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component;
         @Autowired
         private SimpMessagingTemplate template;
 
-        @Scheduled(fixedRate = 10000)
-        public void sendStat() {
-            System.out.println(i++);
-            game.setNight(!game.isNight());
-            this.template.convertAndSend("/chat/game_stat", game);
-        }
+//        @Scheduled(fixedRate = 10000)
+//        public void sendStat() {
+//            //System.out.println(i++);
+//            //game.setNight(!game.isNight());
+//            this.template.convertAndSend("/chat/game_stat", game);
+//        }
     }
 
