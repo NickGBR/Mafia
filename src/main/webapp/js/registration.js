@@ -1,4 +1,4 @@
-let token;
+
 
 function sendUserInformation() {
     const jsonData = {
@@ -21,7 +21,7 @@ function sendUserInformation() {
                 switch (parseInt(data["result"])) {
                     case 0: {
                         console.log("Successful registration and login. New token: " + data["token"]);
-                        token = data["token"];
+                        document.cookie = "token" + "=" + data["token"] + ";path=/";
                         break;
                     }
                     case 1: {

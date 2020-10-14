@@ -14,7 +14,7 @@ function tryToLogin() {
                 switch (parseInt(data["result"])) {
                     case 0: {
                         console.log("Success. New token: " + data["token"]);
-                        token = data["token"];
+                        document.cookie = "token" + "=" + data["token"] + ";path=/";
                         break;
                     }
                     case 3: {

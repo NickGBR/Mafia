@@ -1,43 +1,22 @@
-let token = "";
-
-function attemptLogin() {
-    const jsonData = {
-        'login': "my_login",
-        'password': "some_password"
-    };
-    let request = new XMLHttpRequest();
-    request.open("POST", "/api/user/login", true);
-    request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-    request.onreadystatechange = function () {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            if (request.status === 200) {
-                const data = JSON.parse(request.responseText);
-                console.log(data);
-                switch (parseInt(data["result"])) {
-                    case 0: {
-                        console.log("Success. New token: " + data["token"]);
-                        token = data["token"];
-                        break;
-                    }
-                    case 3: {
-                        console.log("Error: no such user");
-                        break;
-                    }
-                    case 4: {
-                        console.log("Error: wrong password");
-                        break;
-                    }
-                }
-            } else {
-                console.log("Error: " + request.status);
-            }
+function readCookie(name) {
+    let nameEQ = name + '=',
+        allCookies = document.cookie.split(';'),
+        i,
+        cookie;
+    for (i = 0; i < allCookies.length; i += 1) {
+        cookie = allCookies[i];
+        while (cookie.charAt(0) === ' ') {
+            cookie = cookie.substring(1, cookie.length);
         }
-    };
-    request.send(JSON.stringify(jsonData));
+        if (cookie.indexOf(nameEQ) === 0) {
+            return cookie.substring(nameEQ.length, cookie.length);
+        }
+    }
+    return null;
 }
 
-
 function getRooms() {
+    const token = readCookie("token");
     console.log("Current token: " + token);
     let request = new XMLHttpRequest();
     request.open("GET", "/api/room/getAvailable", true);

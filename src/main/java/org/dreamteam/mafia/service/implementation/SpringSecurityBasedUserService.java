@@ -8,6 +8,7 @@ import org.dreamteam.mafia.exceptions.UserRegistrationException;
 import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.UserRepository;
+import org.dreamteam.mafia.service.api.TokenService;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.util.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,16 @@ public class SpringSecurityBasedUserService implements UserService {
 
     UserRepository repository;
     PasswordEncoder encoder;
+    TokenService tokenService;
 
     @Autowired
-    public SpringSecurityBasedUserService(UserRepository repository, PasswordEncoder encoder) {
+    public SpringSecurityBasedUserService(
+            UserRepository repository,
+            PasswordEncoder encoder,
+            TokenService tokenService) {
         this.repository = repository;
         this.encoder = encoder;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -52,13 +58,14 @@ public class SpringSecurityBasedUserService implements UserService {
 
     @Override
     public SignedJsonWebToken loginUser(LoginDTO loginDTO) throws UserAuthenticationException {
-        UserDAO user = repository.getUserByLogin(loginDTO.getLogin());
-        if (user != null) {
-            if (!encoder.matches(loginDTO.getPassword(), user.getPassword())) {
+        UserDAO userDAO = repository.getUserByLogin(loginDTO.getLogin());
+        if (userDAO != null) {
+            if (!encoder.matches(loginDTO.getPassword(), userDAO.getPassword())) {
                 throw new UserAuthenticationException(ResultCode.INCORRECT_PASSWORD,
                                                       "Supplied password do not match login");
             }
-            return new SignedJsonWebToken("123");
+
+            return tokenService.getTokenFor(new User(userDAO));
         } else {
             throw new UserAuthenticationException(ResultCode.USER_NOT_EXISTS,
                                                   "User '" + loginDTO.getLogin() + "' not found in repository");
