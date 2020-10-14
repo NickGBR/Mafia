@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserDTO implements Serializable {
+public class RegistrationDTO implements Serializable {
 
     private String login;
     private String password;
@@ -21,11 +21,18 @@ public class UserDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "UserDTO{" +
+        return "RegistrationDTO{" +
                 "login='" + login + '\'' +
                 ", password='" + password + '\'' +
                 ", passwordConfirmation='" + passwordConfirmation + '\'' +
                 '}';
+    }
+
+    public LoginDTO getLoginData() {
+        LoginDTO loginDTO = new LoginDTO();
+        loginDTO.setLogin(this.login);
+        loginDTO.setPassword(this.password);
+        return loginDTO;
     }
 }
 

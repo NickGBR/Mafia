@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dreamteam.mafia.util.ResultCode;
 
 /**
  * Классс ответа на запрос регистрации. Сериализуется в JSON и отправляется клиенту
@@ -13,7 +12,8 @@ import org.dreamteam.mafia.util.ResultCode;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Response {
-    private ResultCode result;
+public class AuthenticationResponse {
+    private int result;
     private String answerMessage;
+    private String token;
 }

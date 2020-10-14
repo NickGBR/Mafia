@@ -1,7 +1,7 @@
 package org.dreamteam.mafia.service.implementation;
 
 import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dto.UserDTO;
+import org.dreamteam.mafia.dto.RegistrationDTO;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
 import org.dreamteam.mafia.model.SecurityUserDetails;
 import org.dreamteam.mafia.model.User;
@@ -17,8 +17,6 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -33,7 +31,7 @@ public class SpringSecurityBasedUserServiceTest {
     @Mock
     PasswordEncoder mockEncoder;
 
-    UserDTO dtoNormal, dtoPasswordMismatch;
+    RegistrationDTO dtoNormal, dtoPasswordMismatch;
     UserDAO daoNormal;
 
     @Before
@@ -45,12 +43,12 @@ public class SpringSecurityBasedUserServiceTest {
         daoNormal.setLogin("a");
         daoNormal.setPassword("b");
 
-        dtoNormal = new UserDTO();
+        dtoNormal = new RegistrationDTO();
         dtoNormal.setLogin("a");
         dtoNormal.setPassword("b");
         dtoNormal.setPasswordConfirmation("b");
 
-        dtoPasswordMismatch = new UserDTO();
+        dtoPasswordMismatch = new RegistrationDTO();
         dtoPasswordMismatch.setLogin("c");
         dtoPasswordMismatch.setPassword("d");
         dtoPasswordMismatch.setPasswordConfirmation("e");

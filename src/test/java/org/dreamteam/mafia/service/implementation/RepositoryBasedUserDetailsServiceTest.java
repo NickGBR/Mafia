@@ -1,8 +1,9 @@
 package org.dreamteam.mafia.service.implementation;
 
 import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dto.UserDTO;
+import org.dreamteam.mafia.dto.RegistrationDTO;
 import org.dreamteam.mafia.repository.api.UserRepository;
+import org.dreamteam.mafia.security.RepositoryBasedUserDetailsService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class RepositoryBasedUserDetailsServiceTest {
     @Mock
     UserRepository mockRepository;
 
-    UserDTO dtoNormal;
+    RegistrationDTO dtoNormal;
     UserDAO daoNormal;
 
     @Before
@@ -32,7 +33,7 @@ public class RepositoryBasedUserDetailsServiceTest {
         daoNormal.setLogin("a");
         daoNormal.setPassword("b");
 
-        dtoNormal = new UserDTO();
+        dtoNormal = new RegistrationDTO();
         dtoNormal.setLogin("a");
         dtoNormal.setPassword("b");
         dtoNormal.setPasswordConfirmation("b");

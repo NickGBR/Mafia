@@ -1,8 +1,11 @@
 package org.dreamteam.mafia.service.implementation;
 
 import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dto.UserDTO;
+import org.dreamteam.mafia.dto.LoginDTO;
+import org.dreamteam.mafia.dto.RegistrationDTO;
+import org.dreamteam.mafia.exceptions.UserAuthenticationException;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
+import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.UserService;
@@ -33,18 +36,23 @@ public class SpringSecurityBasedUserService implements UserService {
     }
 
     @Override
-    public void registerNewUser(UserDTO userDTO) throws UserRegistrationException {
-        if (!userDTO.getPassword().equals(userDTO.getPasswordConfirmation())) {
-            throw  new UserRegistrationException(ResultCode.PASSWORD_MISMATCH, "Password mismatch!");
+    public void registerNewUser(RegistrationDTO registrationDTO) throws UserRegistrationException {
+        if (!registrationDTO.getPassword().equals(registrationDTO.getPasswordConfirmation())) {
+            throw new UserRegistrationException(ResultCode.PASSWORD_MISMATCH, "Password mismatch!");
         }
         UserDAO user = new UserDAO();
-        user.setLogin(userDTO.getLogin());
-        user.setPassword(encoder.encode(userDTO.getPassword()));
+        user.setLogin(registrationDTO.getLogin());
+        user.setPassword(encoder.encode(registrationDTO.getPassword()));
         try {
             repository.saveUser(user);
         } catch (Exception e) {
             throw new UserRegistrationException(ResultCode.USER_ALREADY_EXISTS, "Login is already in the database");
         }
+    }
+
+    @Override
+    public SignedJsonWebToken loginUser(LoginDTO loginDTO) throws UserAuthenticationException {
+        return new SignedJsonWebToken("123");
     }
 
     /*TODO Разобрать ситуацию, когда пользователь аутентифицирован,
