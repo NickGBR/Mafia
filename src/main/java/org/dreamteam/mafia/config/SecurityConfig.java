@@ -21,8 +21,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final RequestMatcher SECURED_URLS = new OrRequestMatcher(
-            new AntPathRequestMatcher("/api/room"),
-            new AntPathRequestMatcher("/api/game"));
+            new AntPathRequestMatcher("/api/room/*"),
+            new AntPathRequestMatcher("/api/game/*"));
 
     @Bean
     public PasswordEncoder encoder() {
