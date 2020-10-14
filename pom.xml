@@ -7,11 +7,11 @@
     <groupId>org.dreamteam.mafia</groupId>
     <artifactId>mafia-online</artifactId>
     <version>0.1.0</version>
-    <packaging>pom</packaging>
+    <packaging>war</packaging>
 
-    <modules>
+<!--    <modules>
         <module>db</module>
-    </modules>
+    </modules>-->
 
     <name>Mafia Online</name>
     <!-- FIXME change it to the project's website -->

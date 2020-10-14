@@ -41,8 +41,4 @@ public class Room {
     @OneToMany(mappedBy = "room")
     private List<User> userList;
 
-    public Room(int roomId) {
-        this.roomId = roomId;
-    }
-
 }

@@ -34,13 +34,13 @@ public class Game {
     @OneToOne(mappedBy = "game")
     private Room room;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "game")
+    @OneToMany(mappedBy = "game")
     private List<Voting> votingList;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "game")
+    @OneToMany(mappedBy = "game")
     private List<Character> characterList;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "game")
+    @OneToMany(mappedBy = "game")
     private List<Message> messageList;
 
 }

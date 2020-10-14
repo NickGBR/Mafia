@@ -12,8 +12,10 @@ public class DBwrapper {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PU");
         EntityManager em = emf.createEntityManager();
 
-        em.getTransaction();
-        em.merge(new User());
+        User u = new User();
+
+        em.getTransaction().begin();
+        em.merge(u);
         em.getTransaction().commit();
 
     }

@@ -35,4 +35,6 @@ public class Message {
     @Column(name="addressee", nullable = false)
     private int addressee;
 
+
+
 }

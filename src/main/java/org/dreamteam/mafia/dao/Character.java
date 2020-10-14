@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,7 +24,7 @@ public class Character {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "game_id", nullable = false)
-    private Game gameId;
+    private Game game;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -35,5 +36,10 @@ public class Character {
 
     @Column(name = "status", nullable = false)
     private boolean status;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "vote_id", nullable = false)
+    private Voting voting;
+
 
 }
