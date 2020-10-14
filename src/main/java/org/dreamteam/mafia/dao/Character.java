@@ -11,7 +11,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
 @Entity
 @Table(name = "characters")
 
@@ -41,4 +40,9 @@ public class Character {
     @JoinColumn(name = "vote_id", nullable = false)
     private Voting voting;
 
+    @Override
+    public String toString() {
+        return "Character{#" + characterId +
+                '}';
+    }
 }

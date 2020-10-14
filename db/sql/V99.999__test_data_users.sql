@@ -1,3 +1,4 @@
+drop table users;
 insert into users (user_id, password_hash, login, room_id, statistics_id)
 values (1, 12345, 'user1', 1, 1),
        (2, 12346, 'user2', 1, 2),
@@ -7,5 +8,4 @@ values (1, 12345, 'user1', 1, 1),
        (6, 12360, 'user6', 2, 6),
        (7, 12361, 'user7', 3, 7),
        (8, 12362, 'user8', 3, 8),
-       (9, 12363, 'user9', 4, 9),
-       (10, 12364, 'user10', 5, 10);
+       (9, 12363, 'user9', 4, 9);

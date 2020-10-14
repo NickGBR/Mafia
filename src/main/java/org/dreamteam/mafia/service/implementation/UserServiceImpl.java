@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 import java.util.Optional;
 
 import static org.dreamteam.mafia.Application.emf;
@@ -21,7 +23,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @PersistenceContext
-    private final EntityManager entityManager = emf.createEntityManager();
+    private static final EntityManager em = emf.createEntityManager();
 
 
     @Override
@@ -39,7 +41,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findByLogin(UserDTO userDTO) {
-        return null;
+
+        em.getTransaction().begin();
+
+        try {
+            User user = (User) em.createQuery("select user from User user where user.login = ?1")
+                    .setParameter(1, userDTO.getLogin()).getSingleResult();
+            return Optional.of(user);
+        } catch (NoResultException e) {
+            System.out.println("User with login \'" + userDTO.getLogin() + "\' doesn't exist. Please try again in 2805.");
+        }
+
+        em.getTransaction().commit();
+
+        return Optional.empty();
     }
 
 }

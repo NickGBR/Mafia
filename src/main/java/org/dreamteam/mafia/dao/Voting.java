@@ -11,7 +11,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
 @Entity
 @Table(name = "votings")
 
@@ -35,4 +34,9 @@ public class Voting {
     @OneToMany(mappedBy = "voting")
     private List<Character> characterList;
 
+    @Override
+    public String toString() {
+        return "Voting{#" + voteId +
+                '}';
+    }
 }

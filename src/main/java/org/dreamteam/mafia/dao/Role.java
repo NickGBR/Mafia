@@ -3,14 +3,12 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
 @Entity
 @Table(name = "roles")
 
@@ -23,4 +21,10 @@ public class Role {
 
     @Column(name = "role", nullable = false)
     private String role;
+
+    @Override
+    public String toString() {
+        return "Role{" + role +
+                '}';
+    }
 }

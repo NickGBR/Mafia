@@ -10,8 +10,8 @@ import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @ToString
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 
@@ -39,4 +39,11 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Message> messageList;
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", login='" + login + '\'' +
+                '}';
+    }
 }

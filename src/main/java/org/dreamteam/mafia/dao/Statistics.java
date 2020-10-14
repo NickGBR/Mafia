@@ -10,7 +10,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
 @Entity
 @Table(name = "statistics")
 
@@ -41,4 +40,10 @@ public class Statistics {
 
     @OneToOne(mappedBy = "statistics")
     private User user;
+
+    @Override
+    public String toString() {
+        return "Statistics{#" + statisticsId +
+                '}';
+    }
 }

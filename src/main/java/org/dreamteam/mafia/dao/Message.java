@@ -10,7 +10,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
 @Entity
 @Table(name = "message")
 
@@ -35,4 +34,9 @@ public class Message {
     @Column(name="addressee", nullable = false)
     private int addressee;
 
+    @Override
+    public String toString() {
+        return "Message{" + text +
+                '}';
+    }
 }
