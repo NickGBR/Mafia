@@ -14,16 +14,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private static final RequestMatcher SECURED_URLS = new OrRequestMatcher(
+            new AntPathRequestMatcher("/api/room"),
+            new AntPathRequestMatcher("/api/game"));
+
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
-
 
     private final UserDetailsService userDetailsService;
 
@@ -49,14 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().requestMatchers(new NegatedRequestMatcher(
-                                               new OrRequestMatcher(
-                                                       new AntPathRequestMatcher("/secured/*"),
-                                                       new AntPathRequestMatcher("/login")))
-                /*new AntPathRequestMatcher("/register/*"),
-                new AntPathRequestMatcher("/register.html"),
-                new AntPathRequestMatcher("/js/*"),
-                new AntPathRequestMatcher("/css/*"))*/);
+    public void configure(WebSecurity web) {
+        web.ignoring().requestMatchers(
+                new NegatedRequestMatcher(SECURED_URLS));
     }
 }
