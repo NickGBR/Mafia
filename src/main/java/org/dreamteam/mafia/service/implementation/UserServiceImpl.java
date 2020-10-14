@@ -8,13 +8,21 @@ import org.dreamteam.mafia.service.api.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Optional;
+
+import static org.dreamteam.mafia.Application.emf;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @PersistenceContext
+    private final EntityManager entityManager = emf.createEntityManager();
+
 
     @Override
     public User registerNewUser(UserDTO userDTO) throws UserRegistrationException {

@@ -17,6 +17,7 @@ import javax.persistence.*;
 public class Statistics {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "statistics_id", unique = true, nullable = false)
     private int statisticsId;
 

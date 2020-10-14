@@ -41,5 +41,4 @@ public class Character {
     @JoinColumn(name = "vote_id", nullable = false)
     private Voting voting;
 
-
 }
