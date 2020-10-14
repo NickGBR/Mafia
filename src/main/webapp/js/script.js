@@ -123,12 +123,12 @@ function sendTimeMessage(isNight) {
 //Метод меняющий чат в зависимости от премени в игре.
 function setTimeInterface(isNight) {
     if (isNight === true) {
-        document.body.style.backgroundColor = "#03133C";
+        //document.body.style.backgroundColor = "#03133C";
         document.getElementById("send_mafia_button").disabled = false;
         document.getElementById("send_civilians_button").disabled = true;
     }
     if (isNight === false) {
-        document.body.style.backgroundColor = "#FFFFFF";
+        //document.body.style.backgroundColor = "#FFFFFF";
         document.getElementById("send_mafia_button").disabled = true;
         document.getElementById("send_civilians_button").disabled = false;
     }
