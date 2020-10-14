@@ -1,24 +1,32 @@
 package org.dreamteam.mafia.service.implementation;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.impl.compression.GzipCompressionCodec;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
 import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.service.api.TokenService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
-import static io.jsonwebtoken.impl.TextCodec.BASE64;
-
 @Service
 public class TimeLimitedTokenService implements TokenService {
 
     private final static long TIME_LIMIT_IN_HOURS = 24;
-    private static final GzipCompressionCodec COMPRESSION_CODEC = new GzipCompressionCodec();
+
+    private final SecretKey secretKey;
+
+    @Autowired
+    public TimeLimitedTokenService(SecretKey secretKey) {
+        this.secretKey = secretKey;
+    }
 
     @Override
     public SignedJsonWebToken getTokenFor(User user) {
@@ -32,17 +40,16 @@ public class TimeLimitedTokenService implements TokenService {
         return new SignedJsonWebToken(
                 Jwts.builder()
                         .setClaims(claims)
-                        .signWith(SignatureAlgorithm.HS256, BASE64.encode("abc"))
-                        .compressWith(COMPRESSION_CODEC)
+                        .signWith(secretKey)
                         .compact()
         );
     }
 
     @Override
     public Optional<String> extractUsernameFrom(SignedJsonWebToken token) {
-        final JwtParser parser = Jwts
-                .parser()
-                .setSigningKey(BASE64.encode("abc"));
+        final JwtParser parser = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build();
         try {
             Claims claims = parser.parseClaimsJws(token.getValue()).getBody();
             return Optional.ofNullable(claims.getSubject());
