@@ -29,6 +29,10 @@
     <button id="mafia_role_button" onclick="chooseRole(this.id)" disabled="disabled">Играть за мафию</button>
 </p>
 
+<p>
+    <button id="start_game_button" onclick="startGame('/app/host_message')" disabled="disabled">Начать игру!</button>
+</p>
+
 <div class="tab">
     <button class="tablinks" id="civilians_chat_button" onclick="openCity(event, 'civilians_chat')"
             style="visibility:hidden">Мирные
@@ -76,6 +80,5 @@
             });
     </script>
 </div>
-
 </body>
 </html>

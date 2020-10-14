@@ -1,10 +1,11 @@
 let civiliansChat = "civilians_chat_box"; // Хранит id HTML елемента отвечаючего за отображение сообщений в чате мирных жителей.
-let mafiaChat = "mafia_chat_box"; // Хранит id HTML елемента отвечаючего за отображение сообщений в чате мафии.
+let mafiaChat = "mafia_chat_box";         // Хранит id HTML елемента отвечаючего за отображение сообщений в чате мафии.
 let stompClient;
 let name;
 let isMafia = false;
 let isNight;
 let room;
+let isGameActive = false;
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -24,7 +25,6 @@ function connect() {
 // Будем вызвано после установления соединения
 function afterConnect(connection) {
     console.log("Успешное подключение: " + connection);
-    stompClient.subscribe("/chat/game_stat", getStat);
     // Теперь когда подключение установлено
     // Включаем кнопки для отправки сообщений и отключения от сервера
 
@@ -47,7 +47,7 @@ function getStat(response) {
     isNight = data.night;
     console.log(isNight);
     setTimeInterface(isNight);
-    sendTimeMessage(isNight)
+    sendTimeMessage(isNight);
 }
 
 function getMessage(response) {
@@ -62,10 +62,10 @@ function getMessage(response) {
 
 
 function addToChat(text, chat) {
-    const node = document.createElement("LI");  // Создаем элемент списка <li>
+    const node = document.createElement("LI");      // Создаем элемент списка <li>
     node.setAttribute("class", "message");
-    const textNode = document.createTextNode(text);  // Создаем текстовый элемент
-    node.appendChild(textNode); // Вставляем текстовый внутрь элемента списка
+    const textNode = document.createTextNode(text);         // Создаем текстовый элемент
+    node.appendChild(textNode);                             // Вставляем текстовый внутрь элемента списка
     document.getElementById(chat).appendChild(node);
 }
 
@@ -86,9 +86,9 @@ function sendMessage(chat, view) {
         // Это работает на JQuery
         // 'message': $("#message_input_value").val()
         // А это на чистом JavaScript
+        'room': room,                                    // Сервер должен знать в какую комнату переслать сообщение.
         'message': document.getElementById(view).value,
-        'from': name,
-        'room': room
+        'from': name
     });
     console.log(str);
     stompClient.send(chat, {}, str);
@@ -117,8 +117,7 @@ function setRoleInterface(isMafia) {
         document.getElementById("mafia_chat_button").style.visibility = "visible";
         document.getElementById("civilians_chat_button").style.visibility = "visible";
         document.getElementById("civilians_chat_button").click();
-    }
-    else {
+    } else {
         document.getElementById("civilians_chat_button").style.visibility = "visible";
         document.getElementById("civilians_chat_button").click();
     }
@@ -126,15 +125,15 @@ function setRoleInterface(isMafia) {
 
 //Метод выводящий сообщение в зависимости от времени в игре.
 function sendTimeMessage(isNight) {
-    // if (isNight === false) {
-    //     addToChat("День настал!", mafiaChat);
-    //     addToChat("День настал!", civiliansChat);
-    // }
-    // if (isNight === true) {
-    //     addToChat("Ночь настала!", mafiaChat);
-    //     addToChat("Ночь настала!", civiliansChat);
-    //
-    // }
+    if (isNight === false) {
+        addToChat("День настал!", mafiaChat);
+        addToChat("День настал!", civiliansChat);
+    }
+    if (isNight === true) {
+        addToChat("Ночь настала!", mafiaChat);
+        addToChat("Ночь настала!", civiliansChat);
+
+    }
 }
 
 //Метод меняющий чат в зависимости от премени в игре.
@@ -144,30 +143,42 @@ function setTimeInterface(isNight) {
         document.getElementById("send_mafia_button").disabled = false;
         document.getElementById("send_civilians_button").disabled = true;
     }
-    if (isNight === false) {
+    else if (isNight === false) {
         //document.body.style.backgroundColor = "#FFFFFF";
-        document.getElementById("send_mafia_button").disabled = false;
+        document.getElementById("send_mafia_button").disabled = true;
         document.getElementById("send_civilians_button").disabled = false;
     }
 }
 
 //Метод для выбора роли при помощи кнопок.
 function chooseRole(id) {
-    if (id === "mafia_role_button"){ isMafia = true;
+    if (id === "mafia_role_button") {
+        isMafia = true;
         stompClient.subscribe("/chat/civ_messages/" + room, getMessage);
         stompClient.subscribe("/chat/mafia_messages/" + room, getMessage)
-    }
-    else if (id === "civilians_role_button") {
+    } else if (id === "civilians_role_button") {
         isMafia = false;
         stompClient.subscribe("/chat/civ_messages/" + room, getMessage);
     }
+
+    document.getElementById("start_game_button").disabled = false;
     document.getElementById("mafia_role_button").disabled = true;
     document.getElementById("civilians_role_button").disabled = true;
     setRoleInterface(isMafia);
 }
 
-function startGame(){
+function startGame(chat) {
+    sendStartGameMessage(chat);
+    console.log(chat);
+    stompClient.subscribe("/chat/game_stat/" + room, getStat);
+    document.getElementById("start_game_button").disabled = true;
+}
 
+function sendStartGameMessage(chat) {
+    const str = JSON.stringify({
+        'room': room
+    })
+    stompClient.send(chat, {}, str);
 }
 
 function openCity(evt, cityName) {
@@ -190,4 +201,3 @@ function openCity(evt, cityName) {
     document.getElementById(cityName).style.display = "block";
     evt.currentTarget.className += " active";
 }
-

@@ -1,6 +1,5 @@
 function sendUserInformation(){
 
-
     const jsonData = {
         'login': document.getElementById("login_input").value,
         'password': document.getElementById("password_input").value,
