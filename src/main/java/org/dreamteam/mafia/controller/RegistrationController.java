@@ -23,10 +23,11 @@ public class RegistrationController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public Response register(UserDTO dto) {
+    public Response register(@RequestBody UserDTO dto) {
+        System.out.println(dto);
         try {
             userService.registerNewUser(dto);
-            return  new Response(ResultCode.SUCCESS, "Registration is successful");
+            return new Response(ResultCode.SUCCESS, "Registration is successful");
         } catch (UserRegistrationException e) {
             return new Response(e.getCode(), e.getLocalizedMessage());
         }
