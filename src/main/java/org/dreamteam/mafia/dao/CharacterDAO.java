@@ -3,10 +3,8 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Getter
 @Setter
@@ -14,7 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "characters")
 
-public class Character {
+public class CharacterDAO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,22 +21,22 @@ public class Character {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "game_id", nullable = false)
-    private Game game;
+    private GameDAO game;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
+    private UserDAO userId;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "roleId", nullable = false)
-    private Role roleId;
+    private RoleDAO roleId;
 
     @Column(name = "status", nullable = false)
     private boolean status;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "vote_id", nullable = false)
-    private Voting voting;
+    private VotingDAO voting;
 
     @Override
     public String toString() {

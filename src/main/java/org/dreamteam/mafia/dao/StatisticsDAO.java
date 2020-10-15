@@ -3,7 +3,6 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -13,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "statistics")
 
-public class Statistics {
+public class StatisticsDAO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +38,7 @@ public class Statistics {
     private int gamesWonAsCitizen;
 
     @OneToOne(mappedBy = "statistics")
-    private User user;
+    private UserDAO user;
 
     @Override
     public String toString() {
