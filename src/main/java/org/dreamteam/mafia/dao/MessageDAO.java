@@ -30,7 +30,7 @@ public class MessageDAO {
     @JoinColumn(name = "game_id", nullable = false)
     private GameDAO game;
 
-    @Column(name="addressee", nullable = false)
+    @Column(name = "addressee", nullable = false)
     private int addressee;
 
     @Override

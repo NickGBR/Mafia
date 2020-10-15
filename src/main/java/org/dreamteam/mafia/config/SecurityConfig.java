@@ -22,6 +22,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+/**
+ * Класс для настройки параметров Spring Security
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -38,11 +41,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.provider = provider;
     }
 
+    /**
+     * Настраивает менеджер аутентификации
+     *
+     * @param auth - менеджер аутентификации
+     */
     @Override
     protected void configure(final AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(provider);
     }
 
+    /**
+     * Настраивает параметры web-безопасности
+     *
+     * @param web - параметры web-безопасности
+     */
     @Override
     public void configure(WebSecurity web) {
         // Spring Security не распространяется на все URL, не попадающие в SECURED_URLS
@@ -50,6 +63,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 new NegatedRequestMatcher(SECURED_URLS));
     }
 
+    /**
+     * Настраивает параметры безопасноти HTTP
+     *
+     * @param http - параметры безопасноти HTTP
+     * @throws Exception - при ошибках настройки
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -76,17 +95,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout().disable();
     }
 
-    // Обработчик успешной аутентификации
+    /**
+     * Настраивае обработчик успешной аутентификации, отключает редирект
+     *
+     * @return - Обработчик успешной аутентификации
+     */
     @Bean
     SimpleUrlAuthenticationSuccessHandler successHandler() {
         final SimpleUrlAuthenticationSuccessHandler successHandler = new SimpleUrlAuthenticationSuccessHandler();
-        // Отключаем redirect
-        successHandler.setRedirectStrategy((httpServletRequest, httpServletResponse, s) -> {
+        successHandler.setRedirectStrategy((
+                                                   httpServletRequest,
+                                                   httpServletResponse, s) -> {
         });
         return successHandler;
     }
 
-    // Фильтр для включения в цепочку аутентификации
+    /**
+     * Настраивает и возвращает фильтр аутентификации по токенам
+     *
+     * @return - настроенный фильтр для включения в цепочку аутентификации
+     * @throws Exception - при ошибках в натройке фильтра
+     */
     @Bean
     TokenAuthenticationFilter restAuthenticationFilter() throws Exception {
         final TokenAuthenticationFilter filter = new TokenAuthenticationFilter(SECURED_URLS);
@@ -95,7 +124,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return filter;
     }
 
-    // Обработчик проваленной аутентификации
+    /**
+     * Возвращает обработчик проваленной аутентификации в виде страниы 403
+     *
+     * @return - Обработчик проваленной аутентификации
+     */
     @Bean
     AuthenticationEntryPoint forbiddenEntryPoint() {
         return new HttpStatusEntryPoint(FORBIDDEN);

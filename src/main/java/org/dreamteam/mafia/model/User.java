@@ -16,6 +16,4 @@ public class User {
     public User(UserDAO dao) {
         login = dao.getLogin();
     }
-
-
 }

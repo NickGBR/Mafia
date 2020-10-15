@@ -10,10 +10,9 @@ public interface MessageService {
 
     /**
      * Отправляет сообщение от указанного пользователя. Адресаты определяются автоматически.
-     * @param user - отправитель ообщения
+     *
+     * @param user       - отправитель ообщения
      * @param messageDTO - сообщение, полученное от интерфейса
      */
     void sendMessage(User user, MessageDTO messageDTO);
-
-
 }

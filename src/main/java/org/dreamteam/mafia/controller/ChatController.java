@@ -7,11 +7,20 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
+/**
+ * Контроллер для чата
+ */
 @Controller
 public class ChatController {
 
-    Logger logger = LoggerFactory.getLogger(ChatController.class);
+    private final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
+    /**
+     * Обрабатывает входящие сообщения
+     *
+     * @param message - входящеесообщение
+     * @return - рассылаемое сообщение
+     */
     @MessageMapping("/message")
     @SendTo("/chat/messages")
     public Message getMessages(Message message) {

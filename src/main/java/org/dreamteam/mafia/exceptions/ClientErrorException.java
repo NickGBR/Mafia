@@ -2,8 +2,12 @@ package org.dreamteam.mafia.exceptions;
 
 import org.dreamteam.mafia.util.ClientErrorCode;
 
+/**
+ * Класс родительского исключения для ошибок вызванных неверным запросом со стороны клиента
+ * Содержит внутренний код ошибки.
+ */
 public class ClientErrorException extends Exception {
-    ClientErrorCode code;
+    private final ClientErrorCode code;
 
     public ClientErrorException(String message, ClientErrorCode code) {
         super(message);

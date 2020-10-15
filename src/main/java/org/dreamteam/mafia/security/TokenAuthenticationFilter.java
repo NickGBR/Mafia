@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 public final class TokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private static final String BEARER = "Bearer";
-    Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
+    private final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
 
     public TokenAuthenticationFilter(final RequestMatcher requiresAuth) {
         super(requiresAuth);

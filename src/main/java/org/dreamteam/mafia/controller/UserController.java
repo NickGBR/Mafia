@@ -14,18 +14,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Контроллер для регистрации и входа в систему пользователей
+ */
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
 
-    Logger logger = LoggerFactory.getLogger(UserController.class);
-    UserService userService;
+    private final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
+    /**
+     * Обрабатывает запросы на регистрацию
+     *
+     * @param dto - запрос на регистрацию
+     * @return - JWT вновь зарегистрированного пользователя
+     * @throws UserRegistrationException   - при ошибках регистрации
+     * @throws UserAuthenticationException - при ошибках авторизации вновь зарегестрированного пользователя
+     */
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String register(
             @RequestBody RegistrationDTO dto) throws UserRegistrationException, UserAuthenticationException {
@@ -35,6 +46,13 @@ public class UserController {
         return jws.getValue();
     }
 
+    /**
+     * Обрабатывает запросы на вход в систему
+     *
+     * @param dto - запрос на вход в систему
+     * @return - JWT пользователя
+     * @throws UserAuthenticationException- при ошибках авторизации
+     */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(@RequestBody LoginDTO dto) throws UserAuthenticationException {
         logger.debug("Incoming login request. DTO: " + dto);

@@ -7,9 +7,8 @@ import lombok.Setter;
 import java.io.Serializable;
 
 /**
- * Пользователь, восстановленый из JSON, пришедшего со стороны клиента
+ * JSON запрос на регистрацию нового пользователя
  */
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,6 +27,11 @@ public class RegistrationDTO implements Serializable {
                 '}';
     }
 
+    /**
+     * Извлекает из данных для регистрации подмножество данных для логина
+     *
+     * @return - данные для логина
+     */
     public LoginDTO getLoginData() {
         LoginDTO loginDTO = new LoginDTO();
         loginDTO.setLogin(this.login);

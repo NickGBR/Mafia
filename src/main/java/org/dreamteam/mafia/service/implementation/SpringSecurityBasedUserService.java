@@ -22,15 +22,14 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Реализация интерфейса сервиса данных пользователей, работающая со Spring Security и репозиторием
+ * Реализация интерфейса сервиса данных пользователей, работающая со Spring Security
  */
 @Service("securityUserService")
 public class SpringSecurityBasedUserService implements UserService {
 
-
-    CrudUserRepository repository;
-    PasswordEncoder encoder;
-    TokenService tokenService;
+    private final CrudUserRepository repository;
+    private final PasswordEncoder encoder;
+    private final TokenService tokenService;
 
     @Autowired
     public SpringSecurityBasedUserService(
@@ -90,5 +89,4 @@ public class SpringSecurityBasedUserService implements UserService {
         }
         return Optional.empty();
     }
-
 }

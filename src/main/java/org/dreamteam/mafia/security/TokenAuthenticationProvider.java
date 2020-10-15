@@ -18,12 +18,17 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Класс обеспечивающий аутентификацию пользователя по токену.
+ * Обращается к сервису токенов для получения из токена имени пользователя,
+ * а затем пытается найти такового в базе.
+ */
 @Component
 public final class TokenAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
-    Logger logger = LoggerFactory.getLogger(TokenAuthenticationProvider.class);
-    TokenService tokenService;
-    CrudUserRepository repository;
+    private final Logger logger = LoggerFactory.getLogger(TokenAuthenticationProvider.class);
+    private final TokenService tokenService;
+    private final CrudUserRepository repository;
 
     @Autowired
     public TokenAuthenticationProvider(TokenService tokenService, CrudUserRepository repository) {
@@ -52,6 +57,5 @@ public final class TokenAuthenticationProvider extends AbstractUserDetailsAuthen
             }
         }
         throw new UsernameNotFoundException("Cannot find user with authentication token=" + token);
-
     }
 }

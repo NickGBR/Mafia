@@ -17,8 +17,7 @@ import org.springframework.stereotype.Service;
 public class RepositoryBasedUserDetailsService
         implements UserDetailsService {
 
-
-    UserRepository repository;
+    private final UserRepository repository;
 
     @Autowired
     public RepositoryBasedUserDetailsService(UserRepository repository) {
@@ -31,7 +30,7 @@ public class RepositoryBasedUserDetailsService
         if (user != null) {
             return new SecurityUserDetails(user);
         } else {
-            throw  new UsernameNotFoundException("User '" + userName + "' not found in repository");
+            throw new UsernameNotFoundException("User '" + userName + "' not found in repository");
         }
     }
 }
