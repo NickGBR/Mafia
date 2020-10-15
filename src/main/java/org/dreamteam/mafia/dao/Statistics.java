@@ -3,7 +3,6 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -39,7 +38,7 @@ public class Statistics {
     private int gamesWonAsCitizen;
 
     @OneToOne(mappedBy = "statistics")
-    private User user;
+    private UserDAO user;
 
     @Override
     public String toString() {

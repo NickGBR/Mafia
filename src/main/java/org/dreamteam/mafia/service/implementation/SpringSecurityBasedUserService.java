@@ -7,6 +7,7 @@ import org.dreamteam.mafia.exceptions.UserAuthenticationException;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
 import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.repository.api.CrudUserRepository;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.TokenService;
 import org.dreamteam.mafia.service.api.UserService;
@@ -18,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -27,13 +29,13 @@ import java.util.Optional;
 public class SpringSecurityBasedUserService implements UserService {
 
 
-    UserRepository repository;
+    CrudUserRepository repository;
     PasswordEncoder encoder;
     TokenService tokenService;
 
     @Autowired
     public SpringSecurityBasedUserService(
-            UserRepository repository,
+            CrudUserRepository repository,
             PasswordEncoder encoder,
             TokenService tokenService) {
         this.repository = repository;
@@ -48,19 +50,20 @@ public class SpringSecurityBasedUserService implements UserService {
         }
         UserDAO user = new UserDAO();
         user.setLogin(registrationDTO.getLogin());
-        user.setPassword(encoder.encode(registrationDTO.getPassword()));
+        user.setPasswordHash(encoder.encode(registrationDTO.getPassword()));
         try {
-            repository.saveUser(user);
-        } catch (Exception e) {
+            repository.save(user);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
             throw new UserRegistrationException(ResultCode.USER_ALREADY_EXISTS, "Login is already in the database");
         }
     }
 
     @Override
     public SignedJsonWebToken loginUser(LoginDTO loginDTO) throws UserAuthenticationException {
-        UserDAO userDAO = repository.getUserByLogin(loginDTO.getLogin());
-        if (userDAO != null) {
-            if (!encoder.matches(loginDTO.getPassword(), userDAO.getPassword())) {
+        List<UserDAO> userDAOS = repository.findByLogin(loginDTO.getLogin());
+        if (userDAOS.size() > 0) {
+            UserDAO userDAO = userDAOS.get(0);
+            if (!encoder.matches(loginDTO.getPassword(), userDAO.getPasswordHash())) {
                 throw new UserAuthenticationException(ResultCode.INCORRECT_PASSWORD,
                                                       "Supplied password do not match login");
             }
@@ -81,9 +84,9 @@ public class SpringSecurityBasedUserService implements UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
             String currentUserName = authentication.getName();
-            UserDAO user = repository.getUserByLogin(currentUserName);
-            if (user != null) {
-                return Optional.of(new User(user));
+            List<UserDAO> userDAOS = repository.findByLogin(currentUserName);
+            if (userDAOS.size() > 0) {
+                return Optional.of(new User(userDAOS.get(0)));
             }
         }
         return Optional.empty();

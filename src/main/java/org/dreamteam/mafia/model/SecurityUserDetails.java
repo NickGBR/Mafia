@@ -15,7 +15,7 @@ public class SecurityUserDetails implements UserDetails {
 
     public SecurityUserDetails(UserDAO dao) {
         this.login = dao.getLogin();
-        this.password = dao.getPassword();
+        this.password = dao.getPasswordHash();
     }
 
 

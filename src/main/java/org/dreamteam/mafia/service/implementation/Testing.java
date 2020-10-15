@@ -1,16 +1,17 @@
 package org.dreamteam.mafia.service.implementation;
 
-import org.dreamteam.mafia.dao.User;
+import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.repository.api.CrudUserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 
-import java.util.List;
-
+// @SpringBootApplication
 @SpringBootApplication(exclude={DataSourceAutoConfiguration.class})
+@ComponentScan("org.dreamteam.mafia")
 public class Testing {
 
 
@@ -21,13 +22,17 @@ public class Testing {
     @Bean
     public CommandLineRunner demo(CrudUserRepository repository) {
         return (args) -> {
-            User user3 = repository.findByLogin("user3").get(0);
+            UserDAO user3 = repository.findByLogin("Poly").get(0);
             System.out.println(user3);
-            repository.save(new User("123456789", "Poly"));
+            Iterable<UserDAO> usersInDb = repository.findAll();
+
+            repository.save(new UserDAO("123456789", "Poly2"));
             // save a few customers
           //  repository.save(new User(123, "Dessler"));
 
         };
+
+
     }
 
 }

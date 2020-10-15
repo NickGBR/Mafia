@@ -8,7 +8,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import javax.sql.DataSource;
 
 @Configuration
-@EnableJpaRepositories("org.dreamteam.mafia.repository")
+@EnableJpaRepositories("org.dreamteam.mafia.repository.api")
 public class DBConfig {
     @Bean
     public DataSource dataSource() {

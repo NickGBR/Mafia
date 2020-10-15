@@ -31,7 +31,7 @@ public class RepositoryBasedUserDetailsServiceTest {
 
         daoNormal = new UserDAO();
         daoNormal.setLogin("a");
-        daoNormal.setPassword("b");
+        daoNormal.setPasswordHash("b");
 
         dtoNormal = new RegistrationDTO();
         dtoNormal.setLogin("a");
