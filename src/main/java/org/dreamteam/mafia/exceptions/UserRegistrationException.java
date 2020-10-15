@@ -1,19 +1,19 @@
 package org.dreamteam.mafia.exceptions;
 
 import lombok.Getter;
-import org.dreamteam.mafia.util.ResultCode;
+import org.dreamteam.mafia.util.ClientErrorCode;
 
 /**
  * Исключение, выбрасываемое при ошибках в процессе регистрации пользователя
  */
 @Getter
-public class UserRegistrationException extends ExceptionWithCode {
+public class UserRegistrationException extends ClientErrorException {
 
-    public UserRegistrationException(ResultCode code) {
+    public UserRegistrationException(ClientErrorCode code) {
         super(code);
     }
 
-    public UserRegistrationException(ResultCode code, String msg) {
+    public UserRegistrationException(ClientErrorCode code, String msg) {
         super(msg, code);
     }
 }

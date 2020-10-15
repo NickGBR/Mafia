@@ -28,6 +28,20 @@ function getRooms() {
                 console.log(request.responseText);
             } else if (request.status === 401) {
                 console.log("Non authorised!");
+            } else if (request.status === 500) {
+                const data = JSON.parse(request.responseText);
+                switch (parseInt(data["result"])) {
+                    case 1: {
+                        console.log("Error: Internal logic error");
+                        break;
+                    }
+                    case 2: {
+                        console.log("Error: Database error");
+                        break;
+                    }
+                }
+            } else {
+                console.log("Error: " + request.status);
             }
         }
     };

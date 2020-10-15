@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * Классс ответа на запрос регистрации. Сериализуется в JSON и отправляется клиенту
  */
@@ -12,8 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationResponse {
+public class ErrorResponse implements Serializable {
     private int result;
     private String answerMessage;
-    private String token;
 }

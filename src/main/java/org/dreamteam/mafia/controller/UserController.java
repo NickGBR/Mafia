@@ -1,13 +1,11 @@
 package org.dreamteam.mafia.controller;
 
-import org.dreamteam.mafia.dto.AuthenticationResponse;
 import org.dreamteam.mafia.dto.LoginDTO;
 import org.dreamteam.mafia.dto.RegistrationDTO;
 import org.dreamteam.mafia.exceptions.UserAuthenticationException;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
 import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.service.api.UserService;
-import org.dreamteam.mafia.util.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,26 +24,18 @@ public class UserController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public AuthenticationResponse register(@RequestBody RegistrationDTO dto) {
+    public String register(
+            @RequestBody RegistrationDTO dto) throws UserRegistrationException, UserAuthenticationException {
         System.out.println(dto);
-        try {
-            userService.registerNewUser(dto);
-            SignedJsonWebToken jws = userService.loginUser(dto.getLoginData());
-            return new AuthenticationResponse(ResultCode.SUCCESS.getValue(), "Registration is successful",
-                                              jws.getValue());
-        } catch (UserRegistrationException | UserAuthenticationException e) {
-            return new AuthenticationResponse(e.getCode().getValue(), e.getLocalizedMessage(), "");
-        }
+        userService.registerNewUser(dto);
+        SignedJsonWebToken jws = userService.loginUser(dto.getLoginData());
+        return jws.getValue();
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public AuthenticationResponse login(@RequestBody LoginDTO dto) {
+    public String login(@RequestBody LoginDTO dto) throws UserAuthenticationException {
         System.out.println(dto);
-        try {
-            SignedJsonWebToken jws = userService.loginUser(dto);
-            return new AuthenticationResponse(ResultCode.SUCCESS.getValue(), "Login is successful", jws.getValue());
-        } catch (UserAuthenticationException e) {
-            return new AuthenticationResponse(e.getCode().getValue(), e.getLocalizedMessage(), "");
-        }
+        SignedJsonWebToken jws = userService.loginUser(dto);
+        return jws.getValue();
     }
 }
