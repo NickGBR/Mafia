@@ -1,8 +1,11 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.dto.UserDTO;
+import org.dreamteam.mafia.dto.LoginDTO;
+import org.dreamteam.mafia.dto.RegistrationDTO;
+import org.dreamteam.mafia.exceptions.UserAuthenticationException;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
-import org.dreamteam.mafia.dao.User;
+import org.dreamteam.mafia.model.SignedJsonWebToken;
+import org.dreamteam.mafia.model.User;
 
 import java.util.Optional;
 
@@ -13,21 +16,27 @@ public interface UserService {
 
     /**
      * Регистрирует нового пользователя в приложении
-     * @param userDTO - информация о пользователе, полученная из интерфейса
-     * @return - вновь зарегестрированного пользователя
+     *
+     * @param registrationDTO - информация о пользователе, полученная из интерфейса
      * @throws UserRegistrationException - если при регистрации возникли проблемы
      */
-    User registerNewUser(UserDTO userDTO) throws UserRegistrationException;
+    void registerNewUser(RegistrationDTO registrationDTO) throws UserRegistrationException;
+
+    /**
+     * Вход существующего пользователя в приложение
+     *
+     * @param loginDTO - информация о пользователе, полученная из интерфейса
+     * @return - JWS (подписанный JWT), соответствующий пользователю
+     * @throws UserAuthenticationException - если при входе возникли проблемы
+     */
+    SignedJsonWebToken loginUser(LoginDTO loginDTO) throws UserAuthenticationException;
 
     /**
      * Возвращает пользователя, авторизованного в данной сессии.
      * Сама авторизация выполняется до передачи управления в контроллеры за счет интерсепторов Spring Security
+     *
      * @return - авторизованного в настоящий момент пользователя или null, если пользователь еще не авторизован,
      * например, при вызове этого метода из контроллера, отвечающего за регистрацию пользователя
      */
-    Optional<User> getCurrentUser(User currentUser);
-
-    Optional<User> findUserByLogin(UserDTO userDTO);
-
-
+    Optional<User> getCurrentUser();
 }

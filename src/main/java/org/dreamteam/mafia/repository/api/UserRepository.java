@@ -1,12 +1,11 @@
 package org.dreamteam.mafia.repository.api;
 
-import org.dreamteam.mafia.dao.User;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.model.User;
 
-@Repository
+public interface UserRepository {
 
-public interface UserRepository extends CrudRepository<User, Long> {
-
+    void saveUser(UserDAO user) throws Exception;
+    UserDAO getUserByLogin(String login);
 
 }
