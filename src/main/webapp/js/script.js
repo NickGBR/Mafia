@@ -101,7 +101,7 @@ function sendHostMessage(chat, view) {
         "message": {
             'message': document.getElementById(view).value,
             'role': "HOST",
-            'from' : "HOST"
+            'from' : "Host"
         }
     });
     console.log(str);

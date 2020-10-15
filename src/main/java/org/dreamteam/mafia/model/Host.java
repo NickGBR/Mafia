@@ -6,10 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Host implements Runnable{
+
     private final String room;
-    private final SimpMessagingTemplate messagingTemplate;
-    Game game;
-    Map<String, Message> hostMessages;
+    private final SimpMessagingTemplate messagingTemplate; // Используется для отправки сообщений клиенту
+
+    private final Game game;
+    private final Map<String, Message> hostMessages;
+
     public Host(String room, SimpMessagingTemplate messagingTemplate, Map<String, Message> hostMessages) {
         this.hostMessages = hostMessages;
         this.room = room;
@@ -23,9 +26,11 @@ public class Host implements Runnable{
     public void run() {
         System.out.println(hostMessages.size());
 
-        // Проверяем наличие сообщение от HOST в базе, отправляем его при наличии.
+        // Проверяем наличие сообщение от HOST в "hostMessages - бд", отправляем его при наличии.
         if(hostMessages.containsKey(room)){
             messagingTemplate.convertAndSend("/chat/civ_messages/" + room, hostMessages.get(game.getRoom()));
+
+            //Удаляем сообщение из бд.
             hostMessages.remove(room);
         }
         game.setNight(!game.isNight());

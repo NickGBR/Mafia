@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Controller;
 
+import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class ChatController {
     //Хранит выполняемые задачи
     Map<String, ScheduledFuture<?>> tasks = new HashMap<>();
 
+
     @MessageMapping("/civ_message")
     //@SendTo("/chat/civ_messages") //Можем использовать как комнату по умолчанию
     public void getCiviliansMessages(Message message) {
@@ -42,15 +44,18 @@ public class ChatController {
         messagingTemplate.convertAndSend("/chat/civ_messages/" + message.getRoom(), message);
     }
 
-
     @MessageMapping("/mafia_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getMafiaMessages(Message message) {
-
         message.setRole(Message.Role.MAFIA);
         messagingTemplate.convertAndSend("/chat/mafia_messages/" + message.getRoom(), message);
     }
 
+
+    /**
+     * Данные метод принимает Json объект отправленный на "/host_message".
+     * @param game полученный Json преобразуется в объект Game.
+     */
     @MessageMapping("/host_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getHostMessages(Game game) {
@@ -67,14 +72,22 @@ public class ChatController {
             rooms.add(game.getRoom());
             Host host = new Host(game.getRoom(), messagingTemplate, hostMessages);
 
-            // Создаем нового ведущего для игры, и добавляем его в список храниящий всех ведущих рабочих на сервере.
+            // Создаем нового ведущего для игры, и добавляем его в список храниящий всех ведущих работающих на сервере.
             ScheduledFuture<?> future = taskScheduler.scheduleWithFixedDelay(host, 10000);
             tasks.put(game.getRoom(), future);
         }
 
         // Проверяем была ли игра остановлена.
-        if(game.isInterrupted()){
+        if(game.isInterrupted()) {
+            stopGame(game);
+        }
+    }
 
+    /**
+     * Метод для остановки игры.
+     * @param game сессия игры которую необходимо остановить.
+     */
+    private void stopGame(Game game) {
             // Если игра остановлена то останавливаем текущую задачу, удаляем задачу из списка задач.
             tasks.get(game.getRoom()).cancel(true);
             tasks.remove(game.getRoom());
@@ -89,6 +102,5 @@ public class ChatController {
 
             // Отправляем сообщение в чат об остановке игры.
             messagingTemplate.convertAndSend("/chat/civ_messages/" + game.getRoom(), message);
-        }
     }
 }
