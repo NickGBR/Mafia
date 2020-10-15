@@ -59,7 +59,7 @@ function getMessage(response) {
     if (data.role === "MAFIA") addToChat(data.from + ": " + data.message, mafiaChat);
     else if (data.role === "CIVILIAN")
         addToChat(data.from + ": " + data.message, civiliansChat);
-    else if(data.role === "HOST") addToChat(data.from + ": " + data.message, civiliansChat);
+    else if (data.role === "HOST") addToChat(data.from + ": " + data.message, civiliansChat);
 }
 
 
@@ -98,8 +98,11 @@ function sendHostMessage(chat, view) {
         // 'message': $("#message_input_value").val()
         // А это на чистом JavaScript
         'room': room,                                    // Сервер должен знать в какую комнату переслать сообщение.
-        'message': document.getElementById(view).value,
-        'from': "host"
+        "message": {
+            'message': document.getElementById(view).value,
+            'role': "HOST",
+            'from' : "HOST"
+        }
     });
     console.log(str);
     stompClient.send(chat, {}, str);
@@ -187,21 +190,21 @@ function startGame(chat) {
 
 function sendStartGameMessage(chat) {
     const str = JSON.stringify({
-        'room': room
+        'room': room,
     });
     stompClient.send(chat, {}, str);
 }
 
-function stopGame(chat){
+function stopGame(chat) {
     sendStopGameMessage(chat);
     document.getElementById("start_game_button").disabled = false;
     document.getElementById("stop_game_button").disabled = true;
 }
 
-function sendStopGameMessage(chat){
+function sendStopGameMessage(chat) {
     const str = JSON.stringify({
         'interrupted': true,
-        'room':room
+        'room': room
     });
     stompClient.send(chat, {}, str);
 }

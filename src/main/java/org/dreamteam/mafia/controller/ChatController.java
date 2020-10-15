@@ -54,12 +54,18 @@ public class ChatController {
     @MessageMapping("/host_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getHostMessages(Game game) {
+
+        //Добавляем сообщение для вывода.
+        if(game.getMessage()!=null){
+            hostMessages.put(game.getRoom(),game.getMessage());
+        }
+
         // Проверяем наличие команты в игре.
         if (!rooms.contains(game.getRoom())) {
 
             // Если комната новая, то добавляем ее в список существующих комнат.
             rooms.add(game.getRoom());
-            Host host = new Host(game.getRoom(), messagingTemplate);
+            Host host = new Host(game.getRoom(), messagingTemplate, hostMessages);
 
             // Создаем нового ведущего для игры, и добавляем его в список храниящий всех ведущих рабочих на сервере.
             ScheduledFuture<?> future = taskScheduler.scheduleWithFixedDelay(host, 10000);
