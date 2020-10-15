@@ -40,7 +40,7 @@ public class UserDAO {
     @OneToMany(mappedBy = "user")
     private List<MessageDAO> messageList;
 
-    public UserDAO(String passwordHash, String login) {
+    public UserDAO(String login, String passwordHash) {
         this.passwordHash = passwordHash;
         this.login = login;
     }
