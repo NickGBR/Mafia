@@ -4,6 +4,9 @@ pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 .idea
+Mafia.iml
+mafia-online.iml
+/db/db.iml
 release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
