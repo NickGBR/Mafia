@@ -19,7 +19,8 @@ function connect() {
     stompClient.connect({}, afterConnect, onError);
     // Отключаем кнопку подключения, чтобы пользователь не
     // начинал несколько попыток подключения за раз
-    document.getElementById("connect").disabled = true;
+    document.getElementById("connect_button").disabled = true;
+
 }
 
 // Будем вызвано после установления соединения
@@ -29,7 +30,7 @@ function afterConnect(connection) {
     // Включаем кнопки для отправки сообщений и отключения от сервера
 
     document.getElementById("set_name_button").disabled = false;
-    document.getElementById("disconnect").disabled = false;
+    document.getElementById("disconnect_button").disabled = false;
 
 }
 
@@ -38,7 +39,7 @@ function onError(error) {
     console.log("Не удалось установить подключение: " + error);
     // Включаем кнопку подключения обратно.
     // Вдруг в следующий раз подключиться получиться
-    document.getElementById("connect").disabled = false;
+    setErrorDisconnectInterface()
 }
 
 //Получает информацию об игре с сервера.
@@ -52,12 +53,13 @@ function getStat(response) {
 
 function getMessage(response) {
     const data = JSON.parse(response.body);
-    console.log("Получено сообщение: " + data.message);
+    console.log("Получено сообщение: " + data.message)
     console.log("Название чата: " + data.role);
     console.log("From = " + data.from)
-    if (data.role === "MAFIA") addToChat(data.from + " " + data.message, mafiaChat);
+    if (data.role === "MAFIA") addToChat(data.from + ": " + data.message, mafiaChat);
     else if (data.role === "CIVILIAN")
-        addToChat(data.from + " " + data.message, civiliansChat);
+        addToChat(data.from + ": " + data.message, civiliansChat);
+    else if(data.role === "HOST") addToChat(data.from + ": " + data.message, civiliansChat);
 }
 
 
@@ -72,11 +74,7 @@ function addToChat(text, chat) {
 function disconnect() {
     stompClient.disconnect();
     // Отключаем кнопки отправки\отключения и включаем кнопку подключения
-    document.getElementById("connect").disabled = false;
-    document.getElementById("send_civilians_button").disabled = true;
-    document.getElementById("send_mafia_button").disabled = true;
-    document.getElementById("disconnect").disabled = true;
-    // document.getElementById()
+    setErrorDisconnectInterface();
 }
 
 // chat - HTML эллимент для отправки сообщения.
@@ -89,6 +87,19 @@ function sendMessage(chat, view) {
         'room': room,                                    // Сервер должен знать в какую комнату переслать сообщение.
         'message': document.getElementById(view).value,
         'from': name
+    });
+    console.log(str);
+    stompClient.send(chat, {}, str);
+}
+
+function sendHostMessage(chat, view) {
+    const str = JSON.stringify({
+        // Это работает на JQuery
+        // 'message': $("#message_input_value").val()
+        // А это на чистом JavaScript
+        'room': room,                                    // Сервер должен знать в какую комнату переслать сообщение.
+        'message': document.getElementById(view).value,
+        'from': "host"
     });
     console.log(str);
     stompClient.send(chat, {}, str);
@@ -142,8 +153,7 @@ function setTimeInterface(isNight) {
         //document.body.style.backgroundColor = "#03133C";
         document.getElementById("send_mafia_button").disabled = false;
         document.getElementById("send_civilians_button").disabled = true;
-    }
-    else if (isNight === false) {
+    } else if (isNight === false) {
         //document.body.style.backgroundColor = "#FFFFFF";
         document.getElementById("send_mafia_button").disabled = true;
         document.getElementById("send_civilians_button").disabled = false;
@@ -169,16 +179,46 @@ function chooseRole(id) {
 
 function startGame(chat) {
     sendStartGameMessage(chat);
-    console.log(chat);
     stompClient.subscribe("/chat/game_stat/" + room, getStat);
+
     document.getElementById("start_game_button").disabled = true;
+    document.getElementById("stop_game_button").disabled = false;
 }
 
 function sendStartGameMessage(chat) {
     const str = JSON.stringify({
         'room': room
-    })
+    });
     stompClient.send(chat, {}, str);
+}
+
+function stopGame(chat){
+    sendStopGameMessage(chat);
+    document.getElementById("start_game_button").disabled = false;
+    document.getElementById("stop_game_button").disabled = true;
+}
+
+function sendStopGameMessage(chat){
+    const str = JSON.stringify({
+        'interrupted': true,
+        'room':room
+    });
+    stompClient.send(chat, {}, str);
+}
+
+// Настойка интерфеса при отключении от сервера или ошибке.
+function setErrorDisconnectInterface() {
+    document.getElementById("send_civilians_button").disabled = true;
+    document.getElementById("send_mafia_button").disabled = true;
+    document.getElementById("disconnect_button").disabled = true;
+    document.getElementById("set_name_button").disabled = true;
+    document.getElementById("set_room_button").disabled = true;
+    document.getElementById("start_game_button").disabled = true;
+    document.getElementById("stop_game_button").disabled = true;
+    document.getElementById("connect_button").disabled = false;
+    document.getElementById("room_input").disabled = false;
+    document.getElementById("name_input").disabled = false;
+
 }
 
 function openCity(evt, cityName) {

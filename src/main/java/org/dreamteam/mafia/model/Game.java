@@ -6,7 +6,7 @@ package org.dreamteam.mafia.model;
 public class Game {
     private boolean isNight = false;
     private String room;
-    private boolean isActive = false;
+    private boolean isInterrupted;  // Используется для прерывания игры, если пришел объект Game c isInterrupted = true, то игра останавливается.
 
     public boolean isNight() {
         return isNight;
@@ -24,11 +24,11 @@ public class Game {
         this.room = room;
     }
 
-    public boolean isActive() {
-        return isActive;
+    public boolean isInterrupted() {
+        return isInterrupted;
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
+    public void setInterrupted(boolean interrupted) {
+        isInterrupted = interrupted;
     }
 }

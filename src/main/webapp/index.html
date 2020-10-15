@@ -13,8 +13,8 @@
 </head>
 <body class="bodyPadding">
 <p>
-    <button id="connect" onclick="connect()">Установить подключение к серверу</button>
-    <button id="disconnect" onclick="disconnect()" disabled>Сбросить подключение</button>
+    <button id="connect_button" onclick="connect()">Установить подключение к серверу</button>
+    <button id="disconnect_button" onclick="disconnect()" disabled>Сбросить подключение</button>
 </p>
 <p>
     <input id="name_input" class="message_input" placeholder="Введите имя пользователя"/>
@@ -31,6 +31,7 @@
 
 <p>
     <button id="start_game_button" onclick="startGame('/app/host_message')" disabled="disabled">Начать игру!</button>
+    <button id="stop_game_button" onclick="stopGame('/app/host_message')" disabled="disabled">Остановить игру!</button>
 </p>
 
 <div class="tab">
@@ -80,5 +81,11 @@
             });
     </script>
 </div>
+<p>
+    <input id="message_input_host_value" class="message_input" placeholder="Введите сообщение..."/>
+    <button id="send_host_button" onclick="sendHostMessage('/app/host_message','message_input_host_value')" class="text">
+    Send host message
+    </button>
+</p>
 </body>
 </html>

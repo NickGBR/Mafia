@@ -48,7 +48,8 @@ public class Message {
 
     public enum Role{
         MAFIA,
-        CIVILIAN
+        CIVILIAN,
+        HOST
     }
 
 }

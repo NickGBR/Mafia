@@ -1,8 +1,8 @@
 package org.dreamteam.mafia.model;
 
-import org.dreamteam.mafia.model.Game;
-import org.dreamteam.mafia.model.Message;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+
+import java.util.Map;
 
 public class Host implements Runnable{
     private final String room;
@@ -15,12 +15,10 @@ public class Host implements Runnable{
         this.game = new Game();
         game.setNight(true);
         this.game.setRoom(room);
-        this.game.setActive(true);
     }
 
     @Override
     public void run() {
-        System.out.println(room + " asked!");
         game.setNight(!game.isNight());
         messagingTemplate.convertAndSend("/chat/game_stat/" + room, game);
     }

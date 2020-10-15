@@ -1,5 +1,6 @@
 package org.dreamteam.mafia.controller;
 
+import org.dreamteam.mafia.config.ThreadPoolTaskSchedulerConfig;
 import org.dreamteam.mafia.model.Game;
 import org.dreamteam.mafia.model.Host;
 import org.dreamteam.mafia.model.Message;
@@ -11,6 +12,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
 
 @Controller
 public class ChatController {
@@ -21,7 +25,15 @@ public class ChatController {
 
     @Autowired
     SimpMessagingTemplate messagingTemplate;
+
+    //Хранит специальные сообщение от хоста
+    Map<String, Message> hostMessages = new HashMap<>();
+
+    //Хранит текущие комнаты в игре.
     ArrayList<String> rooms = new ArrayList<>();
+
+    //Хранит выполняемые задачи
+    Map<String, ScheduledFuture<?>> tasks = new HashMap<>();
 
     @MessageMapping("/civ_message")
     //@SendTo("/chat/civ_messages") //Можем использовать как комнату по умолчанию
@@ -34,7 +46,7 @@ public class ChatController {
     @MessageMapping("/mafia_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getMafiaMessages(Message message) {
-        System.out.println(message.getRoom());
+
         message.setRole(Message.Role.MAFIA);
         messagingTemplate.convertAndSend("/chat/mafia_messages/" + message.getRoom(), message);
     }
@@ -42,14 +54,35 @@ public class ChatController {
     @MessageMapping("/host_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getHostMessages(Game game) {
+        // Проверяем наличие команты в игре.
         if (!rooms.contains(game.getRoom())) {
-            System.out.println(game.getRoom() + " added");
+
+            // Если комната новая, то добавляем ее в список существующих комнат.
             rooms.add(game.getRoom());
-            taskScheduler.scheduleWithFixedDelay(new Host(game.getRoom(), messagingTemplate),10000);
+            Host host = new Host(game.getRoom(), messagingTemplate);
+
+            // Создаем нового ведущего для игры, и добавляем его в список храниящий всех ведущих рабочих на сервере.
+            ScheduledFuture<?> future = taskScheduler.scheduleWithFixedDelay(host, 10000);
+            tasks.put(game.getRoom(), future);
         }
-        else {
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            messagingTemplate.convertAndSend("/chat/mafia_messages/" + game.getRoom(), "{\"active\":true}");
+
+        // Проверяем была ли игра остановлена.
+        if(game.isInterrupted()){
+
+            // Если игра остановлена то останавливаем текущую задачу, удаляем задачу из списка задач.
+            tasks.get(game.getRoom()).cancel(true);
+            tasks.remove(game.getRoom());
+            rooms.remove(game.getRoom());
+
+            //Собираем сообщение для отправки в пользовательский чат
+            Message message = new Message();
+            message.setMessage("Игра была остановлена!");
+            message.setRoom(game.getRoom());
+            message.setRole(Message.Role.HOST);
+            message.setFrom("Host");
+
+            // Отправляем сообщение в чат об остановке игры.
+            messagingTemplate.convertAndSend("/chat/civ_messages/" + game.getRoom(), message);
         }
     }
 }
