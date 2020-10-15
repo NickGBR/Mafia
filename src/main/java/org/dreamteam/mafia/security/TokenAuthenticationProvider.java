@@ -4,8 +4,9 @@ import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.model.SecurityUserDetails;
 import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.repository.api.CrudUserRepository;
-import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.TokenService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @Component
 public final class TokenAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
+    Logger logger = LoggerFactory.getLogger(TokenAuthenticationProvider.class);
     TokenService tokenService;
     CrudUserRepository repository;
 
@@ -41,7 +43,7 @@ public final class TokenAuthenticationProvider extends AbstractUserDetailsAuthen
             String userName,
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
         final Object token = usernamePasswordAuthenticationToken.getCredentials();
-        System.out.println(userName + " : " + token);
+        logger.debug("Retrieving user via token. " + userName + " : " + token);
         Optional<String> login = tokenService.extractUsernameFrom(new SignedJsonWebToken(token.toString()));
         if (login.isPresent()) {
             List<UserDAO> userDAOS = repository.findByLogin(login.get());

@@ -6,3 +6,8 @@ spring:
     properties:
       hibernate:
         format-sql: true
+logging:
+  level:
+    root: error
+    spring.framework: info
+    org.dreamteam: debug
