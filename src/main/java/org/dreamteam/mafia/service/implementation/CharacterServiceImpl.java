@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class CharacterServiceImpl implements CharacterService {
 
-    @Autowired
     private CharacterRepository characterRepository;
 
     @Override

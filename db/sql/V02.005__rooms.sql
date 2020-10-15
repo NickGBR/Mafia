@@ -1,4 +1,4 @@
-drop table rooms cascade;
+--drop table rooms;
 
 create table rooms
 (

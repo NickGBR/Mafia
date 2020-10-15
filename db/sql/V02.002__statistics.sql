@@ -1,4 +1,4 @@
-drop table statistics;
+--drop table statistics;
 
 create table statistics
 (

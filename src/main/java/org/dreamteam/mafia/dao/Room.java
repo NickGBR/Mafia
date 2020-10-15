@@ -37,8 +37,8 @@ public class Room {
     @NotFound(action = NotFoundAction.IGNORE)
     private Game game;
 
-    @OneToMany(mappedBy = "room")
-    private List<User> userList;
+    //@OneToMany(mappedBy = "room")
+    //private List<User> userList;
 
     @Override
     public String toString() {

@@ -9,7 +9,7 @@ import javax.persistence.Persistence;
 @SpringBootApplication
 public class Application {
 
-    public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("PU");
+   // public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("PU");
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

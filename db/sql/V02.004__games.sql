@@ -1,4 +1,4 @@
-drop table games cascade;
+--drop table games;
 
 create table games
 (

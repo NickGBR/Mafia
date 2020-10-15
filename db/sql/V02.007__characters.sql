@@ -1,4 +1,4 @@
-drop table characters cascade;
+--drop table characters;
 
 create table characters
 (

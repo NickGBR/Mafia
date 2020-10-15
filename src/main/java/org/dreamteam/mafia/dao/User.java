@@ -23,14 +23,14 @@ public class User {
     private long userId;
 
     @Column(name = "password_hash", nullable = false)
-    private long passwordHash;
+    private String passwordHash;
 
     @Column(name = "login", unique = true, nullable = false, length = 100)
     private String login;
-
+/*
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "room_id")
-    private Room room;
+    private Room room;*/
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "statistics_id")
@@ -38,6 +38,11 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Message> messageList;
+
+    public User(String passwordHash, String login) {
+        this.passwordHash = passwordHash;
+        this.login = login;
+    }
 
     @Override
     public String toString() {

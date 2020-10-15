@@ -1,4 +1,4 @@
-drop table roles cascade;
+--drop table roles;
 
 create table roles
 (
