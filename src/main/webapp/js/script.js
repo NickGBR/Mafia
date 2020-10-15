@@ -51,11 +51,14 @@ function getStat(response) {
     sendTimeMessage(isNight);
 }
 
+// Данный метод получает сообщения от сокета.
 function getMessage(response) {
     const data = JSON.parse(response.body);
     console.log("Получено сообщение: " + data.message)
     console.log("Название чата: " + data.role);
     console.log("From = " + data.from)
+
+    //Определяем от кого пришло сообщение.
     if (data.role === "MAFIA") addToChat(data.from + ": " + data.message, mafiaChat);
     else if (data.role === "CIVILIAN")
         addToChat(data.from + ": " + data.message, civiliansChat);
