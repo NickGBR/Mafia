@@ -1,5 +1,3 @@
-
-
 create table users2characters
 (
     user_id       int not null primary key,

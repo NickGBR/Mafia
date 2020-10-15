@@ -34,10 +34,10 @@ public class UserDAO {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "statistics_id")
-    private Statistics statistics;
+    private StatisticsDAO statistics;
 
     @OneToMany(mappedBy = "user")
-    private List<Message> messageList;
+    private List<MessageDAO> messageList;
 
     public UserDAO(String passwordHash, String login) {
         this.passwordHash = passwordHash;

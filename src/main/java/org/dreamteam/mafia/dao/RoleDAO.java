@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "roles")
 
-public class Role {
+public class RoleDAO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

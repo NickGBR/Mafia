@@ -3,7 +3,6 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "games")
 
-public class Game {
+public class GameDAO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,16 +30,16 @@ public class Game {
     private int numberOfDay;
 
     @OneToOne(mappedBy = "game")
-    private Room room;
+    private RoomDAO room;
 
     @OneToMany(mappedBy = "game")
-    private List<Voting> votingList;
+    private List<VotingDAO> votingList;
 
     @OneToMany(mappedBy = "game")
-    private List<Character> characterList;
+    private List<CharacterDAO> characterList;
 
     @OneToMany(mappedBy = "game")
-    private List<Message> messageList;
+    private List<MessageDAO> messageList;
 
     @Override
     public String toString() {

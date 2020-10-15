@@ -3,12 +3,10 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Getter
 @Setter
@@ -16,7 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "rooms")
 
-public class Room {
+public class RoomDAO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +33,7 @@ public class Room {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "game_id")
     @NotFound(action = NotFoundAction.IGNORE)
-    private Game game;
+    private GameDAO game;
 
     //@OneToMany(mappedBy = "room")
     //private List<User> userList;
