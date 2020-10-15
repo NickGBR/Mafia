@@ -23,6 +23,7 @@ public class Testing {
         return (args) -> {
             User user3 = repository.findByLogin("user3").get(0);
             System.out.println(user3);
+            repository.save(new User("123456789", "Poly"));
             // save a few customers
           //  repository.save(new User(123, "Dessler"));
 
