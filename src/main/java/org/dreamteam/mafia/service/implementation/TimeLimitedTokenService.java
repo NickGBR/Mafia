@@ -16,6 +16,9 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * Класс реализующий выдачу JWT c ограниченным сроком действия: 24 часа
+ */
 @Service
 public class TimeLimitedTokenService implements TokenService {
 

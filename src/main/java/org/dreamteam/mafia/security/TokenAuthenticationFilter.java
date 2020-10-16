@@ -1,5 +1,7 @@
 package org.dreamteam.mafia.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +23,7 @@ import java.util.Optional;
  */
 public final class TokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private static final String BEARER = "Bearer";
+    private final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
 
     public TokenAuthenticationFilter(final RequestMatcher requiresAuth) {
         super(requiresAuth);
@@ -30,9 +33,9 @@ public final class TokenAuthenticationFilter extends AbstractAuthenticationProce
     public Authentication attemptAuthentication(
             final HttpServletRequest request,
             final HttpServletResponse response) {
-        System.out.println("Authentication attempt");
         final String param = request.getHeader(HttpHeaders.AUTHORIZATION);
-        System.out.println(param);
+
+        logger.debug("Authentication attempt. Header: " + param);
 
         final String token = Optional.ofNullable(param)
                 .filter(value -> value.startsWith(BEARER))

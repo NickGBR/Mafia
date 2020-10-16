@@ -7,15 +7,18 @@
     <groupId>org.dreamteam.mafia</groupId>
     <artifactId>mafia-online</artifactId>
     <version>0.1.0</version>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>db</module>
-    </modules>
+    <!--   <packaging>pom</packaging>-->
+    <packaging>jar</packaging>
 
     <name>Mafia Online</name>
     <!-- FIXME change it to the project's website -->
     <url>http://www.example.com</url>
+
+
+    <!-- <modules>
+         <module>db</module>
+     </modules>-->
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -30,17 +33,18 @@
     </parent>
 
     <dependencies>
-        <!-- Для Spring JPA-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
         <!-- Для аннотаций Lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Для шаблонизатора Thymeleaf-->
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
+            <version>3.0.11.RELEASE</version>
         </dependency>
 
         <!-- Для работы с JPA-->
@@ -79,6 +83,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- Для Spring JPA-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
         <!-- Для аутентификации по JWT(JSON Web Token)-->
@@ -158,6 +168,7 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 </project>

@@ -1,19 +1,19 @@
 package org.dreamteam.mafia.exceptions;
 
 import lombok.Getter;
-import org.dreamteam.mafia.util.ResultCode;
+import org.dreamteam.mafia.util.ClientErrorCode;
 
 /**
  * Исключение, выбрасываемое при ошибках в процессе аутентификации пользователя в системе
  */
 @Getter
-public class UserAuthenticationException extends ExceptionWithCode {
+public class UserAuthenticationException extends ClientErrorException {
 
-    public UserAuthenticationException(ResultCode code) {
+    public UserAuthenticationException(ClientErrorCode code) {
         super(code);
     }
 
-    public UserAuthenticationException(ResultCode code, String msg) {
+    public UserAuthenticationException(ClientErrorCode code, String msg) {
         super(msg, code);
     }
 }

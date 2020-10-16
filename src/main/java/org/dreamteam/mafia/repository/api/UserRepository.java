@@ -1,17 +1,27 @@
-
 package org.dreamteam.mafia.repository.api;
 
 import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.model.User;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
+/**
+ * Интерфейс простого репозитория для доступа к пользователям
+ */
 @Repository
 public interface UserRepository {
 
+    /**
+     * Добавляет пользователя в репозиторий
+     *
+     * @param user - добавляемый пользователь
+     * @throws Exception - при ошибке добавления
+     */
     void saveUser(UserDAO user) throws Exception;
-    UserDAO getUserByLogin(String login);
 
+    /**
+     * Возвращает пользователя по логину
+     *
+     * @param login - логин
+     * @return - пользователь или null
+     */
+    UserDAO getUserByLogin(String login);
 }

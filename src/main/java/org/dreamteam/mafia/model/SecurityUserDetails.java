@@ -8,16 +8,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * Данные пользователя, необходимые для Spring Security
+ */
 public class SecurityUserDetails implements UserDetails {
 
-    String password;
-    String login;
+    private final String password;
+    private final String login;
 
     public SecurityUserDetails(UserDAO dao) {
         this.login = dao.getLogin();
         this.password = dao.getPasswordHash();
     }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

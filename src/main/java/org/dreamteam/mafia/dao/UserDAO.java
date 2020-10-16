@@ -3,14 +3,15 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Объект, связанный с таблицей пользователей в БД
+ */
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
@@ -39,7 +40,7 @@ public class UserDAO {
     @OneToMany(mappedBy = "user")
     private List<MessageDAO> messageList;
 
-    public UserDAO(String passwordHash, String login) {
+    public UserDAO(String login, String passwordHash) {
         this.passwordHash = passwordHash;
         this.login = login;
     }

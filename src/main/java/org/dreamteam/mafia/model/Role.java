@@ -9,5 +9,4 @@ public enum Role {
     SHERIFF,
     MAFIA,
     DON
-
 }

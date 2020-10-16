@@ -7,18 +7,25 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
+/**
+ * Класс для настроеек параметров подключений к БД
+ */
 @Configuration
 @EnableJpaRepositories("org.dreamteam.mafia.repository.api")
 public class DBConfig {
+
+    /**
+     * Bean для получения источника данных, подключенного к БД
+     *
+     * @return - настроенный источник данных
+     */
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-
         dataSource.setDriverClassName("org.postgresql.Driver");
         dataSource.setUsername("postgres");
-        dataSource.setPassword("postgres");
+        dataSource.setPassword("32167");
         dataSource.setUrl("jdbc:postgresql://localhost:5432/mafia");
-
         return dataSource;
     }
 }

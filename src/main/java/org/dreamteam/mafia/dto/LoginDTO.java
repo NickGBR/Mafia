@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.io.Serializable;
 
 /**
- * Пользователь, восстановленый из JSON, пришедшего со стороны клиента
+ * JSON запрос на вход в систему пользователя
  */
 
 @Getter
