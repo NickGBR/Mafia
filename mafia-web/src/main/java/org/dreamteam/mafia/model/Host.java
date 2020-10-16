@@ -2,7 +2,6 @@ package org.dreamteam.mafia.model;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class Host implements Runnable{
