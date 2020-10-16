@@ -27,9 +27,9 @@ public class CharacterDAO {
     @JoinColumn(name = "user_id", nullable = false)
     private UserDAO userId;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+   /* @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "roleId", nullable = false)
-    private RoleDAO roleId;
+    private RoleDAO roleId;*/
 
     @Column(name = "status", nullable = false)
     private boolean status;
