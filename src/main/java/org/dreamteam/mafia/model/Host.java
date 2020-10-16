@@ -24,7 +24,6 @@ public class Host implements Runnable{
 
     @Override
     public void run() {
-        System.out.println(hostMessages.size());
 
         // Проверяем наличие сообщение от HOST в "hostMessages - бд", отправляем его при наличии.
         if(hostMessages.containsKey(room)){

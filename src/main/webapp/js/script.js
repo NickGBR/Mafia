@@ -28,7 +28,6 @@ function afterConnect(connection) {
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
     // Включаем кнопки для отправки сообщений и отключения от сервера
-
     document.getElementById("set_name_button").disabled = false;
     document.getElementById("disconnect_button").disabled = false;
 
@@ -48,6 +47,7 @@ function getStat(response) {
     isNight = data.night;
     console.log(isNight);
     setTimeInterface(isNight);
+    //Отправляем сообщение о времени суток
     sendTimeMessage(isNight);
 }
 
@@ -65,7 +65,7 @@ function getMessage(response) {
     else if (data.role === "HOST") addToChat(data.from + ": " + data.message, civiliansChat);
 }
 
-
+// Добавление сообщения в HTML
 function addToChat(text, chat) {
     const node = document.createElement("LI");      // Создаем элемент списка <li>
     node.setAttribute("class", "message");
@@ -107,7 +107,6 @@ function sendHostMessage(chat, view) {
             'from' : "Host"
         }
     });
-    console.log(str);
     stompClient.send(chat, {}, str);
 }
 
@@ -159,7 +158,7 @@ function setTimeInterface(isNight) {
         //document.body.style.backgroundColor = "#03133C";
         document.getElementById("send_mafia_button").disabled = false;
         document.getElementById("send_civilians_button").disabled = true;
-    } else if (isNight === false) {
+    } else{
         //document.body.style.backgroundColor = "#FFFFFF";
         document.getElementById("send_mafia_button").disabled = true;
         document.getElementById("send_civilians_button").disabled = false;
