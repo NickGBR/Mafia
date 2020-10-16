@@ -3,6 +3,8 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dreamteam.mafia.dao.converter.RoleEnum;
+import org.dreamteam.mafia.model.Role;
 
 import javax.persistence.*;
 
@@ -27,9 +29,10 @@ public class CharacterDAO {
     @JoinColumn(name = "user_id", nullable = false)
     private UserDAO userId;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "roleId", nullable = false)
-    private RoleDAO roleId;
+    // @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleEnum role;
 
     @Column(name = "status", nullable = false)
     private boolean status;

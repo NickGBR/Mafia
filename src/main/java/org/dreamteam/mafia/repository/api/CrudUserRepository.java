@@ -11,6 +11,4 @@ public interface CrudUserRepository extends CrudRepository<UserDAO, Long> {
 
    List<UserDAO> findByLogin(String login);
 
-   //long nextId()
-
 }
