@@ -141,6 +141,7 @@ function setRoleInterface(isMafia) {
 
 //Метод выводящий сообщение в зависимости от времени в игре.
 function sendTimeMessage(isNight) {
+    console.log("OOPS " + room )
     if (isNight === false) {
         addToChat("День настал!", mafiaChat);
         addToChat("День настал!", civiliansChat);
@@ -184,10 +185,14 @@ function chooseRole(id) {
 
 function startGame(chat) {
     sendStartGameMessage(chat);
-    stompClient.subscribe("/chat/game_stat/" + room, getStat);
+    //  Подписываемя на топик информации об игре, передаем метод для обработки ответа, устанавливаем id для
+    // возможноти отписаться от топика, если не отписаться, клиен подписывается на один и тот-же топик два раза
+    // и сообщения дублируются.
+    stompClient.subscribe("/chat/game_stat/" + room, getStat, {id:"game_stat_chat"});
 
     document.getElementById("start_game_button").disabled = true;
     document.getElementById("stop_game_button").disabled = false;
+    document.getElementById("send_host_button").disabled = false;
 }
 
 function sendStartGameMessage(chat) {
@@ -199,8 +204,10 @@ function sendStartGameMessage(chat) {
 
 function stopGame(chat) {
     sendStopGameMessage(chat);
+    console.log(stompClient.unsubscribe("game_stat_chat") + "!!!!!!!");
     document.getElementById("start_game_button").disabled = false;
     document.getElementById("stop_game_button").disabled = true;
+    document.getElementById("send_host_button").disabled = true;
 }
 
 function sendStopGameMessage(chat) {
