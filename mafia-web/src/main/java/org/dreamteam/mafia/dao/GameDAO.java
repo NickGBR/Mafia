@@ -18,10 +18,10 @@ public class GameDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "game_id", unique = true, nullable = false)
-    private int gameId;
+    private Integer gameId;
 
     @Column(name = "phase", nullable = false)
-    private boolean phase;
+    private Integer phase;
 
     @Column(name = "status", nullable = false)
     private boolean status;

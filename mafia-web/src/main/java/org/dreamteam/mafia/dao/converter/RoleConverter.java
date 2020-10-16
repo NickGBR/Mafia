@@ -1,4 +1,4 @@
-/*package org.dreamteam.mafia.dao.converter;
+package org.dreamteam.mafia.dao.converter;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
@@ -11,7 +11,7 @@ public class RoleConverter implements AttributeConverter<RoleEnum, String> {
         if (role == null) {
             return null;
         }
-        return role.getCode();
+        return role.toString();
     }
 
     @Override
@@ -26,4 +26,4 @@ public class RoleConverter implements AttributeConverter<RoleEnum, String> {
                 .orElseThrow(IllegalArgumentException::new);
 
     }
-}*/
+}

@@ -25,11 +25,11 @@ public class Testing {
             }
 
 
-/*            UserDAO user = repository.findByLogin("user1").get(0);
+/*           UserDAO user = repository.findByLogin("user1").get(0);
             System.out.println(user);
 
-            repository.save(new UserDAO("123456789", "Poly3"));*/
+            repository.save(new UserDAO("123456789", "Poly3"));
+        };*/
         };
     }
-
 }

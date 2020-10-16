@@ -3,7 +3,7 @@
 create table characters
 (
     character_id serial  not null primary key,
-    game_id      serial  not null,
+    game_id      int     not null,
     user_id      serial  not null,
     role         text,
     status       boolean not null,
