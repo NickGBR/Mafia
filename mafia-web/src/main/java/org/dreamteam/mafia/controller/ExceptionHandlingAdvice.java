@@ -44,7 +44,7 @@ public class ExceptionHandlingAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  // 500
     @ExceptionHandler(DataAccessException.class)
     @ResponseBody
-    public ErrorResponse handleClientError(DataAccessException exception) {
+    public ErrorResponse handleDatabaseError(DataAccessException exception) {
         logger.error("DB caused exception: "
                              + exception.getLocalizedMessage());
         return new ErrorResponse(ServerErrorCode.DB_FAILURE.getValue(), exception.getLocalizedMessage());
@@ -59,7 +59,7 @@ public class ExceptionHandlingAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  // 500
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public ErrorResponse handleClientError(Exception exception) {
+    public ErrorResponse handleServerError(Exception exception) {
         logger.error("Internal logic caused exception: "
                              + exception.getLocalizedMessage());
         return new ErrorResponse(ServerErrorCode.SERVER_CODE_FAILURE.getValue(), exception.getLocalizedMessage());
