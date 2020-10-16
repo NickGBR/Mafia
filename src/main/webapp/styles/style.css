@@ -1,25 +1,22 @@
 #civilians_chat_box {
     position: relative;
-    text-align: left;
-    padding: 10px;
-    background: #fff;
-    height: 270px;
-    width: 60%;
-    border: 3px solid #ACD8F0;
-    overflow: auto;
-}
+    text-align:left;
+    padding:10px;
+    background:#fff;
+    height:270px;
+    width:60%;
+    border:3px solid #ACD8F0;
+    overflow:auto; }
 
 #mafia_chat_box {
     position: relative;
-    text-align: left;
-    padding: 10px;
-    background: #fff;
-    height: 270px;
-    width: 60%;
-    border: 3px solid #FF0000;
-    overflow: auto;
-}
-
+    text-align:left;
+    padding:10px;
+    background:#fff;
+    height:270px;
+    width:60%;
+    border:3px solid #FF0000;
+    overflow:auto; }
 /* Style the tab */
 .tab {
     overflow: hidden;
@@ -57,6 +54,6 @@
     border-top: none;
 }
 
-.bodyPadding {
+.bodyPadding{
     padding: 10px;
 }

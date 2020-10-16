@@ -2,7 +2,9 @@ package org.dreamteam.mafia.repository.implementation;
 
 import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.repository.api.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
