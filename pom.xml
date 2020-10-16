@@ -7,7 +7,7 @@
     <groupId>org.dreamteam.mafia</groupId>
     <artifactId>mafia-online</artifactId>
     <version>0.1.0</version>
-    <!--   <packaging>pom</packaging>-->
+    <!--   <packagin g>pom</packaging>-->
     <packaging>jar</packaging>
 
     <name>Mafia Online</name>
