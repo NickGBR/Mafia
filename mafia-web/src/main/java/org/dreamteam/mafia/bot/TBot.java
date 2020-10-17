@@ -1,6 +1,7 @@
 package org.dreamteam.mafia.bot;
 
 import lombok.SneakyThrows;
+import org.dreamteam.mafia.model.Message;
 import org.dreamteam.mafia.model.TelegramUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,15 +50,14 @@ public class TBot extends TelegramLongPollingBot {
         if(update.hasCallbackQuery()){
             String userId = update.getCallbackQuery().getFrom().getId().toString();
             if(update.getCallbackQuery().getData().equals("play_button_pressed")){
-                users.get(userId).setStartButtonPressed(true);
-                System.out.println(users.get(userId).isStartButtonPressed());
+                sendMessage(userId, "Введите название комнаты");
             }
         }
     }
 
-    public void sendMessage(String message) throws TelegramApiException {
-        SendMessage message1 = new SendMessage().setChatId((long) 807321539).setText(message);
-        execute(message1);
+    public void sendMessage(String id, String text) throws TelegramApiException {
+        SendMessage message = new SendMessage().setChatId(id).setText(text);
+        execute(message);
     }
 
 
