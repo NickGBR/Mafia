@@ -1,3 +1,4 @@
+/*
 package org.dreamteam.mafia.dao.converter;
 
 import javax.persistence.AttributeConverter;
@@ -27,3 +28,4 @@ public class RoleConverter implements AttributeConverter<RoleEnum, String> {
 
     }
 }
+*/

@@ -1,10 +1,15 @@
-package org.dreamteam.mafia.dao.converter;
+package org.dreamteam.mafia.dao.enums;
 
 import lombok.Getter;
 
 @Getter
 public enum RoleEnum {
-    DON("DON"),
+    DON,
+    MAFIA,
+    SHERIFF,
+    CITIZEN
+
+/*    DON("DON"),
     MAFIA("MAFIA"),
     SHERIFF("SHERIFF"),
     CITIZEN("CITIZEN");
@@ -13,5 +18,5 @@ public enum RoleEnum {
 
     RoleEnum(String code) {
         this.code = code;
-    }
+    }*/
 }

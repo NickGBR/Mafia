@@ -1,28 +1,24 @@
 package org.dreamteam.mafia;
 
-import org.dreamteam.mafia.dao.CharacterDAO;
-import org.dreamteam.mafia.dao.converter.RoleEnum;
-import org.dreamteam.mafia.repository.api.CharacterRepository;
+import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-
-import java.util.List;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 // @ComponentScan("org.dreamteam.mafia")
 public class Testing {
 
     @Bean
-    public CommandLineRunner demo(CharacterRepository repository) {
+    public CommandLineRunner demo(RoomRepository repository) {
         return (args) -> {
 
-            List<CharacterDAO> byRole = repository.findByRole(RoleEnum.MAFIA);
+         /*   Iterable<RoomDAO> all = repository.findAll();
+            for (RoomDAO m : all) {
+                System.out.println(m);
+            }*/
 
-            for (CharacterDAO c : byRole) {
-                System.out.println(c);
-            }
 
 
 /*           UserDAO user = repository.findByLogin("user1").get(0);
