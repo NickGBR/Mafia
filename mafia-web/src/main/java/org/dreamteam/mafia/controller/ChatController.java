@@ -1,14 +1,18 @@
 package org.dreamteam.mafia.controller;
 
+
+import org.dreamteam.mafia.bot.TBot;
 import org.dreamteam.mafia.model.Game;
 import org.dreamteam.mafia.model.Host;
 import org.dreamteam.mafia.model.Message;
+import org.dreamteam.mafia.model.TelegramUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Controller;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +25,9 @@ import java.util.concurrent.ScheduledFuture;
 @Controller
 public class ChatController {
 
+    @Autowired
+    TBot bot;
+
     @Qualifier("Task")
     @Autowired
     ThreadPoolTaskScheduler taskScheduler;
@@ -28,13 +35,13 @@ public class ChatController {
     @Autowired
     SimpMessagingTemplate messagingTemplate;
 
-    //Хранит специальные сообщение от хоста
+    //Хранит специальные сообщение от хоста.
     Map<String, Message> hostMessages = new HashMap<>();
 
     //Хранит текущие комнаты в игре.
     ArrayList<String> rooms = new ArrayList<>();
 
-    //Хранит выполняемые задачи
+    //Хранит выполняемые задачи.
     Map<String, ScheduledFuture<?>> tasks = new HashMap<>();
 
     @MessageMapping("/civ_message")
@@ -46,9 +53,10 @@ public class ChatController {
 
     @MessageMapping("/mafia_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
-    public void getMafiaMessages(Message message) {
+    public void getMafiaMessages(Message message) throws TelegramApiException {
         message.setRole(Message.Role.MAFIA);
         messagingTemplate.convertAndSend("/chat/mafia_messages/" + message.getRoom(), message);
+        bot.sendMessage(message.getMessage());
     }
 
     /**
