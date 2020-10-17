@@ -12,8 +12,16 @@ import org.dreamteam.mafia.dao.UserDAO;
 public class User {
 
     private String login;
+    private boolean isStartButtonPressed = false;
+    private String chatId;
+    private String room;
+    private String name;
+    private Message.Role role;
 
     public User(UserDAO dao) {
         login = dao.getLogin();
+    }
+
+    public User(){
     }
 }

@@ -5,7 +5,7 @@ import org.dreamteam.mafia.bot.TBot;
 import org.dreamteam.mafia.model.Game;
 import org.dreamteam.mafia.model.Host;
 import org.dreamteam.mafia.model.Message;
-import org.dreamteam.mafia.model.TelegramUser;
+import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.temporary.TemporaryDB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,8 +15,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Controller;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
@@ -105,10 +103,10 @@ public class ChatController {
         messagingTemplate.convertAndSend("/chat/civ_messages/" + game.getRoom(), message);
     }
 
-    private void cleanTelegramUsersRoom(String room){
-        Map<String, TelegramUser> telegramUsers = TemporaryDB.telegramUsersByRooms.get(room);
+    private void cleanTelegramUsersRoom(String room) {
+        Map<String, User> telegramUsers = TemporaryDB.usersByRooms.get(room);
         System.out.println(telegramUsers);
-        for(Map.Entry<String,TelegramUser> pair : telegramUsers.entrySet()){
+        for (Map.Entry<String, User> pair : telegramUsers.entrySet()) {
             System.out.println("before: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
             telegramUsers.get(pair.getKey()).setRoom(null);
             System.out.println("after: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
