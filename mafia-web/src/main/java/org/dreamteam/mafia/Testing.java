@@ -2,9 +2,11 @@ package org.dreamteam.mafia;
 
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.StatisticsDAO;
+import org.dreamteam.mafia.dao.VotingDAO;
 import org.dreamteam.mafia.model.Room;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.repository.api.StatisticsRepository;
+import org.dreamteam.mafia.repository.api.VotingRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -16,11 +18,11 @@ import java.util.Optional;
 public class Testing {
 
     @Bean
-    public CommandLineRunner demo(RoomRepository repository) {
+    public CommandLineRunner demo(VotingRepository repository) {
         return (args) -> {
 
-            Iterable<RoomDAO> all = repository.findAll();
-            for (RoomDAO r : all) {
+            Iterable<VotingDAO> all = repository.findAll();
+            for (VotingDAO r : all) {
                 System.out.println(r);
             }
 

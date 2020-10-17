@@ -29,10 +29,10 @@ public class RoomDAO {
     private String description;
 
     @Column(name = "password_hash")
-    private Long passwordHash;
+    private String passwordHash;
 
-    @Column(name = "users_amount", nullable = false)
-    private Integer usersAmount;
+    @Column(name = "max_users_amount", nullable = false)
+    private Integer maxUsersAmount;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "game_id")
@@ -42,10 +42,10 @@ public class RoomDAO {
    @OneToMany(mappedBy = "room")
    private List<UserDAO> userList;
 
-    public RoomDAO(String name, Long passwordHash, Integer usersAmount, GameDAO game) {
+    public RoomDAO(String name, String passwordHash, Integer maxUsersAmount, GameDAO game) {
         this.name = name;
         this.passwordHash = passwordHash;
-        this.usersAmount = usersAmount;
+        this.maxUsersAmount = maxUsersAmount;
         this.game = game;
      //   this.userList = userList;
     }
@@ -57,7 +57,7 @@ public class RoomDAO {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", passwordHash=" + passwordHash +
-                ", usersAmount=" + usersAmount +
+                ", maxUsersAmount=" + maxUsersAmount +
               //  ", game=" + game +
                // ", userList=" + userList +
                 '}';

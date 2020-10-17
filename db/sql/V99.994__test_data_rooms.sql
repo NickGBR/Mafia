@@ -1,4 +1,4 @@
-insert into rooms (name, description, password_hash, game_id, users_amount)
+insert into rooms (name, description, password_hash, game_id, max_users_amount)
 values ('room1', 'ololo', 56789, 1, 3),
        ('room2', 'hohoho', 56790, 2, 5),
        ('room3', 'hihihi', 56791, 3, 4),
