@@ -32,7 +32,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // Защищаемые URL
     private static final RequestMatcher SECURED_URLS = new OrRequestMatcher(
             new AntPathRequestMatcher("/api/room/*"),
-            new AntPathRequestMatcher("/api/game/*"));
+            new AntPathRequestMatcher("/api/game/*"),
+            new AntPathRequestMatcher("/api/user/getCurrentName"));
     private final TokenAuthenticationProvider provider;
 
     @Autowired
