@@ -35,21 +35,21 @@ public class TBot extends TelegramLongPollingBot {
 
         // Часть отвечающая за работу с сообщениями
         if (update.hasMessage() && update.getMessage().hasText()) {
-
             userId = update.getMessage().getChatId().toString();
-
-            // Получаем пользователя по ID.
-            TelegramUser telegramUser = TemporaryDB.telegramUsers.get(userId);
-
+            TelegramUser telegramUser;
             //Если пользователя не существует, добавляем его в БД.
             if (!TemporaryDB.telegramUsers.containsKey(userId)) {
-                TelegramUser user = new TelegramUser();
-                user.setChatId(userId);
-                TemporaryDB.telegramUsers.put(userId, user);
+                telegramUser = new TelegramUser();
+                telegramUser.setChatId(userId);
+                TemporaryDB.telegramUsers.put(userId, telegramUser);
 
                 // Создаем кнопку для начала игры.
                 createStartGameButton(userId);
             }
+            else{
+                telegramUser = TemporaryDB.telegramUsers.get(userId);
+            }
+
 
             // Если пользователь не имеет комнаты, но уже нажал кнопку начала игры,
             if (telegramUser.isStartButtonPressed() && telegramUser.getRoom() == null) {
