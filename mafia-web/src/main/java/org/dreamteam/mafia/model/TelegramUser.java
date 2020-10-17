@@ -3,6 +3,7 @@ package org.dreamteam.mafia.model;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 @Setter
@@ -13,5 +14,7 @@ public class TelegramUser {
     private boolean isStartButtonPressed = false;
     private String chatId;
     private String room;
+    private String name;
+    private Message.Role role;
 
 }

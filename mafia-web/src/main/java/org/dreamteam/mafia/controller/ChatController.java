@@ -92,6 +92,7 @@ public class ChatController {
         TemporaryDB.tasks.get(game.getRoom()).cancel(true);
         TemporaryDB.tasks.remove(game.getRoom());
         TemporaryDB.rooms.remove(game.getRoom());
+        cleanTelegramUsersRoom(game.getRoom());
 
         //Собираем сообщение для отправки в пользовательский чат
         Message message = new Message();
@@ -102,5 +103,15 @@ public class ChatController {
 
         // Отправляем сообщение в чат об остановке игры.
         messagingTemplate.convertAndSend("/chat/civ_messages/" + game.getRoom(), message);
+    }
+
+    private void cleanTelegramUsersRoom(String room){
+        Map<String, TelegramUser> telegramUsers = TemporaryDB.telegramUsersByRooms.get(room);
+        System.out.println(telegramUsers);
+        for(Map.Entry<String,TelegramUser> pair : telegramUsers.entrySet()){
+            System.out.println("before: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
+            telegramUsers.get(pair.getKey()).setRoom(null);
+            System.out.println("after: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
+        }
     }
 }

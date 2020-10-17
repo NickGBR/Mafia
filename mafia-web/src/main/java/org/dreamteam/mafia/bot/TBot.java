@@ -5,6 +5,7 @@ import org.dreamteam.mafia.model.Message;
 import org.dreamteam.mafia.model.TelegramUser;
 import org.dreamteam.mafia.temporary.TemporaryDB;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -14,12 +15,15 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 
 
 @Component
 public class TBot extends TelegramLongPollingBot {
+
+    @Autowired
+    SimpMessagingTemplate messagingTemplate;
 
     /**
      * Принимает сообщения от пользователя, обрабатывает его, и отправляет ответ.
@@ -29,9 +33,13 @@ public class TBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         String userId;
 
-        // Часто отвечающая за работу с сообщениями
+        // Часть отвечающая за работу с сообщениями
         if (update.hasMessage() && update.getMessage().hasText()) {
+
             userId = update.getMessage().getChatId().toString();
+
+            // Получаем пользователя по ID.
+            TelegramUser telegramUser = TemporaryDB.telegramUsers.get(userId);
 
             //Если пользователя не существует, добавляем его в БД.
             if (!TemporaryDB.telegramUsers.containsKey(userId)) {
@@ -43,20 +51,32 @@ public class TBot extends TelegramLongPollingBot {
                 createStartGameButton(userId);
             }
 
-                TelegramUser telegramUser = TemporaryDB.telegramUsers.get(userId);
+            // Если пользователь не имеет комнаты, но уже нажал кнопку начала игры,
+            if (telegramUser.isStartButtonPressed() && telegramUser.getRoom() == null) {
 
-                // Если пользователь не имеет комнаты, но уже нажал кнопку начала игры,
-                if (telegramUser.isStartButtonPressed() && telegramUser.getRoom() == null) {
+                // То проверяем существует ли комната, если да то добавляем пользователя в комнату,
+                String room = update.getMessage().getText();
+                if (TemporaryDB.rooms.contains(room)) {
+                    telegramUser.setRoom(room);
 
-                    // То проверяем существкет ли комната, если да то домавляем пользователя в комнату,
-                    System.out.println(update.getMessage().getText());
-                    if (TemporaryDB.rooms.contains(update.getMessage().getText())) {
-                        telegramUser.setRoom(update.getMessage().getText());
+                    // Добавляем пользователя в комнаты
+                    if (TemporaryDB.telegramUsersByRooms.containsKey(room)) {
+                        TemporaryDB.telegramUsersByRooms.get(room).put(userId, telegramUser);
+                    } else{ TemporaryDB.telegramUsersByRooms.put(room, new HashMap<>());
+                        TemporaryDB.telegramUsersByRooms.get(room).put(userId, telegramUser);
+                        System.out.println(TemporaryDB.telegramUsersByRooms.get(room).get(userId));
                     }
-                    // если нет, то проси повторить попытку.
-                    else sendMessage(userId, "Такой комнаты не существует." + "\n" + "Повторите попытку!");
                 }
+                // если нет, то просим повторить попытку.
+                else sendTelegramMessage(userId, "Такой комнаты не существует." + "\n" + "Повторите попытку!");
             }
+
+            if(telegramUser.getRoom()!=null){
+                telegramUser.setRole(Message.Role.CIVILIAN);
+                System.out.println("hi");
+                sendWebMessage(BotConst.CIV_WEB_CHAT,telegramUser,update.getMessage().getText());
+            }
+        }
 
         // Часть отвечающая за работу с кнопками.
         if (update.hasCallbackQuery()) {
@@ -64,15 +84,26 @@ public class TBot extends TelegramLongPollingBot {
             if (update.getCallbackQuery().getData().equals("play_button_pressed")) {
 
                 TemporaryDB.telegramUsers.get(userId).setStartButtonPressed(true);
-                sendMessage(userId, "Введите название комнаты");
+                TemporaryDB.telegramUsers.get(userId).setName(update.getCallbackQuery().getFrom().getUserName());
+                sendTelegramMessage(userId, "Введите название комнаты");
             }
         }
     }
 
-    public void sendMessage(String id, String text) throws TelegramApiException {
+    public void sendTelegramMessage(String id, String text) throws TelegramApiException {
         SendMessage message = new SendMessage().setChatId(id).setText(text);
         execute(message);
     }
+
+    private void sendWebMessage(String chat, TelegramUser user, String text){
+        Message message = new Message();
+        message.setFrom(user.getName());
+        message.setMessage(text);
+        message.setRole(user.getRole());
+        messagingTemplate.convertAndSend(chat + user.getRoom(), message);
+    }
+
+
 
 
     @Override
@@ -107,6 +138,8 @@ public class TBot extends TelegramLongPollingBot {
     private static class BotConst {
         final static String START_GAME_BUTTON_TEXT = "start";
         final static String START_GAME_MESSAGE_TEXT = "Добро пожаловть в игру мафия, чтобы начать играть, нажмите кнопку ниже...";
+        final static String MAFIA_WEB_CHAT = "/chat/mafia_messages/";
+        final static String CIV_WEB_CHAT = "/chat/civ_messages/";
     }
 }
 

@@ -124,6 +124,12 @@ function setRoom() {
     document.getElementById("civilians_role_button").disabled = false;
     document.getElementById("set_room_button").disabled = true;
     document.getElementById("room_input").disabled = true;
+    const str = JSON.stringify({
+        'room': room
+    });
+    // Заранее отправляем информацию о добавлении новой комнаты на сервер
+    // чтобы телеграм пользователи могу в нее войти до начала игры.
+    stompClient.send("/app/host_message", {}, str);
 }
 
 // Метод устанавливающий начальную конфигурацию пользовательского интерфейса в зависимости от роли игрока.

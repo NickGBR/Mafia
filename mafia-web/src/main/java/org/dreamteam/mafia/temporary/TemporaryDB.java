@@ -22,4 +22,9 @@ public class TemporaryDB {
 
     /** Хранит пользователей подключившихся через Телеграм.*/
     public static Map<String, TelegramUser> telegramUsers = new HashMap<>();
+
+    /** Хранит пользователей подключившихся через Телеграм. Ключем является комната которая содержит в себе Map с
+     * пользователями комнаты, досткуп к которым можно получить по id.*/
+    public static Map<String, Map<String,TelegramUser>> telegramUsersByRooms = new HashMap<>();
+
 }
