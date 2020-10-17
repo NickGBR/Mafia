@@ -2,6 +2,7 @@ package org.dreamteam.mafia;
 
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.StatisticsDAO;
+import org.dreamteam.mafia.model.Room;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.repository.api.StatisticsRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -9,17 +10,20 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import java.util.Optional;
+
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class Testing {
 
     @Bean
-    public CommandLineRunner demo(StatisticsRepository repository) {
+    public CommandLineRunner demo(RoomRepository repository) {
         return (args) -> {
 
-            Iterable<StatisticsDAO> all = repository.findAll();
-            for (StatisticsDAO m : all) {
-                System.out.println(m);
+            Iterable<RoomDAO> all = repository.findAll();
+            for (RoomDAO r : all) {
+                System.out.println(r);
             }
+
 
 
 

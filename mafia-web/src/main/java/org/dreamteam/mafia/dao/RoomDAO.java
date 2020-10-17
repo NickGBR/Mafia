@@ -25,6 +25,9 @@ public class RoomDAO {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "password_hash")
     private Long passwordHash;
 
@@ -39,7 +42,7 @@ public class RoomDAO {
    @OneToMany(mappedBy = "room")
    private List<UserDAO> userList;
 
-    public RoomDAO(String name, Long passwordHash, Integer usersAmount, GameDAO game, List<UserDAO> userList) {
+    public RoomDAO(String name, Long passwordHash, Integer usersAmount, GameDAO game) {
         this.name = name;
         this.passwordHash = passwordHash;
         this.usersAmount = usersAmount;
@@ -49,12 +52,14 @@ public class RoomDAO {
 
     @Override
     public String toString() {
-        return "RoomDAO{" +
+        return "Room{" +
                 "roomId=" + roomId +
                 ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", passwordHash=" + passwordHash +
                 ", usersAmount=" + usersAmount +
-                ", gameId=" + game.getGameId() +
-             //   ", userList=" + userList.size() +
+              //  ", game=" + game +
+               // ", userList=" + userList +
                 '}';
     }
 }
