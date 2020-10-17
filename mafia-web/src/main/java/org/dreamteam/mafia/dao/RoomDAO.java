@@ -36,15 +36,15 @@ public class RoomDAO {
     @NotFound(action = NotFoundAction.IGNORE)
     private GameDAO game;
 
-    @OneToMany(mappedBy = "room")
-    private List<UserDAO> userList;
+   @OneToMany(mappedBy = "room")
+   private List<UserDAO> userList;
 
     public RoomDAO(String name, Long passwordHash, Integer usersAmount, GameDAO game, List<UserDAO> userList) {
         this.name = name;
         this.passwordHash = passwordHash;
         this.usersAmount = usersAmount;
         this.game = game;
-        this.userList = userList;
+     //   this.userList = userList;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class RoomDAO {
                 ", name='" + name + '\'' +
                 ", usersAmount=" + usersAmount +
                 ", gameId=" + game.getGameId() +
-                ", userList=" + userList.size() +
+             //   ", userList=" + userList.size() +
                 '}';
     }
 }
