@@ -22,34 +22,36 @@ public class GameDAO {
     @Column(name = "game_id", unique = true, nullable = false)
     private Integer gameId;
 
-    @Column(name = "phase", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private GamePhaseEnum phase;
+    @OneToOne(mappedBy = "game")
+    private RoomDAO room;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private GameStatusEnum status;
 
+    @Column(name = "phase", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private GamePhaseEnum phase;
+
     @Column(name = "day_number", nullable = false)
     private Integer numberOfDay;
 
-    @OneToOne(mappedBy = "game")
-    private RoomDAO room;
-
-    @OneToMany(mappedBy = "game")
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
     private List<VotingDAO> votingList;
 
-    @OneToMany(mappedBy = "game")
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
     private List<CharacterDAO> characterList;
 
-    @OneToMany(mappedBy = "game")
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
     private List<MessageDAO> messageList;
 
-    public GameDAO(GamePhaseEnum phase, GameStatusEnum status, Integer numberOfDay, RoomDAO room, List<VotingDAO> votingList, List<CharacterDAO> characterList, List<MessageDAO> messageList) {
-        this.phase = phase;
-        this.status = status;
-        this.numberOfDay = numberOfDay;
+    public GameDAO(RoomDAO room, GameStatusEnum status, GamePhaseEnum phase,
+                   Integer numberOfDay, List<VotingDAO> votingList,
+                   List<CharacterDAO> characterList, List<MessageDAO> messageList) {
         this.room = room;
+        this.status = status;
+        this.phase = phase;
+        this.numberOfDay = numberOfDay;
         this.votingList = votingList;
         this.characterList = characterList;
         this.messageList = messageList;
@@ -58,9 +60,14 @@ public class GameDAO {
     @Override
     public String toString() {
         return "Game{" +
-                "id=" + gameId +
+                "gameId=" + gameId +
+         //       ", roomId=" + room +
                 ", status=" + status +
-                ", room=" + room +
+                ", phase=" + phase +
+                ", numberOfDay=" + numberOfDay +
+                ", votingList=" + votingList +
+                ", characterList=" + characterList +
+                ", messageList=" + messageList +
                 '}';
     }
 }

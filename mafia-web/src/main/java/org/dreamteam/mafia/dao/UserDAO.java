@@ -21,35 +21,42 @@ public class UserDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", unique = true, nullable = false)
-    private long userId;
-
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+    private Long userId;
 
     @Column(name = "login", unique = true, nullable = false, length = 100)
     private String login;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "room_id")
     private RoomDAO room;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "statistics_id")
     private StatisticsDAO statistics;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<MessageDAO> messageList;
 
-    public UserDAO(String login, String passwordHash) {
-        this.passwordHash = passwordHash;
+    public UserDAO(String login, String passwordHash, RoomDAO room, StatisticsDAO statistics, List<MessageDAO> messageList) {
         this.login = login;
+        this.passwordHash = passwordHash;
+        this.room = room;
+        this.statistics = statistics;
+        this.messageList = messageList;
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "userId=" + userId +
+                ", passwordHash='" + passwordHash + '\'' +
                 ", login='" + login + '\'' +
+                ", roomId=" + room.getRoomId() +
+                ", statisticsId=" + statistics.getStatisticsId() +
+                ", messageList=" + messageList +
                 '}';
     }
 }

@@ -37,7 +37,7 @@ public class CharacterDAO {
     @Enumerated(EnumType.STRING)
     private CharacterStatusEnum status;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "vote_id")
     private VotingDAO voting;
 

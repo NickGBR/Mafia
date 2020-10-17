@@ -18,36 +18,36 @@ public class VotingDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vote_id", unique = true, nullable = false)
-    private int voteId;
+    private Integer voteId;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "game_id", nullable = false)
     private GameDAO game;
 
     @Column(name = "day_number", nullable = false)
-    private int numberOfDay;
+    private Integer numberOfDay;
 
     @Column(name = "votes_amount", nullable = false)
-    private int votesAmount;
+    private Integer votesAmount;
 
-    @OneToMany(mappedBy = "voting")
+    @OneToMany(mappedBy = "voting", fetch = FetchType.EAGER)
     private List<CharacterDAO> characterList;
 
-    public VotingDAO(GameDAO game, int numberOfDay, int votesAmount, List<CharacterDAO> characterList) {
+    public VotingDAO(GameDAO game, Integer numberOfDay, Integer votesAmount, List<CharacterDAO> characterList) {
         this.game = game;
         this.numberOfDay = numberOfDay;
         this.votesAmount = votesAmount;
         this.characterList = characterList;
     }
 
-  /*  @Override
+    @Override
     public String toString() {
         return "Voting{" +
                 "voteId=" + voteId +
-               // ", game=" + game +
+                ", gameId=" + game.getGameId() +
                 ", numberOfDay=" + numberOfDay +
                 ", votesAmount=" + votesAmount +
-                ", characterList=" + characterList +
+                ", characterList=" + characterList.size() +
                 '}';
-    }*/
+    }
 }
