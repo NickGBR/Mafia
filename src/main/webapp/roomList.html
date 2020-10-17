@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru-Ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Чат на WebSocket-ах</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="js/stomp.js"></script>
+    <script src="js/script.js" type="text/javascript"></script>
+    <link href="styles/style.css" rel="stylesheet" type="text/css"/>
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" rel="stylesheet">
+
+</head>
+<body class="bodyPadding" onload="connect()">
+<p>
+    <input class="message_input" id="name_input" placeholder="Введите имя пользователя"/>
+    <button class="text" disabled="disabled" id="set_name_button" onclick="setName()">Установить имя</button>
+</p>
+<p>
+    <input class="message_input" id="room_input" placeholder="Введите название комнаты"/>
+    <button class="text" disabled="disabled" id="set_room_button" onclick="addRoom('rooms_list')">Добавить комнату
+    </button>
+</p>
+<p>
+<div id="rooms_box">
+<dl id="rooms_list">
+</dl>
+</div>
+</p>
+
+</body>
+</html>

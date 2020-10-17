@@ -11,6 +11,7 @@ function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
     // или имитировать их другими средствами
     const socket = new SockJS("http://localhost:8080/chat-messaging");
+    console.log("Connected successfully");
     stompClient = Stomp.over(socket);
 
     // Пытаемся подключиться, передавая пустой список заголовков - {}
@@ -19,8 +20,7 @@ function connect() {
     stompClient.connect({}, afterConnect, onError);
     // Отключаем кнопку подключения, чтобы пользователь не
     // начинал несколько попыток подключения за раз
-    document.getElementById("connect_button").disabled = true;
-
+    //document.getElementById("connect_button").disabled = true;
 }
 
 // Будем вызвано после установления соединения
@@ -29,7 +29,7 @@ function afterConnect(connection) {
     // Теперь когда подключение установлено
     // Включаем кнопки для отправки сообщений и отключения от сервера
     document.getElementById("set_name_button").disabled = false;
-    document.getElementById("disconnect_button").disabled = false;
+    //document.getElementById("disconnect_button").disabled = false;
 
 }
 
@@ -74,6 +74,18 @@ function addToChat(text, chat) {
     document.getElementById(chat).appendChild(node);
 }
 
+function addRoomToInterface(room, elementId){
+    const dd = document.createElement("dd")           // Создаем элемент списка <dd>
+    const button = document.createElement("button")     // Создаем кнопку
+    button.setAttribute("id", room);                 // Устанавливаем id как название комнаты
+    button.setAttribute("onclick","alert(this.id)"); // Действие при нажатии кнопки
+    const buttonName = document.createTextNode(room);                 // Создаем текстовый элемент
+
+    button.appendChild(buttonName);
+    dd.appendChild(button)// Вставляем текстовый внутрь элемента списка
+    document.getElementById(elementId).appendChild(dd);
+}
+
 function disconnect() {
     stompClient.disconnect();
     // Отключаем кнопки отправки\отключения и включаем кнопку подключения
@@ -95,7 +107,7 @@ function sendMessage(chat, view) {
     stompClient.send(chat, {}, str);
 }
 
-function sendHostMessage(chat, view) {
+function sendSystemMessage(chat, view) {
     const str = JSON.stringify({
         // Это работает на JQuery
         // 'message': $("#message_input_value").val()
@@ -118,18 +130,20 @@ function setName() {
     document.getElementById("set_room_button").disabled = false;
 }
 
-function setRoom() {
+// Передаем комнате, эллимент где будут отображаться все комнты.
+function addRoom(elementId) {
     room = document.getElementById("room_input").value;
-    document.getElementById("mafia_role_button").disabled = false;
-    document.getElementById("civilians_role_button").disabled = false;
-    document.getElementById("set_room_button").disabled = true;
-    document.getElementById("room_input").disabled = true;
+    //document.getElementById("mafia_role_button").disabled = false;
+    //document.getElementById("civilians_role_button").disabled = false;
+    //document.getElementById("set_room_button").disabled = true;
+    //document.getElementById("room_input").disabled = true;
     const str = JSON.stringify({
         'room': room
     });
     // Заранее отправляем информацию о добавлении новой комнаты на сервер
     // чтобы телеграм пользователи могу в нее войти до начала игры.
-    stompClient.send("/app/host_message", {}, str);
+    stompClient.send("/app/system_message", {}, str);
+    addRoomToInterface(room,elementId)
 }
 
 // Метод устанавливающий начальную конфигурацию пользовательского интерфейса в зависимости от роли игрока.

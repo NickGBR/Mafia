@@ -49,11 +49,11 @@ public class ChatController {
     }
 
     /**
-     * Данные метод принимает Json объект отправленный на "/host_message".
+     * Данные метод принимает Json объект отправленный на "/system_message".
      *
      * @param game полученный Json преобразуется в объект Game.
      */
-    @MessageMapping("/host_message")
+    @MessageMapping("/system_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getHostMessages(Game game) {
 
@@ -103,13 +103,20 @@ public class ChatController {
         messagingTemplate.convertAndSend("/chat/civ_messages/" + game.getRoom(), message);
     }
 
+    /**
+     * Удаляет пользователей из указанной комнаты при остановке игры.
+     * Пользователи хранятся в "TemporaryDB.usersByRooms"
+     * @param room пользователи данной комнаты будут удалены из нее.
+     */
     private void cleanTelegramUsersRoom(String room) {
-        Map<String, User> telegramUsers = TemporaryDB.usersByRooms.get(room);
-        System.out.println(telegramUsers);
-        for (Map.Entry<String, User> pair : telegramUsers.entrySet()) {
+        if(!TemporaryDB.usersByRooms.isEmpty()){
+        Map<String, User> users = TemporaryDB.usersByRooms.get(room);
+        System.out.println(users);
+        for (Map.Entry<String, User> pair : users.entrySet()) {
             System.out.println("before: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
-            telegramUsers.get(pair.getKey()).setRoom(null);
+            users.get(pair.getKey()).setRoom(null);
             System.out.println("after: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
+        }
         }
     }
 }
