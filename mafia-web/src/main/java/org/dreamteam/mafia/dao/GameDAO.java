@@ -7,7 +7,7 @@ import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -22,34 +22,36 @@ public class GameDAO {
     @Column(name = "game_id", unique = true, nullable = false)
     private Integer gameId;
 
-    @Column(name = "phase", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private GamePhaseEnum phase;
+    @OneToOne(mappedBy = "game")
+    private RoomDAO room;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private GameStatusEnum status;
 
+    @Column(name = "phase", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private GamePhaseEnum phase;
+
     @Column(name = "day_number", nullable = false)
     private Integer numberOfDay;
 
-    @OneToOne(mappedBy = "game")
-    private RoomDAO room;
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
+    private Set<VotingDAO> votingList;
 
-    @OneToMany(mappedBy = "game")
-    private List<VotingDAO> votingList;
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
+    private Set<CharacterDAO> characterList;
 
-    @OneToMany(mappedBy = "game")
-    private List<CharacterDAO> characterList;
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
+    private Set<MessageDAO> messageList;
 
-    @OneToMany(mappedBy = "game")
-    private List<MessageDAO> messageList;
-
-    public GameDAO(GamePhaseEnum phase, GameStatusEnum status, Integer numberOfDay, RoomDAO room, List<VotingDAO> votingList, List<CharacterDAO> characterList, List<MessageDAO> messageList) {
-        this.phase = phase;
-        this.status = status;
-        this.numberOfDay = numberOfDay;
+    public GameDAO(RoomDAO room, GameStatusEnum status, GamePhaseEnum phase,
+                   Integer numberOfDay, Set<VotingDAO> votingList,
+                   Set<CharacterDAO> characterList, Set<MessageDAO> messageList) {
         this.room = room;
+        this.status = status;
+        this.phase = phase;
+        this.numberOfDay = numberOfDay;
         this.votingList = votingList;
         this.characterList = characterList;
         this.messageList = messageList;
@@ -58,9 +60,14 @@ public class GameDAO {
     @Override
     public String toString() {
         return "Game{" +
-                "id=" + gameId +
+                "gameId=" + gameId +
+                ", roomId=" + room.getRoomId() +
                 ", status=" + status +
-                ", room=" + room +
+                ", phase=" + phase +
+                ", numberOfDay=" + numberOfDay +
+                ", votingList=" + votingList +
+                ", characterList=" + characterList +
+                ", messageList=" + messageList +
                 '}';
     }
 }

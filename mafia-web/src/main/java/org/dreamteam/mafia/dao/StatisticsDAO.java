@@ -19,6 +19,9 @@ public class StatisticsDAO {
     @Column(name = "statistics_id", unique = true, nullable = false)
     private Integer statisticsId;
 
+    @OneToOne(mappedBy = "statistics", fetch = FetchType.EAGER)
+    private UserDAO user;
+
     @Column(name = "games_total_as_mafia", nullable = false)
     private Integer gamesTotalAsMafia;
 
@@ -35,13 +38,11 @@ public class StatisticsDAO {
     private Integer gamesWonAsSheriff;
 
     @Column(name = "games_won_as_citizen", nullable = false)
-    private int gamesWonAsCitizen;
+    private Integer gamesWonAsCitizen;
 
-    @OneToOne(mappedBy = "statistics")
-    private UserDAO user;
-
-    public StatisticsDAO(UserDAO user, int gamesTotalAsMafia, int gamesTotalAsSheriff, int gamesTotalAsCitizen,
-                         int gamesWonAsMafia, int gamesWonAsSheriff, int gamesWonAsCitizen) {
+    public StatisticsDAO(UserDAO user, Integer gamesTotalAsMafia, Integer gamesTotalAsSheriff,
+                         Integer gamesTotalAsCitizen, Integer gamesWonAsMafia,
+                         Integer gamesWonAsSheriff, Integer gamesWonAsCitizen) {
         this.user = user;
         this.gamesTotalAsMafia = gamesTotalAsMafia;
         this.gamesTotalAsSheriff = gamesTotalAsSheriff;
@@ -54,7 +55,8 @@ public class StatisticsDAO {
     @Override
     public String toString() {
         return "Statistics{" +
-                "user=" + user.getLogin() +
+                "statisticsId=" + statisticsId +
+                ", user=" + user.getLogin() +
                 ", gamesTotalAsMafia=" + gamesTotalAsMafia +
                 ", gamesTotalAsSheriff=" + gamesTotalAsSheriff +
                 ", gamesTotalAsCitizen=" + gamesTotalAsCitizen +

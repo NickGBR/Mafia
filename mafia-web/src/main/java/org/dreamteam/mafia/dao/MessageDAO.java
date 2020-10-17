@@ -19,25 +19,25 @@ public class MessageDAO {
     @Column(name = "message_id", unique = true, nullable = false)
     private Integer messageId;
 
-    @Column(name = "text", nullable = false)
-    private String text;
-
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
     private UserDAO user;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "game_id", nullable = false)
     private GameDAO game;
 
     @Column(name = "addressee", nullable = false)
     private Integer addresseeId;
 
-    public MessageDAO(String text, UserDAO user, GameDAO game, Integer addresseeId) {
-        this.text = text;
+    @Column(name = "text", nullable = false)
+    private String text;
+
+    public MessageDAO(UserDAO user, GameDAO game, Integer addresseeId, String text) {
         this.user = user;
         this.game = game;
         this.addresseeId = addresseeId;
+        this.text = text;
     }
 
     @Override
