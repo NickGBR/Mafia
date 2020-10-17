@@ -3,6 +3,8 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dreamteam.mafia.dao.enums.RoleEnum;
+import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
 
 import javax.persistence.*;
 
@@ -17,7 +19,7 @@ public class CharacterDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "character_id", unique = true, nullable = false)
-    private int characterId;
+    private Integer characterId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "game_id", nullable = false)
@@ -27,20 +29,32 @@ public class CharacterDAO {
     @JoinColumn(name = "user_id", nullable = false)
     private UserDAO userId;
 
-   /* @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "roleId", nullable = false)
-    private RoleDAO roleId;*/
+    @JoinColumn(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleEnum role;
 
     @Column(name = "status", nullable = false)
-    private boolean status;
+    @Enumerated(EnumType.STRING)
+    private CharacterStatusEnum status;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "vote_id", nullable = false)
+    @JoinColumn(name = "vote_id")
     private VotingDAO voting;
+
+    public CharacterDAO(GameDAO game, UserDAO userId, RoleEnum role, CharacterStatusEnum status, VotingDAO voting) {
+        this.game = game;
+        this.userId = userId;
+        this.role = role;
+        this.status = status;
+        this.voting = voting;
+    }
 
     @Override
     public String toString() {
-        return "Character{#" + characterId +
+        return "Character{" +
+  //              "game=" + game +
+                ", role=" + role +
+                ", status=" + status +
                 '}';
     }
 }

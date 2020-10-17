@@ -7,14 +7,8 @@ create table roles
 );
 
 
-insert into roles (role)
-values ('don'),
-       ('mafia'),
-       ('mafia'),
-       ('sheriff'),
-       ('citizen'),
-       ('citizen'),
-       ('citizen'),
-       ('citizen'),
-       ('citizen'),
-       ('citizen');
+insert into roles (role_id, role)
+values (1, 'DON'),
+       (2, 'MAFIA'),
+       (3, 'SHERIFF'),
+       (4, 'CITIZEN');

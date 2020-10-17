@@ -28,10 +28,10 @@ public class UserDAO {
 
     @Column(name = "login", unique = true, nullable = false, length = 100)
     private String login;
-/*
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "room_id")
-    private Room room;*/
+    private RoomDAO room;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "statistics_id")

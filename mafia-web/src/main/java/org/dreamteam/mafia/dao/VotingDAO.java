@@ -33,9 +33,21 @@ public class VotingDAO {
     @OneToMany(mappedBy = "voting")
     private List<CharacterDAO> characterList;
 
-    @Override
-    public String toString() {
-        return "Voting{#" + voteId +
-                '}';
+    public VotingDAO(GameDAO game, int numberOfDay, int votesAmount, List<CharacterDAO> characterList) {
+        this.game = game;
+        this.numberOfDay = numberOfDay;
+        this.votesAmount = votesAmount;
+        this.characterList = characterList;
     }
+
+  /*  @Override
+    public String toString() {
+        return "Voting{" +
+                "voteId=" + voteId +
+               // ", game=" + game +
+                ", numberOfDay=" + numberOfDay +
+                ", votesAmount=" + votesAmount +
+                ", characterList=" + characterList +
+                '}';
+    }*/
 }

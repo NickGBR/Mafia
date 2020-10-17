@@ -1,8 +1,10 @@
-package org.dreamteam.mafia.dao;
+/*package org.dreamteam.mafia.dao;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dreamteam.mafia.dao.converter.RoleConverter;
+import org.dreamteam.mafia.dao.converter.RoleEnum;
 
 import javax.persistence.*;
 
@@ -17,14 +19,19 @@ public class RoleDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "role_id", nullable = false)
-    private int roleId;
+    private Integer roleId;
 
     @Column(name = "role", nullable = false)
-    private String role;
+    @Convert(converter = RoleConverter.class)
+    private RoleEnum role;
 
     @Override
     public String toString() {
         return "Role{" + role +
                 '}';
     }
-}
+
+    public RoleDAO(RoleEnum role) {
+        this.role = role;
+    }
+}*/
