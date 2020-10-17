@@ -7,7 +7,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -22,6 +22,11 @@ public class RoomDAO {
     @Column(name = "room_id", unique = true, nullable = false)
     private Integer roomId;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "game_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private GameDAO game;
+
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -34,32 +39,29 @@ public class RoomDAO {
     @Column(name = "max_users_amount", nullable = false)
     private Integer maxUsersAmount;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "game_id")
-    @NotFound(action = NotFoundAction.IGNORE)
-    private GameDAO game;
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
+    private Set<UserDAO> userList;
 
-   @OneToMany(mappedBy = "room")
-   private List<UserDAO> userList;
-
-    public RoomDAO(String name, String passwordHash, Integer maxUsersAmount, GameDAO game) {
+    public RoomDAO(GameDAO game, String name, String description,
+                   String passwordHash, Integer maxUsersAmount, Set<UserDAO> userList) {
+        this.game = game;
         this.name = name;
+        this.description = description;
         this.passwordHash = passwordHash;
         this.maxUsersAmount = maxUsersAmount;
-        this.game = game;
-     //   this.userList = userList;
+        this.userList = userList;
     }
 
     @Override
     public String toString() {
-        return "Room{" +
+        return "RoomDAO{" +
                 "roomId=" + roomId +
+                ", gameId=" + game.getGameId() +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", passwordHash=" + passwordHash +
+                ", passwordHash='" + passwordHash + '\'' +
                 ", maxUsersAmount=" + maxUsersAmount +
-              //  ", game=" + game +
-               // ", userList=" + userList +
+                ", userList=" + userList +
                 '}';
     }
 }

@@ -14,11 +14,11 @@ import java.util.Optional;
 public class Testing {
 
     @Bean
-    public CommandLineRunner demo(GameRepository repository) {
+    public CommandLineRunner demo(CharacterRepository repository) {
         return (args) -> {
 
-            Iterable<GameDAO> all = repository.findAll();
-            for (GameDAO r : all) {
+            Iterable<CharacterDAO> all = repository.findAll();
+            for (CharacterDAO r : all) {
                 System.out.println(r);
             }
 

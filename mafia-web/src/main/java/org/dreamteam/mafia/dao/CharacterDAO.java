@@ -8,8 +8,8 @@ import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
 
 import javax.persistence.*;
 
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
 @Entity
 @Table(name = "characters")
@@ -21,40 +21,43 @@ public class CharacterDAO {
     @Column(name = "character_id", unique = true, nullable = false)
     private Integer characterId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserDAO user;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "game_id", nullable = false)
     private GameDAO game;
-
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserDAO userId;
-
-    @JoinColumn(name = "role", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private RoleEnum role;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private CharacterStatusEnum status;
 
+    @JoinColumn(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleEnum role;
+
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "vote_id")
     private VotingDAO voting;
 
-    public CharacterDAO(GameDAO game, UserDAO userId, RoleEnum role, CharacterStatusEnum status, VotingDAO voting) {
+    public CharacterDAO(UserDAO user, GameDAO game, CharacterStatusEnum status, RoleEnum role, VotingDAO voting) {
+        this.user = user;
         this.game = game;
-        this.userId = userId;
-        this.role = role;
         this.status = status;
+        this.role = role;
         this.voting = voting;
     }
 
     @Override
     public String toString() {
         return "Character{" +
-  //              "game=" + game +
-                ", role=" + role +
+                "characterId=" + characterId +
+                ", user=" + user.getLogin() +
+                ", gameId=" + game.getGameId() +
                 ", status=" + status +
+                ", role=" + role +
+                ", voting=" + voting +
                 '}';
     }
 }

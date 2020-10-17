@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Объект, связанный с таблицей пользователей в БД
@@ -38,9 +38,9 @@ public class UserDAO {
     private StatisticsDAO statistics;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<MessageDAO> messageList;
+    private Set<MessageDAO> messageList;
 
-    public UserDAO(String login, String passwordHash, RoomDAO room, StatisticsDAO statistics, List<MessageDAO> messageList) {
+    public UserDAO(String login, String passwordHash, RoomDAO room, StatisticsDAO statistics, Set<MessageDAO> messageList) {
         this.login = login;
         this.passwordHash = passwordHash;
         this.room = room;

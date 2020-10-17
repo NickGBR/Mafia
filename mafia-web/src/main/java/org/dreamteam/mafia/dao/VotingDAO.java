@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -31,9 +31,9 @@ public class VotingDAO {
     private Integer votesAmount;
 
     @OneToMany(mappedBy = "voting", fetch = FetchType.EAGER)
-    private List<CharacterDAO> characterList;
+    private Set<CharacterDAO> characterList;
 
-    public VotingDAO(GameDAO game, Integer numberOfDay, Integer votesAmount, List<CharacterDAO> characterList) {
+    public VotingDAO(GameDAO game, Integer numberOfDay, Integer votesAmount, Set<CharacterDAO> characterList) {
         this.game = game;
         this.numberOfDay = numberOfDay;
         this.votesAmount = votesAmount;

@@ -23,7 +23,7 @@ public class MessageDAO {
     @JoinColumn(name = "user_id", nullable = false)
     private UserDAO user;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "game_id", nullable = false)
     private GameDAO game;
 

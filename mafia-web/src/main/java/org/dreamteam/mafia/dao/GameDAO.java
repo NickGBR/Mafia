@@ -7,7 +7,7 @@ import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -37,17 +37,17 @@ public class GameDAO {
     private Integer numberOfDay;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
-    private List<VotingDAO> votingList;
+    private Set<VotingDAO> votingList;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
-    private List<CharacterDAO> characterList;
+    private Set<CharacterDAO> characterList;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
-    private List<MessageDAO> messageList;
+    private Set<MessageDAO> messageList;
 
     public GameDAO(RoomDAO room, GameStatusEnum status, GamePhaseEnum phase,
-                   Integer numberOfDay, List<VotingDAO> votingList,
-                   List<CharacterDAO> characterList, List<MessageDAO> messageList) {
+                   Integer numberOfDay, Set<VotingDAO> votingList,
+                   Set<CharacterDAO> characterList, Set<MessageDAO> messageList) {
         this.room = room;
         this.status = status;
         this.phase = phase;
@@ -61,7 +61,7 @@ public class GameDAO {
     public String toString() {
         return "Game{" +
                 "gameId=" + gameId +
-         //       ", roomId=" + room +
+                ", roomId=" + room.getRoomId() +
                 ", status=" + status +
                 ", phase=" + phase +
                 ", numberOfDay=" + numberOfDay +
