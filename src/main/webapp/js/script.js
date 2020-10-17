@@ -141,7 +141,6 @@ function setRoleInterface(isMafia) {
 
 //Метод выводящий сообщение в зависимости от времени в игре.
 function sendTimeMessage(isNight) {
-    console.log("OOPS " + room )
     if (isNight === false) {
         addToChat("День настал!", mafiaChat);
         addToChat("День настал!", civiliansChat);

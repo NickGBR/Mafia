@@ -3,6 +3,7 @@ package org.dreamteam.mafia.bot;
 import lombok.SneakyThrows;
 import org.dreamteam.mafia.model.Message;
 import org.dreamteam.mafia.model.TelegramUser;
+import org.dreamteam.mafia.temporary.TemporaryDB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -20,36 +21,49 @@ import java.util.List;
 @Component
 public class TBot extends TelegramLongPollingBot {
 
-    @Autowired
-    /* Map для хранения пользователей по их id, для ключа используем String, так как Spring,
-       не позволяет использовать другие типы для хранения ключа*/
-    private Map<String, TelegramUser> users;
-
     /**
      * Принимает сообщения от пользователя, обрабатывает его, и отправляет ответ.
-     *
-     * @param update
      */
     @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
-        //Проверяем существуют ли пользователь.
+        String userId;
 
+        // Часто отвечающая за работу с сообщениями
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String userId = update.getMessage().getChatId().toString();
-            System.out.println(userId);
+            userId = update.getMessage().getChatId().toString();
 
-            //Если пользователя не существует, добавляем его в мапу с пользователями
-            if (!users.containsKey(userId)) {
+            //Если пользователя не существует, добавляем его в БД.
+            if (!TemporaryDB.telegramUsers.containsKey(userId)) {
                 TelegramUser user = new TelegramUser();
                 user.setChatId(userId);
-                users.put(userId, user);
-                createStartGameButton(Long.parseLong(userId));
+                TemporaryDB.telegramUsers.put(userId, user);
+
+                // Создаем кнопку для начала игры.
+                createStartGameButton(userId);
             }
-        }
-        if(update.hasCallbackQuery()){
-            String userId = update.getCallbackQuery().getFrom().getId().toString();
-            if(update.getCallbackQuery().getData().equals("play_button_pressed")){
+
+                TelegramUser telegramUser = TemporaryDB.telegramUsers.get(userId);
+
+                // Если пользователь не имеет комнаты, но уже нажал кнопку начала игры,
+                if (telegramUser.isStartButtonPressed() && telegramUser.getRoom() == null) {
+
+                    // То проверяем существкет ли комната, если да то домавляем пользователя в комнату,
+                    System.out.println(update.getMessage().getText());
+                    if (TemporaryDB.rooms.contains(update.getMessage().getText())) {
+                        telegramUser.setRoom(update.getMessage().getText());
+                    }
+                    // если нет, то проси повторить попытку.
+                    else sendMessage(userId, "Такой комнаты не существует." + "\n" + "Повторите попытку!");
+                }
+            }
+
+        // Часть отвечающая за работу с кнопками.
+        if (update.hasCallbackQuery()) {
+            userId = update.getCallbackQuery().getFrom().getId().toString();
+            if (update.getCallbackQuery().getData().equals("play_button_pressed")) {
+
+                TemporaryDB.telegramUsers.get(userId).setStartButtonPressed(true);
                 sendMessage(userId, "Введите название комнаты");
             }
         }
@@ -71,15 +85,11 @@ public class TBot extends TelegramLongPollingBot {
         return "1348924592:AAFZR9e7WK65yR04yDloEa5QGjfB4Hvpucw";
     }
 
-    //Получение мапы с пользователями.
-    public Map<String, TelegramUser> getUsers() {
-        return users;
-    }
 
     /**
      * Создает кнопку для старта игры.
      */
-    private void createStartGameButton(Long userId) throws TelegramApiException {
+    private void createStartGameButton(String userId) throws TelegramApiException {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();       //Создаем объект разметки кнопок.
         InlineKeyboardButton startButton = new InlineKeyboardButton();  //Создаем кнопку для начала игры.
         startButton.setText(BotConst.START_GAME_BUTTON_TEXT);

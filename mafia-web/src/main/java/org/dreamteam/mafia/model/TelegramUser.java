@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("prototype")
 public class TelegramUser {
-    boolean isStartButtonPressed = false;
-    String chatId;
+    private boolean isStartButtonPressed = false;
+    private String chatId;
+    private String room;
+
 }
