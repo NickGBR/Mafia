@@ -74,7 +74,11 @@ function addToChat(text, chat) {
     document.getElementById(chat).appendChild(node);
 }
 
-function addRoomToInterface(room, elementId){
+function addRoomToInterface(response){
+    const data = JSON.parse(response.body);
+    room = data.room;
+
+    //Отправляем сообщение о времени суток
     const dd = document.createElement("dd")           // Создаем элемент списка <dd>
     const button = document.createElement("button")     // Создаем кнопку
     button.setAttribute("id", room);                 // Устанавливаем id как название комнаты
@@ -83,7 +87,7 @@ function addRoomToInterface(room, elementId){
 
     button.appendChild(buttonName);
     dd.appendChild(button)// Вставляем текстовый внутрь элемента списка
-    document.getElementById(elementId).appendChild(dd);
+    document.getElementById('rooms_list').appendChild(dd);
 }
 
 function disconnect() {
@@ -124,6 +128,7 @@ function sendSystemMessage(chat, view) {
 
 //Метод установки ника пользователя в чате.
 function setName() {
+    stompClient.subscribe("/chat/system_messages/rooms/", addRoomToInterface)
     name = document.getElementById("name_input").value;
     document.getElementById("set_name_button").disabled = true;
     document.getElementById("name_input").disabled = true;
@@ -131,7 +136,7 @@ function setName() {
 }
 
 // Передаем комнате, эллимент где будут отображаться все комнты.
-function addRoom(elementId) {
+function addRoom() {
     room = document.getElementById("room_input").value;
     //document.getElementById("mafia_role_button").disabled = false;
     //document.getElementById("civilians_role_button").disabled = false;
@@ -143,7 +148,6 @@ function addRoom(elementId) {
     // Заранее отправляем информацию о добавлении новой комнаты на сервер
     // чтобы телеграм пользователи могу в нее войти до начала игры.
     stompClient.send("/app/system_message", {}, str);
-    addRoomToInterface(room,elementId)
 }
 
 // Метод устанавливающий начальную конфигурацию пользовательского интерфейса в зависимости от роли игрока.

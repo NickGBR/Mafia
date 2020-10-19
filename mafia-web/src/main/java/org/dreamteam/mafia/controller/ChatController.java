@@ -66,6 +66,7 @@ public class ChatController {
         if (!TemporaryDB.rooms.contains(game.getRoom())) {
 
             // Если комната новая, то добавляем ее в список существующих комнат.
+            messagingTemplate.convertAndSend("/chat/system_messages/rooms/", game);
             TemporaryDB.rooms.add(game.getRoom());
             Host host = new Host(game.getRoom(), messagingTemplate, TemporaryDB.systemMessages);
 

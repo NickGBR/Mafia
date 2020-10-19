@@ -5,7 +5,7 @@ package org.dreamteam.mafia.model;
  */
 public class Game {
     private boolean isNight = false;
-    private String room;
+    private String room; // Данное поле должно быть id, добавить name and id
     private Message message;
     private boolean isInterrupted;  // Используется для прерывания игры, если пришел объект Game c isInterrupted = true, то игра останавливается.
 
