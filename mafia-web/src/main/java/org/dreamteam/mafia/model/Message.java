@@ -11,9 +11,15 @@ import lombok.Setter;
 public class Message {
 
     private String from;
-    private String message;
+    private String text;
     private String role;
     private String room;
+
+    /**
+     * Используется для регистрации нового пользователя. Если сообщение первое, то
+     * браузер меняет значение перемменой на true, и сервер понимает что нужно добавить нового пользователя.
+     */
+    private boolean firstMessage = false;
 
     public void setRole(Role role) {
         this.role = role.toString();
@@ -21,10 +27,10 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message [from=" + from + ", message=" + message + "]";
+        return "Message [from=" + from + ", message=" + text + "]";
     }
 
-    public enum Role{
+    public enum Role {
         MAFIA,
         CIVILIAN,
         HOST

@@ -6,7 +6,11 @@ let isMafia = false;
 let isNight;
 let room;
 let isGameActive = false;
+let storage = window.sessionStorage;
 
+function getData(){
+    console.log(storage.getItem("name"))
+}
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
     // или имитировать их другими средствами
@@ -22,19 +26,21 @@ function connect() {
     // начинал несколько попыток подключения за раз
     //document.getElementById("connect_button").disabled = true;
 }
-
 // Будем вызвано после установления соединения
 function afterConnect(connection) {
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
     // Включаем кнопки для отправки сообщений и отключения от сервера
     document.getElementById("set_name_button").disabled = false;
+    document.getElementById("set_room_button").disabled = false;
+
     //document.getElementById("disconnect_button").disabled = false;
 
 }
 
 // Будет вызвано при ошибке установления соединения
 function onError(error) {
+    alert("Ошибка подключения к серверу.");
     console.log("Не удалось установить подключение: " + error);
     // Включаем кнопку подключения обратно.
     // Вдруг в следующий раз подключиться получиться
@@ -54,15 +60,15 @@ function getStat(response) {
 // Данный метод получает сообщения от сокета.
 function getMessage(response) {
     const data = JSON.parse(response.body);
-    console.log("Получено сообщение: " + data.message)
+    console.log("Получено сообщение: " + data.text)
     console.log("Название чата: " + data.role);
     console.log("From = " + data.from)
 
     //Определяем от кого пришло сообщение.
-    if (data.role === "MAFIA") addToChat(data.from + ": " + data.message, mafiaChat);
+    if (data.role === "MAFIA") addToChat(data.from + ": " + data.text, mafiaChat);
     else if (data.role === "CIVILIAN")
-        addToChat(data.from + ": " + data.message, civiliansChat);
-    else if (data.role === "HOST") addToChat(data.from + ": " + data.message, civiliansChat);
+        addToChat(data.from + ": " + data.text, civiliansChat);
+    else if (data.role === "HOST") addToChat(data.from + ": " + data.text, civiliansChat);
 }
 
 // Добавление сообщения в HTML
@@ -100,13 +106,16 @@ function sendMessage(chat, view) {
         // 'message': $("#message_input_value").val()
         // А это на чистом JavaScript
         'room': room,                                    // Сервер должен знать в какую комнату переслать сообщение.
-        'message': document.getElementById(view).value,
+        'text': document.getElementById(view).value,
         'from': name
     });
     console.log(str);
     stompClient.send(chat, {}, str);
 }
 
+function getStorageData(){
+    name = storage.getItem("name");
+}
 function sendSystemMessage(chat, view) {
     const str = JSON.stringify({
         // Это работает на JQuery
@@ -114,7 +123,7 @@ function sendSystemMessage(chat, view) {
         // А это на чистом JavaScript
         'room': room,                                    // Сервер должен знать в какую комнату переслать сообщение.
         "message": {
-            'message': document.getElementById(view).value,
+            'text': document.getElementById(view).value,
             'role': "HOST",
             'from' : "Host"
         }
@@ -122,15 +131,19 @@ function sendSystemMessage(chat, view) {
     stompClient.send(chat, {}, str);
 }
 
-//Метод установки ника пользователя в чате.
+/**
+ * Метод установки имени пользователя пользователя в чате.
+ */
 function setName() {
     name = document.getElementById("name_input").value;
-    document.getElementById("set_name_button").disabled = true;
-    document.getElementById("name_input").disabled = true;
-    document.getElementById("set_room_button").disabled = false;
+    storage.setItem("name", name);
+    document.location.href = "/roomList.html";
 }
 
-// Передаем комнате, эллимент где будут отображаться все комнты.
+/**
+ * Передаем комнате, эллимент где будут отображаться все комнты.
+  * @param elementId
+ */
 function addRoom(elementId) {
     room = document.getElementById("room_input").value;
     //document.getElementById("mafia_role_button").disabled = false;
@@ -146,7 +159,10 @@ function addRoom(elementId) {
     addRoomToInterface(room,elementId)
 }
 
-// Метод устанавливающий начальную конфигурацию пользовательского интерфейса в зависимости от роли игрока.
+/**
+ * Метод устанавливающий начальную конфигурацию пользовательского интерфейса в зависимости от роли игрока.
+ * @param isMafia
+ */
 function setRoleInterface(isMafia) {
     console.log(isMafia)
     if (isMafia === true) {
@@ -159,7 +175,10 @@ function setRoleInterface(isMafia) {
     }
 }
 
-//Метод выводящий сообщение в зависимости от времени в игре.
+/**
+ * Метод выводящий сообщение в зависимости от времени в игре.
+ * @param isNight
+ */
 function sendTimeMessage(isNight) {
     if (isNight === false) {
         addToChat("День настал!", mafiaChat);
@@ -172,7 +191,10 @@ function sendTimeMessage(isNight) {
     }
 }
 
-//Метод меняющий чат в зависимости от премени в игре.
+/**
+ * Метод меняющий чат в зависимости от времени в игре.
+ * @param isNight
+ */
 function setTimeInterface(isNight) {
     if (isNight === true) {
         //document.body.style.backgroundColor = "#03133C";
@@ -185,7 +207,10 @@ function setTimeInterface(isNight) {
     }
 }
 
-//Метод для выбора роли при помощи кнопок.
+/**
+ * Метод для выбора роли при помощи кнопок.
+ * @param id
+ */
 function chooseRole(id) {
     if (id === "mafia_role_button") {
         isMafia = true;
@@ -237,7 +262,9 @@ function sendStopGameMessage(chat) {
     stompClient.send(chat, {}, str);
 }
 
-// Настойка интерфеса при отключении от сервера или ошибке.
+/**
+ * Настойка интерфеса при отключении от сервера или ошибке.
+  */
 function setErrorDisconnectInterface() {
     document.getElementById("send_civilians_button").disabled = true;
     document.getElementById("send_mafia_button").disabled = true;

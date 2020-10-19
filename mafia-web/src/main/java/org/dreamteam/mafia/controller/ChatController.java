@@ -57,7 +57,7 @@ public class ChatController {
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getHostMessages(Game game) {
 
-        //Добавляем сообщение для вывода.
+        //Добавляем сообщение для вывода. Хост отправляет сообщение на сервер, которве выводится в игре.
         if (game.getMessage() != null) {
             TemporaryDB.systemMessages.put(game.getRoom(), game.getMessage());
         }
@@ -94,7 +94,7 @@ public class ChatController {
 
         //Собираем сообщение для отправки в пользовательский чат
         Message message = new Message();
-        message.setMessage("Игра была остановлена!");
+        message.setText("Игра была остановлена!");
         message.setRoom(game.getRoom());
         message.setRole(Message.Role.HOST);
         message.setFrom("Host");
@@ -106,17 +106,18 @@ public class ChatController {
     /**
      * Удаляет пользователей из указанной комнаты при остановке игры.
      * Пользователи хранятся в "TemporaryDB.usersByRooms"
+     *
      * @param room пользователи данной комнаты будут удалены из нее.
      */
     private void cleanTelegramUsersRoom(String room) {
-        if(!TemporaryDB.usersByRooms.isEmpty()){
-        Map<String, User> users = TemporaryDB.usersByRooms.get(room);
-        System.out.println(users);
-        for (Map.Entry<String, User> pair : users.entrySet()) {
-            System.out.println("before: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
-            users.get(pair.getKey()).setRoom(null);
-            System.out.println("after: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
-        }
+        if (!TemporaryDB.usersByRooms.isEmpty()) {
+            Map<String, User> users = TemporaryDB.usersByRooms.get(room);
+            System.out.println(users);
+            for (Map.Entry<String, User> pair : users.entrySet()) {
+                System.out.println("before: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
+                users.get(pair.getKey()).setRoom(null);
+                System.out.println("after: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
+            }
         }
     }
 }

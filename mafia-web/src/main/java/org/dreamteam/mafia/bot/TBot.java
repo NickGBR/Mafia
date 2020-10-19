@@ -98,7 +98,7 @@ public class TBot extends TelegramLongPollingBot {
     private void sendWebMessage(String chat, User user, String text){
         Message message = new Message();
         message.setFrom(user.getName());
-        message.setMessage(text);
+        message.setText(text);
         message.setRole(user.getRole());
         messagingTemplate.convertAndSend(chat + user.getRoom(), message);
     }
