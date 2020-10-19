@@ -48,11 +48,12 @@ public final class TokenAuthenticationProvider extends AbstractUserDetailsAuthen
             String userName,
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
         final Object token = usernamePasswordAuthenticationToken.getCredentials();
-        logger.debug("Retrieving user via token. " + userName + " : " + token);
+        logger.debug("Retrieving user via token: " + token);
         Optional<String> login = tokenService.extractUsernameFrom(new SignedJsonWebToken(token.toString()));
         if (login.isPresent()) {
             List<UserDAO> userDAOS = repository.findByLogin(login.get());
             if (userDAOS.size() > 0) {
+                logger.debug("User successfully found: " + userDAOS.get(0).getLogin());
                 return new SecurityUserDetails(userDAOS.get(0));
             }
         }
