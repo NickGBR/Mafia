@@ -1,6 +1,7 @@
 package org.dreamteam.mafia.repository.api;
 
 import org.dreamteam.mafia.dao.RoomDAO;
+import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.springframework.data.repository.CrudRepository;
 
@@ -14,5 +15,6 @@ public interface RoomRepository extends CrudRepository<RoomDAO, Long> {
      * @return список комнат
      */
     List<RoomDAO> findRoomDAOByGameStatus(GameStatusEnum gameStatusEnum);
+
 
 }

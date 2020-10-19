@@ -13,17 +13,20 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
+import java.util.Optional;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class Testing {
 
     @Bean
-    public CommandLineRunner demo(RoomRepository repository) {
+    public CommandLineRunner demo(CrudUserRepository userRepository,
+                                  RoomRepository roomRepository) {
         return (args) -> {
 
-            List<RoomDAO> rooms = repository.findRoomDAOByGameStatus(GameStatusEnum.DELETED);
-            for (RoomDAO r : rooms) {
-                System.out.println(r);
+            List<UserDAO> byRoomId = userRepository.findByRoomId(2);
+
+            for (UserDAO u : byRoomId) {
+                System.out.println(u);
             }
 
 

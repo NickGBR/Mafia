@@ -8,7 +8,6 @@ import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 
 import javax.persistence.*;
 import java.util.Set;
-import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -30,7 +29,7 @@ public class RoomDAO {
     @JoinColumn(name = "admin_id", nullable = false)
     private UserDAO admin;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "room_name", nullable = false)
     private String name;
 
     @Column(name = "description")
@@ -65,10 +64,10 @@ public class RoomDAO {
     @OneToMany(mappedBy = "messageId", fetch = FetchType.EAGER)
     private Set<MessageDAO> messageList;
 
-    public RoomDAO(String passwordHash, UserDAO admin, String name, Integer maxUsersAmount, GameStatusEnum gameStatus) {
+    public RoomDAO(String passwordHash, UserDAO admin, String roomName, Integer maxUsersAmount, GameStatusEnum gameStatus) {
         this.passwordHash = passwordHash;
         this.admin = admin;
-        this.name = name;
+        this.name = roomName;
         this.maxUsersAmount = maxUsersAmount;
         this.gameStatus = gameStatus;
     }

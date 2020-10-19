@@ -1,4 +1,4 @@
-insert into rooms (password_hash, admin_id, name, description,
+insert into rooms (password_hash, admin_id, room_name, description,
                    max_users_amount, game_status, day_number, game_phase,
                    mafia, sheriff, don)
 values ('98765', 1, 'room1', 'description1', 10, 'DELETED', 1, 'NIGHT', 0, false, false),
