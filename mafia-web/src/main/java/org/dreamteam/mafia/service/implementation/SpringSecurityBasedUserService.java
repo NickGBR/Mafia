@@ -10,6 +10,7 @@ import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.CrudUserRepository;
 import org.dreamteam.mafia.service.api.TokenService;
 import org.dreamteam.mafia.service.api.UserService;
+import org.dreamteam.mafia.temporary.TemporaryDB;
 import org.dreamteam.mafia.util.ClientErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -54,6 +55,9 @@ public class SpringSecurityBasedUserService implements UserService {
         UserDAO user = new UserDAO();
         user.setLogin(registrationDTO.getLogin());
         user.setPasswordHash(encoder.encode(registrationDTO.getPassword()));
+
+        //TemporaryDB.users.put()
+
         repository.save(user);
     }
 

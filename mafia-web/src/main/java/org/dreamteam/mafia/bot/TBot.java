@@ -35,6 +35,7 @@ public class TBot extends TelegramLongPollingBot {
 
         // Часть отвечающая за работу с сообщениями
         if (update.hasMessage() && update.getMessage().hasText()) {
+            System.out.println(update.getMessage().getChatId());
             userId = update.getMessage().getChatId().toString();
             User user;
             //Если пользователя не существует, добавляем его в БД.
@@ -81,6 +82,8 @@ public class TBot extends TelegramLongPollingBot {
         // Часть отвечающая за работу с кнопками.
         if (update.hasCallbackQuery()) {
             userId = update.getCallbackQuery().getFrom().getId().toString();
+            org.telegram.telegrambots.meta.api.objects.User from = update.getCallbackQuery().getFrom();//807321539
+            System.out.println(from.toString()); //test
             if (update.getCallbackQuery().getData().equals("play_button_pressed")) {
 
                 TemporaryDB.users.get(userId).setStartButtonPressed(true);

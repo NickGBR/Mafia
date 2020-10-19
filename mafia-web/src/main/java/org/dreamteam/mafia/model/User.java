@@ -15,7 +15,7 @@ public class User {
     private boolean isStartButtonPressed = false;
     private String chatId;
     private String room;
-    private String name;
+    private String name; //У телеграм юзеров имя начинается с @t_UserName
     private Message.Role role;
 
     public User(UserDAO dao) {
@@ -23,5 +23,6 @@ public class User {
     }
 
     public User(){
+
     }
 }

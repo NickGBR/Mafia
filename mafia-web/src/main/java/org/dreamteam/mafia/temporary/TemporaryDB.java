@@ -27,7 +27,7 @@ public class TemporaryDB {
     public static Map<String, ScheduledFuture<?>> tasks = new HashMap<>();
 
     /**
-     * Хранит пользователей подключившихся через Телеграм.
+     * Хранит пользователей подключившихся через Телеграм web: + userName.
      */
     public static Map<String, User> users = new HashMap<>();
 

@@ -7,6 +7,7 @@ import org.dreamteam.mafia.exceptions.UserRegistrationException;
 import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.service.api.UserService;
+import org.dreamteam.mafia.temporary.TemporaryDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
