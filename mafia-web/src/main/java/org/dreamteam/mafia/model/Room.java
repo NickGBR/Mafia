@@ -10,9 +10,13 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Room {
+    private boolean isStarted = false;
+    private boolean isExisting = false;
+    /* Используется для прерывания игры, если пришел объект Room c isInterrupted = true,
+     то игра останавливается.*/
+    private boolean isInterrupted = false;
     private boolean isNight = false;
     private String name;
     private String id;
     private Message message;
-    private boolean isInterrupted;  // Используется для прерывания игры, если пришел объект Room c isInterrupted = true, то игра останавливается.
 }

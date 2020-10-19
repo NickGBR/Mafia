@@ -35,7 +35,7 @@ function connect() {
     stompClient.connect({'x-auth-token': token}, afterConnect, onError);
     // Отключаем кнопку подключения, чтобы пользователь не
     // начинал несколько попыток подключения за раз
-    //document.getElementById("connect_button").disabled = true;
+    // document.getElementById("connect_button").disabled = true;
 }
 
 // Будем вызвано после установления соединения

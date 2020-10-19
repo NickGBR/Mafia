@@ -12,8 +12,12 @@ function tryToLogin() {
                 const data = request.responseText
                 console.log("Success. New token: " + data);
                 document.cookie = "token" + "=" + data + ";path=/";
+
                 // Добавленно Никитой.
                 sessionStorage.setItem("token", data);
+                // Берем введенный логин, сервер подтвердил что логин валидный.
+                sessionStorage.setItem("login", document.getElementById("login_input").value)
+                //Переходим на страницу с чатом.
                 window.open('roomList.html');
             } else if (request.status === 400) {
                 const data = JSON.parse(request.responseText);

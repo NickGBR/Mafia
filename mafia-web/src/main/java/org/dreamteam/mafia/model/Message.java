@@ -11,7 +11,7 @@ import lombok.Setter;
 public class Message {
 
     private String from;
-    private String message;
+    private String text;
     private String role;
     private String room;
 
@@ -21,7 +21,7 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message [from=" + from + ", message=" + message + "]";
+        return "Message [from=" + from + ", message=" + text + "]";
     }
 
     public enum Role{
