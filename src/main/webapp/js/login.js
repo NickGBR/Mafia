@@ -12,6 +12,9 @@ function tryToLogin() {
                 const data = request.responseText
                 console.log("Success. New token: " + data);
                 document.cookie = "token" + "=" + data + ";path=/";
+                // Добавленно Никитой.
+                sessionStorage.setItem("token", data);
+                window.open('roomList.html');
             } else if (request.status === 400) {
                 const data = JSON.parse(request.responseText);
                 switch (parseInt(data["result"])) {

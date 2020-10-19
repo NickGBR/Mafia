@@ -13,7 +13,7 @@ public class User {
 
     private String login;
     private boolean isStartButtonPressed = false;
-    private String chatId;
+    private String id;
     private String room;
     private String name; //У телеграм юзеров имя начинается с @t_UserName
     private Message.Role role;

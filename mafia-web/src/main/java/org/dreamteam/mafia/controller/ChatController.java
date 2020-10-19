@@ -2,10 +2,11 @@ package org.dreamteam.mafia.controller;
 
 
 import org.dreamteam.mafia.bot.TBot;
-import org.dreamteam.mafia.model.Game;
+import org.dreamteam.mafia.model.Room;
 import org.dreamteam.mafia.model.Host;
 import org.dreamteam.mafia.model.Message;
 import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.temporary.TemporaryDB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,6 +27,9 @@ public class ChatController {
 
     @Autowired
     TBot bot;
+
+    @Autowired
+    UserService userService;
 
     @Qualifier("Task")
     @Autowired
@@ -51,57 +55,60 @@ public class ChatController {
     /**
      * Данные метод принимает Json объект отправленный на "/system_message".
      *
-     * @param game полученный Json преобразуется в объект Game.
+     * @param room полученный Json преобразуется в объект Room.
      */
     @MessageMapping("/system_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
-    public void getHostMessages(Game game) {
+    public void getSystemMessages(Room room) {
 
         //Добавляем сообщение для вывода.
-        if (game.getMessage() != null) {
-            TemporaryDB.systemMessages.put(game.getRoom(), game.getMessage());
+        if (room.getMessage() != null) {
+            TemporaryDB.systemMessages.put(room.getName(), room.getMessage());
         }
 
         // Проверяем наличие команты в игре.
-        if (!TemporaryDB.rooms.contains(game.getRoom())) {
+        if (!TemporaryDB.rooms.contains(room.getName())) {
 
             // Если комната новая, то добавляем ее в список существующих комнат.
-            messagingTemplate.convertAndSend("/chat/system_messages/rooms/", game);
-            TemporaryDB.rooms.add(game.getRoom());
-            Host host = new Host(game.getRoom(), messagingTemplate, TemporaryDB.systemMessages);
+            messagingTemplate.convertAndSend("/chat/system_messages/rooms/", room);
+            TemporaryDB.rooms.add(room.getName());
+
+            System.out.println("Комната " + room.getName() + " добавлена!");
+
+            Host host = new Host(room.getName(), messagingTemplate, TemporaryDB.systemMessages);
 
             // Создаем нового ведущего для игры, и добавляем его в список храниящий всех ведущих работающих на сервере.
             ScheduledFuture<?> future = taskScheduler.scheduleWithFixedDelay(host, 10000);
-            TemporaryDB.tasks.put(game.getRoom(), future);
+            TemporaryDB.tasks.put(room.getName(), future);
         }
 
         // Проверяем была ли игра остановлена.
-        if (game.isInterrupted()) {
-            stopGame(game);
+        if (room.isInterrupted()) {
+            stopGame(room);
         }
     }
 
     /**
      * Метод для остановки игры.
      *
-     * @param game сессия игры которую необходимо остановить.
+     * @param room сессия игры которую необходимо остановить.
      */
-    private void stopGame(Game game) {
+    private void stopGame(Room room) {
         // Если игра остановлена то останавливаем текущую задачу, удаляем задачу из списка задач.
-        TemporaryDB.tasks.get(game.getRoom()).cancel(true);
-        TemporaryDB.tasks.remove(game.getRoom());
-        TemporaryDB.rooms.remove(game.getRoom());
-        cleanTelegramUsersRoom(game.getRoom());
+        TemporaryDB.tasks.get(room.getName()).cancel(true);
+        TemporaryDB.tasks.remove(room.getName());
+        TemporaryDB.rooms.remove(room.getName());
+        cleanTelegramUsersRoom(room.getName());
 
         //Собираем сообщение для отправки в пользовательский чат
         Message message = new Message();
         message.setMessage("Игра была остановлена!");
-        message.setRoom(game.getRoom());
+        message.setRoom(room.getName());
         message.setRole(Message.Role.HOST);
         message.setFrom("Host");
 
         // Отправляем сообщение в чат об остановке игры.
-        messagingTemplate.convertAndSend("/chat/civ_messages/" + game.getRoom(), message);
+        messagingTemplate.convertAndSend("/chat/civ_messages/" + room.getName(), message);
     }
 
     /**

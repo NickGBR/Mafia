@@ -41,11 +41,6 @@ function connect() {
 // Будем вызвано после установления соединения
 function afterConnect(connection) {
     console.log("Успешное подключение: " + connection);
-    // Теперь когда подключение установлено
-    // Включаем кнопки для отправки сообщений и отключения от сервера
-    document.getElementById("connectButton").disabled = false;
-    //document.getElementById("disconnect_button").disabled = false;
-
 }
 
 // Будет вызвано при ошибке установления соединения

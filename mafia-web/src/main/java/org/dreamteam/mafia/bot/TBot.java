@@ -41,7 +41,7 @@ public class TBot extends TelegramLongPollingBot {
             //Если пользователя не существует, добавляем его в БД.
             if (!TemporaryDB.users.containsKey(userId)) {
                 user = new User();
-                user.setChatId(userId);
+                user.setId(userId);
                 TemporaryDB.users.put(userId, user);
 
                 // Создаем кнопку для начала игры.

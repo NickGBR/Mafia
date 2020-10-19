@@ -13,14 +13,12 @@ function connect() {
     const socket = new SockJS("http://localhost:8080/chat-messaging");
     console.log("Connected successfully");
     stompClient = Stomp.over(socket);
-
-    // Пытаемся подключиться, передавая пустой список заголовков - {}
+    // Получем токен достпа для конкретного пользователя.
+    let token = sessionStorage.getItem('token');
+    // Пытаемся подключиться, передав токен в заголовке.
     // И две функции: одну для обработки успешного подключения,
     // и вторую для обработки ошибки подключения
-    stompClient.connect({}, afterConnect, onError);
-    // Отключаем кнопку подключения, чтобы пользователь не
-    // начинал несколько попыток подключения за раз
-    //document.getElementById("connect_button").disabled = true;
+    stompClient.connect({'x-auth-token': token}, afterConnect, onError);
 }
 
 // Будем вызвано после установления соединения
@@ -135,20 +133,7 @@ function setName() {
     document.getElementById("set_room_button").disabled = false;
 }
 
-// Передаем комнате, эллимент где будут отображаться все комнты.
-function addRoom() {
-    room = document.getElementById("room_input").value;
-    //document.getElementById("mafia_role_button").disabled = false;
-    //document.getElementById("civilians_role_button").disabled = false;
-    //document.getElementById("set_room_button").disabled = true;
-    //document.getElementById("room_input").disabled = true;
-    const str = JSON.stringify({
-        'room': room
-    });
-    // Заранее отправляем информацию о добавлении новой комнаты на сервер
-    // чтобы телеграм пользователи могу в нее войти до начала игры.
-    stompClient.send("/app/system_message", {}, str);
-}
+
 
 // Метод устанавливающий начальную конфигурацию пользовательского интерфейса в зависимости от роли игрока.
 function setRoleInterface(isMafia) {

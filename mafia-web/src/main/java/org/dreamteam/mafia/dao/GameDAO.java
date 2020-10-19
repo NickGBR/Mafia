@@ -59,7 +59,7 @@ public class GameDAO {
 
     @Override
     public String toString() {
-        return "Game{" +
+        return "Room{" +
                 "gameId=" + gameId +
                 ", roomId=" + room.getRoomId() +
                 ", status=" + status +
