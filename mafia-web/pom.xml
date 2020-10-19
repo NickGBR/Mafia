@@ -109,6 +109,15 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Зависимость для бота-->
+            <dependency>
+                <groupId>org.telegram</groupId>
+                <artifactId>telegrambots-spring-boot-starter</artifactId>
+                <version>4.9.1</version>
+            </dependency>
+
+
     </dependencies>
 
     <build>

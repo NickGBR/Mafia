@@ -1,17 +1,20 @@
 package org.dreamteam.mafia.controller;
 
+
+import org.dreamteam.mafia.bot.TBot;
 import org.dreamteam.mafia.model.Game;
 import org.dreamteam.mafia.model.Host;
 import org.dreamteam.mafia.model.Message;
+import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.temporary.TemporaryDB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Controller;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
@@ -21,21 +24,15 @@ import java.util.concurrent.ScheduledFuture;
 @Controller
 public class ChatController {
 
+    @Autowired
+    TBot bot;
+
     @Qualifier("Task")
     @Autowired
     ThreadPoolTaskScheduler taskScheduler;
 
     @Autowired
     SimpMessagingTemplate messagingTemplate;
-
-    //Хранит специальные сообщение от хоста
-    Map<String, Message> hostMessages = new HashMap<>();
-
-    //Хранит текущие комнаты в игре.
-    ArrayList<String> rooms = new ArrayList<>();
-
-    //Хранит выполняемые задачи
-    Map<String, ScheduledFuture<?>> tasks = new HashMap<>();
 
     @MessageMapping("/civ_message")
     //@SendTo("/chat/civ_messages") //Можем использовать как комнату по умолчанию
@@ -46,35 +43,36 @@ public class ChatController {
 
     @MessageMapping("/mafia_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
-    public void getMafiaMessages(Message message) {
+    public void getMafiaMessages(Message message) throws TelegramApiException {
         message.setRole(Message.Role.MAFIA);
         messagingTemplate.convertAndSend("/chat/mafia_messages/" + message.getRoom(), message);
     }
 
     /**
-     * Данные метод принимает Json объект отправленный на "/host_message".
+     * Данные метод принимает Json объект отправленный на "/system_message".
      *
      * @param game полученный Json преобразуется в объект Game.
      */
-    @MessageMapping("/host_message")
+    @MessageMapping("/system_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getHostMessages(Game game) {
 
         //Добавляем сообщение для вывода.
         if (game.getMessage() != null) {
-            hostMessages.put(game.getRoom(), game.getMessage());
+            TemporaryDB.systemMessages.put(game.getRoom(), game.getMessage());
         }
 
         // Проверяем наличие команты в игре.
-        if (!rooms.contains(game.getRoom())) {
+        if (!TemporaryDB.rooms.contains(game.getRoom())) {
 
             // Если комната новая, то добавляем ее в список существующих комнат.
-            rooms.add(game.getRoom());
-            Host host = new Host(game.getRoom(), messagingTemplate, hostMessages);
+            messagingTemplate.convertAndSend("/chat/system_messages/rooms/", game);
+            TemporaryDB.rooms.add(game.getRoom());
+            Host host = new Host(game.getRoom(), messagingTemplate, TemporaryDB.systemMessages);
 
             // Создаем нового ведущего для игры, и добавляем его в список храниящий всех ведущих работающих на сервере.
             ScheduledFuture<?> future = taskScheduler.scheduleWithFixedDelay(host, 10000);
-            tasks.put(game.getRoom(), future);
+            TemporaryDB.tasks.put(game.getRoom(), future);
         }
 
         // Проверяем была ли игра остановлена.
@@ -90,9 +88,10 @@ public class ChatController {
      */
     private void stopGame(Game game) {
         // Если игра остановлена то останавливаем текущую задачу, удаляем задачу из списка задач.
-        tasks.get(game.getRoom()).cancel(true);
-        tasks.remove(game.getRoom());
-        rooms.remove(game.getRoom());
+        TemporaryDB.tasks.get(game.getRoom()).cancel(true);
+        TemporaryDB.tasks.remove(game.getRoom());
+        TemporaryDB.rooms.remove(game.getRoom());
+        cleanTelegramUsersRoom(game.getRoom());
 
         //Собираем сообщение для отправки в пользовательский чат
         Message message = new Message();
@@ -103,5 +102,22 @@ public class ChatController {
 
         // Отправляем сообщение в чат об остановке игры.
         messagingTemplate.convertAndSend("/chat/civ_messages/" + game.getRoom(), message);
+    }
+
+    /**
+     * Удаляет пользователей из указанной комнаты при остановке игры.
+     * Пользователи хранятся в "TemporaryDB.usersByRooms"
+     * @param room пользователи данной комнаты будут удалены из нее.
+     */
+    private void cleanTelegramUsersRoom(String room) {
+        if(!TemporaryDB.usersByRooms.isEmpty()){
+        Map<String, User> users = TemporaryDB.usersByRooms.get(room);
+        System.out.println(users);
+        for (Map.Entry<String, User> pair : users.entrySet()) {
+            System.out.println("before: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
+            users.get(pair.getKey()).setRoom(null);
+            System.out.println("after: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
+        }
+        }
     }
 }
