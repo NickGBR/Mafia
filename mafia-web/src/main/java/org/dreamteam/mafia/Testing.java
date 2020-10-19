@@ -1,24 +1,25 @@
 package org.dreamteam.mafia;
 
-import org.dreamteam.mafia.dao.*;
-import org.dreamteam.mafia.model.Room;
-import org.dreamteam.mafia.repository.api.*;
+import org.dreamteam.mafia.dao.MessageDAO;
+import org.dreamteam.mafia.dao.RoomDAO;
+import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.repository.api.CrudUserRepository;
+import org.dreamteam.mafia.repository.api.MessageRepository;
+import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import java.util.Optional;
-
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class Testing {
 
     @Bean
-    public CommandLineRunner demo(CharacterRepository repository) {
+    public CommandLineRunner demo(RoomRepository repository) {
         return (args) -> {
 
-            Iterable<CharacterDAO> all = repository.findAll();
-            for (CharacterDAO r : all) {
+            Iterable<RoomDAO> all = repository.findAll();
+            for (RoomDAO r : all) {
                 System.out.println(r);
             }
 
