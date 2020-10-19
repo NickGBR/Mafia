@@ -3,8 +3,8 @@
 create table games
 (
     game_id    serial  not null primary key,
-    phase      serial  not null,
-    status     boolean not null,
+    phase      text    not null,
+    status     text    not null,
     day_number integer not null
 );
 

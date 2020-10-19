@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,24 +18,36 @@ public class VotingDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vote_id", unique = true, nullable = false)
-    private int voteId;
+    private Integer voteId;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "game_id", nullable = false)
     private GameDAO game;
 
     @Column(name = "day_number", nullable = false)
-    private int numberOfDay;
+    private Integer numberOfDay;
 
     @Column(name = "votes_amount", nullable = false)
-    private int votesAmount;
+    private Integer votesAmount;
 
-    @OneToMany(mappedBy = "voting")
-    private List<CharacterDAO> characterList;
+    @OneToMany(mappedBy = "voting", fetch = FetchType.EAGER)
+    private Set<CharacterDAO> characterList;
+
+    public VotingDAO(GameDAO game, Integer numberOfDay, Integer votesAmount, Set<CharacterDAO> characterList) {
+        this.game = game;
+        this.numberOfDay = numberOfDay;
+        this.votesAmount = votesAmount;
+        this.characterList = characterList;
+    }
 
     @Override
     public String toString() {
-        return "Voting{#" + voteId +
+        return "Voting{" +
+                "voteId=" + voteId +
+                ", gameId=" + game.getGameId() +
+                ", numberOfDay=" + numberOfDay +
+                ", votesAmount=" + votesAmount +
+                ", characterList=" + characterList.size() +
                 '}';
     }
 }
