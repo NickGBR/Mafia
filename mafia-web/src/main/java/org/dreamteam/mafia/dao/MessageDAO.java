@@ -18,7 +18,7 @@ public class MessageDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "message_id", unique = true, nullable = false)
-    private Integer messageId;
+    private Long messageId;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "room_id")

@@ -58,17 +58,19 @@ public class UserDAO {
     public UserDAO(String login, String passwordHash) {
         this.login = login;
         this.passwordHash = passwordHash;
-        isReady = false;
-        character = CharacterEnum.CITIZEN;
-        characterStatus = CharacterStatusEnum.ALIVE;
-        votesAgainst = 0;
-        room = null;
     }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("UserDAO{");
-        sb.append("login='").append(login).append('\'');
+        sb.append("userId=").append(userId);
+        sb.append(", login='").append(login).append('\'');
+        sb.append(", passwordHash='").append(passwordHash).append('\'');
+        sb.append(", roomId=").append(room.getRoomId());
+        sb.append(", isReady=").append(isReady);
+        sb.append(", character=").append(character);
+        sb.append(", characterStatus=").append(characterStatus);
+        sb.append(", votesAgainst=").append(votesAgainst);
         sb.append('}');
         return sb.toString();
     }

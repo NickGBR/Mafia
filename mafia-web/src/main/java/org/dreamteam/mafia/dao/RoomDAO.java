@@ -23,7 +23,7 @@ public class RoomDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id", unique = true, nullable = false)
-    private Integer roomId;
+    private Long roomId;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
@@ -63,7 +63,6 @@ public class RoomDAO {
 
     @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
     @NotFound(action= NotFoundAction.IGNORE)
-    //@ManyToMany(mappedBy = "room")
     private Set<UserDAO> userList;
 
     @OneToMany(mappedBy = "messageId", fetch = FetchType.EAGER)
@@ -75,8 +74,6 @@ public class RoomDAO {
         this.name = roomName;
         this.maxUsersAmount = maxUsersAmount;
         this.gameStatus = gameStatus;
-        this.userList = Collections.emptySet();
-        this.messageList = Collections.emptySet();
     }
 
     @Override
@@ -84,7 +81,7 @@ public class RoomDAO {
         final StringBuilder sb = new StringBuilder("RoomDAO{");
         sb.append("roomId=").append(roomId);
         sb.append(", passwordHash='").append(passwordHash).append('\'');
-        sb.append(", admin=").append(admin);
+        sb.append(", admin=").append(admin.getLogin());
         sb.append(", name='").append(name).append('\'');
         sb.append(", description='").append(description).append('\'');
         sb.append(", maxUsersAmount=").append(maxUsersAmount);
