@@ -1,6 +1,5 @@
 package org.dreamteam.mafia;
 
-import org.dreamteam.mafia.bot.TBot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

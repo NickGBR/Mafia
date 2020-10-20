@@ -1,7 +1,6 @@
 package org.dreamteam.mafia.controller;
 
 import org.apache.http.HttpResponse;
-import org.dreamteam.mafia.bot.TBot;
 import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.model.*;
 import org.dreamteam.mafia.service.api.UserService;
@@ -23,9 +22,6 @@ import java.util.concurrent.ScheduledFuture;
  */
 @Controller
 public class ChatController {
-
-    @Autowired
-    TBot bot;
 
     @Autowired
     UserService userService;
