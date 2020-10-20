@@ -1,7 +1,6 @@
 package org.dreamteam.mafia.security;
 
 import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.TokenService;
 import org.junit.Assert;
@@ -11,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
@@ -23,7 +21,7 @@ public class TokenAuthenticationProviderTest {
     @Mock
     TokenService mockTokenService;
     @Mock
-    UsernamePasswordAuthenticationToken mockToken;
+    SignedJsonWebToken mockToken;
     String token;
     UserDAO daoNormal;
     @InjectMocks
@@ -46,7 +44,7 @@ public class TokenAuthenticationProviderTest {
         Mockito.when(mockTokenService.extractUsernameFrom(Mockito.any(SignedJsonWebToken.class))).thenReturn(
                 Optional.of(daoNormal.getLogin()));
         try {
-            testedService.retrieveUser("", mockToken);
+            testedService.authenticate(mockToken);
         } catch (UsernameNotFoundException e) {
             Assert.fail("Failed to authenticate valid user");
         }
@@ -61,7 +59,7 @@ public class TokenAuthenticationProviderTest {
         Mockito.when(mockTokenService.extractUsernameFrom(Mockito.any(SignedJsonWebToken.class))).thenReturn(
                 Optional.empty());
         try {
-            testedService.retrieveUser("", mockToken);
+            testedService.authenticate(mockToken);
             Assert.fail("Successfully authenticated user with invalid token");
         } catch (UsernameNotFoundException ignored) {
         }
@@ -76,7 +74,7 @@ public class TokenAuthenticationProviderTest {
         Mockito.when(mockTokenService.extractUsernameFrom(Mockito.any(SignedJsonWebToken.class))).thenReturn(
                 Optional.of(daoNormal.getLogin()));
         try {
-            testedService.retrieveUser("", mockToken);
+            testedService.authenticate(mockToken);
             Assert.fail("Successfully authenticated user which is missing from the repository");
         } catch (UsernameNotFoundException ignored) {
         }
