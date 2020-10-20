@@ -22,10 +22,8 @@ public class Testing {
     public CommandLineRunner demo(CrudUserRepository userRepository,
                                   RoomRepository roomRepository) {
         return (args) -> {
-
-            Integer c = userRepository.findCurrentUsersAmountByRoomId(5);
-
-            System.out.println(c);
+            Integer d = userRepository.findUsersAmountByRoomIdReadyToPlay(8);
+            System.out.println(d);
 
 
 
