@@ -23,11 +23,9 @@ public class Testing {
                                   RoomRepository roomRepository) {
         return (args) -> {
 
-            List<UserDAO> byRoomId = userRepository.findByRoomId(2);
+            Integer c = userRepository.findCurrentUsersAmountByRoomId(5);
 
-            for (UserDAO u : byRoomId) {
-                System.out.println(u);
-            }
+            System.out.println(c);
 
 
 

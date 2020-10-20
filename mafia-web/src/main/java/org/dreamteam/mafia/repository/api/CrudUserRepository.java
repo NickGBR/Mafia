@@ -30,5 +30,12 @@ public interface CrudUserRepository extends CrudRepository<UserDAO, Long> {
     @Query("select u from UserDAO u where u.room.roomId = ?1")
     List<UserDAO> findByRoomId(Integer roomId);
 
+    /**
+     * Текущее количество игроков в комнате.
+     * @param roomId идентификатор комнаты
+     * @return текущее количество игроков
+     */
+    @Query(value = "select count(u) from UserDAO u where u.room.roomId = ?1")
+    Integer findCurrentUsersAmountByRoomId(Integer roomId);
 
 }
