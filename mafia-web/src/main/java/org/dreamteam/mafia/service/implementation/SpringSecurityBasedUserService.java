@@ -18,7 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -46,8 +45,8 @@ public class SpringSecurityBasedUserService implements UserService {
         if (!registrationDTO.getPassword().equals(registrationDTO.getPasswordConfirmation())) {
             throw new UserRegistrationException(ClientErrorCode.PASSWORD_MISMATCH, "Password mismatch!");
         }
-        List<UserDAO> sameLoginList = repository.findByLogin(registrationDTO.getLogin());
-        if (!(sameLoginList.size() == 0)) {
+        Optional<UserDAO> sameLoginDao = repository.findByLogin(registrationDTO.getLogin());
+        if (sameLoginDao.isPresent()) {
             throw new UserRegistrationException(ClientErrorCode.USER_ALREADY_EXISTS,
                                                 "Login is already in the database");
         }
@@ -60,15 +59,14 @@ public class SpringSecurityBasedUserService implements UserService {
 
     @Override
     public SignedJsonWebToken loginUser(LoginDTO loginDTO) throws UserAuthenticationException {
-        List<UserDAO> userDAOS = repository.findByLogin(loginDTO.getLogin());
-        if (userDAOS.size() > 0) {
-            UserDAO userDAO = userDAOS.get(0);
-            if (!encoder.matches(loginDTO.getPassword(), userDAO.getPasswordHash())) {
+        Optional<UserDAO> userDAO = repository.findByLogin(loginDTO.getLogin());
+        if (userDAO.isPresent()) {
+            if (!encoder.matches(loginDTO.getPassword(), userDAO.get().getPasswordHash())) {
                 throw new UserAuthenticationException(ClientErrorCode.INCORRECT_PASSWORD,
                                                       "Supplied password do not match login");
             }
 
-            return tokenService.getTokenFor(new User(userDAO));
+            return tokenService.getTokenFor(new User(userDAO.get()));
         } else {
             throw new UserAuthenticationException(ClientErrorCode.USER_NOT_EXISTS,
                                                   "User '" + loginDTO.getLogin() + "' not found in repository");
@@ -80,9 +78,9 @@ public class SpringSecurityBasedUserService implements UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
             String currentUserName = authentication.getName();
-            List<UserDAO> userDAOS = repository.findByLogin(currentUserName);
-            if (userDAOS.size() > 0) {
-                return Optional.of(new User(userDAOS.get(0)));
+            Optional<UserDAO> userDAO = repository.findByLogin(currentUserName);
+            if (userDAO.isPresent()) {
+                return Optional.of(new User(userDAO.get()));
             } else {
                 throw new RuntimeException(
                         "User is authenticated, but is not present in repository. Internal logic failure");

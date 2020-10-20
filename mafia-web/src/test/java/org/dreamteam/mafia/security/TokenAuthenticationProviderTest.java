@@ -14,8 +14,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Optional;
 
 public class TokenAuthenticationProviderTest {
@@ -44,7 +42,7 @@ public class TokenAuthenticationProviderTest {
     @Test
     public void retrieveUserPositive() {
         Mockito.when(mockRepository.findByLogin(daoNormal.getLogin()))
-                .thenReturn(Collections.singletonList(daoNormal));
+                .thenReturn(Optional.of(daoNormal));
         Mockito.when(mockTokenService.extractUsernameFrom(Mockito.any(SignedJsonWebToken.class))).thenReturn(
                 Optional.of(daoNormal.getLogin()));
         try {
@@ -59,7 +57,7 @@ public class TokenAuthenticationProviderTest {
     @Test
     public void retrieveUserInvalidToken() {
         Mockito.when(mockRepository.findByLogin(daoNormal.getLogin()))
-                .thenReturn(Collections.singletonList(daoNormal));
+                .thenReturn(Optional.of(daoNormal));
         Mockito.when(mockTokenService.extractUsernameFrom(Mockito.any(SignedJsonWebToken.class))).thenReturn(
                 Optional.empty());
         try {
@@ -74,7 +72,7 @@ public class TokenAuthenticationProviderTest {
     @Test
     public void retrieveUserNoSuchUser() {
         Mockito.when(mockRepository.findByLogin(daoNormal.getLogin()))
-                .thenReturn(new ArrayList<>());
+                .thenReturn(Optional.empty());
         Mockito.when(mockTokenService.extractUsernameFrom(Mockito.any(SignedJsonWebToken.class))).thenReturn(
                 Optional.of(daoNormal.getLogin()));
         try {

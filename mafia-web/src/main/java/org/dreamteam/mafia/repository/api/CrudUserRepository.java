@@ -4,7 +4,7 @@ import org.dreamteam.mafia.dao.UserDAO;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Spring Data репозиторий для обеспечения CRUD доступа к пользователям
@@ -18,5 +18,5 @@ public interface CrudUserRepository extends CrudRepository<UserDAO, Long> {
      * @param login - логин
      * @return - список пользователей. Для текущей БД всегла 0 или 1 пользователь, т.к. логин уникален
      */
-    List<UserDAO> findByLogin(String login);
+    Optional<UserDAO> findByLogin(String login);
 }

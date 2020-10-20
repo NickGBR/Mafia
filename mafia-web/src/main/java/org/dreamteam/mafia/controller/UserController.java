@@ -67,10 +67,9 @@ public class UserController {
      * Обрабатывает запрос на получение имени текущего пользователя
      *
      * @return - имя текущего пользователя
-     * @throws UserAuthenticationException- при ошибках авторизации
      */
     @RequestMapping(value = "/getCurrentName", method = RequestMethod.GET)
-    public String getCurrentUserName() throws UserAuthenticationException {
+    public String getCurrentUserName() {
         logger.debug("Incoming request for current username.");
         Optional<User> currentUser = userService.getCurrentUser();
         if (currentUser.isPresent()) {

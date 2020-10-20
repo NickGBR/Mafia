@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -51,9 +50,9 @@ public final class TokenAuthenticationProvider extends AbstractUserDetailsAuthen
         logger.debug("Retrieving user via token. " + userName + " : " + token);
         Optional<String> login = tokenService.extractUsernameFrom(new SignedJsonWebToken(token.toString()));
         if (login.isPresent()) {
-            List<UserDAO> userDAOS = repository.findByLogin(login.get());
-            if (userDAOS.size() > 0) {
-                return new SecurityUserDetails(userDAOS.get(0));
+            Optional<UserDAO> userDAO = repository.findByLogin(login.get());
+            if (userDAO.isPresent()) {
+                return new SecurityUserDetails(userDAO.get());
             }
         }
         throw new UsernameNotFoundException("Cannot find user with authentication token=" + token);

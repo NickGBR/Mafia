@@ -21,8 +21,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Optional;
 
 public class SpringSecurityBasedUserServiceTest {
@@ -63,7 +61,7 @@ public class SpringSecurityBasedUserServiceTest {
     @Test
     public void loginUserPositive() {
         Mockito.when(mockRepository.findByLogin(daoNormal.getLogin()))
-                .thenReturn(Collections.singletonList(daoNormal));
+                .thenReturn(Optional.of(daoNormal));
         Mockito.when(mockEncoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         try {
             testedService.loginUser(dtoNormal.getLoginData());
@@ -77,7 +75,7 @@ public class SpringSecurityBasedUserServiceTest {
     @Test
     public void loginUserWrongPassword() {
         Mockito.when(mockRepository.findByLogin(daoNormal.getLogin()))
-                .thenReturn(Collections.singletonList(daoNormal));
+                .thenReturn(Optional.of(daoNormal));
         Mockito.when(mockEncoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         try {
             testedService.loginUser(dtoNormal.getLoginData());
@@ -91,7 +89,7 @@ public class SpringSecurityBasedUserServiceTest {
     @Test
     public void loginUserNoSuchUser() {
         Mockito.when(mockRepository.findByLogin(daoNormal.getLogin()))
-                .thenReturn(new ArrayList<>());
+                .thenReturn(Optional.empty());
         Mockito.when(mockEncoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         try {
             testedService.loginUser(dtoNormal.getLoginData());
@@ -125,7 +123,7 @@ public class SpringSecurityBasedUserServiceTest {
     @Test
     public void registerNewUserLoginExists() {
         Mockito.when(mockRepository.findByLogin(daoNormal.getLogin()))
-                .thenReturn(Collections.singletonList(daoNormal));
+                .thenReturn(Optional.of(daoNormal));
         try {
             testedService.registerNewUser(dtoNormal);
             Assert.fail("Registered user when repository refused to perform saving");
@@ -142,7 +140,7 @@ public class SpringSecurityBasedUserServiceTest {
                                                         securityUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
         Mockito.when(mockRepository.findByLogin(daoNormal.getLogin()))
-                .thenReturn(Collections.singletonList(daoNormal));
+                .thenReturn(Optional.of(daoNormal));
         Optional<User> user = testedService.getCurrentUser();
         Assert.assertTrue("Failed to return properly authorised user", user.isPresent());
         Assert.assertEquals("Returned different user, than currently authorised", daoNormal.getLogin(),
@@ -166,7 +164,7 @@ public class SpringSecurityBasedUserServiceTest {
                 new AnonymousAuthenticationToken("non_empty", daoNormal, securityUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
         Mockito.when(mockRepository.findByLogin(daoNormal.getLogin()))
-                .thenReturn(Collections.singletonList(daoNormal));
+                .thenReturn(Optional.of(daoNormal));
         Optional<User> user = testedService.getCurrentUser();
         Mockito.verify(mockRepository, Mockito.never()).findByLogin(Mockito.anyString());
         Assert.assertFalse("Found user, when authorised one was anonymous", user.isPresent());
@@ -181,7 +179,7 @@ public class SpringSecurityBasedUserServiceTest {
                                                         securityUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
         Mockito.when(mockRepository.findByLogin(daoNormal.getLogin()))
-                .thenReturn(new ArrayList<>());
+                .thenReturn(Optional.empty());
         try {
             testedService.getCurrentUser();
             Assert.fail("Did not throw exception, when the authorised user wasn't in repository");
