@@ -33,7 +33,11 @@ public class UserDAO {
     private String passwordHash;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "room_id")
+    @JoinTable(
+            name = "users2rooms",
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = {@JoinColumn(name = "room_id")}
+    )
     @NotFound(action = NotFoundAction.IGNORE)
     private RoomDAO room;
 
@@ -54,19 +58,18 @@ public class UserDAO {
     public UserDAO(String login, String passwordHash) {
         this.login = login;
         this.passwordHash = passwordHash;
+        isReady = false;
+        character = CharacterEnum.CITIZEN;
+        characterStatus = CharacterStatusEnum.ALIVE;
+        votesAgainst = 0;
+        room = null;
     }
 
     @Override
     public String toString() {
-        return "UserDAO{" +
-                "userId=" + userId +
-                ", login='" + login + '\'' +
-                ", passwordHash='" + passwordHash + '\'' +
-                ", roomId=" + room.getRoomId() +
-                ", isReady=" + isReady +
-                ", character=" + character +
-                ", characterStatus=" + characterStatus +
-                ", votesAgainst=" + votesAgainst +
-                '}';
+        final StringBuilder sb = new StringBuilder("UserDAO{");
+        sb.append("login='").append(login).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

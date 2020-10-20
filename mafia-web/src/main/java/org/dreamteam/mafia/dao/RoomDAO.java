@@ -5,8 +5,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.util.Collections;
 import java.util.Set;
 
 @Getter
@@ -25,7 +28,7 @@ public class RoomDAO {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "admin_id", nullable = false)
     private UserDAO admin;
 
@@ -59,6 +62,8 @@ public class RoomDAO {
     private Boolean don;
 
     @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
+    @NotFound(action= NotFoundAction.IGNORE)
+    //@ManyToMany(mappedBy = "room")
     private Set<UserDAO> userList;
 
     @OneToMany(mappedBy = "messageId", fetch = FetchType.EAGER)
@@ -70,25 +75,26 @@ public class RoomDAO {
         this.name = roomName;
         this.maxUsersAmount = maxUsersAmount;
         this.gameStatus = gameStatus;
+        this.userList = Collections.emptySet();
+        this.messageList = Collections.emptySet();
     }
 
     @Override
     public String toString() {
-        return "RoomDAO{" +
-                "roomId=" + roomId +
-                ", passwordHash='" + passwordHash + '\'' +
-                ", admin=" + admin.getLogin() +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", maxUsersAmount=" + maxUsersAmount +
-                ", gameStatus='" + gameStatus + '\'' +
-                ", dayNumber=" + dayNumber +
-                ", gamePhase='" + gamePhase + '\'' +
-                ", mafia=" + mafia +
-                ", sheriff=" + sheriff +
-                ", don=" + don +
-                ", userList=" + userList +
-                ", messageList=" + messageList +
-                '}';
+        final StringBuilder sb = new StringBuilder("RoomDAO{");
+        sb.append("roomId=").append(roomId);
+        sb.append(", passwordHash='").append(passwordHash).append('\'');
+        sb.append(", admin=").append(admin);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", maxUsersAmount=").append(maxUsersAmount);
+        sb.append(", gameStatus=").append(gameStatus);
+        sb.append(", dayNumber=").append(dayNumber);
+        sb.append(", gamePhase=").append(gamePhase);
+        sb.append(", mafia=").append(mafia);
+        sb.append(", sheriff=").append(sheriff);
+        sb.append(", don=").append(don);
+        sb.append('}');
+        return sb.toString();
     }
 }
