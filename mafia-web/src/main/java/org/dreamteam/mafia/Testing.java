@@ -1,10 +1,6 @@
 package org.dreamteam.mafia;
 
-import org.dreamteam.mafia.dao.MessageDAO;
 import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.repository.api.CrudUserRepository;
-import org.dreamteam.mafia.repository.api.MessageRepository;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

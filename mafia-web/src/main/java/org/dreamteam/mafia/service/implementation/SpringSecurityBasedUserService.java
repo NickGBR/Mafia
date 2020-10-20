@@ -7,7 +7,7 @@ import org.dreamteam.mafia.exceptions.UserAuthenticationException;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
 import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.model.User;
-import org.dreamteam.mafia.repository.api.CrudUserRepository;
+import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.TokenService;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.util.ClientErrorCode;
@@ -26,13 +26,13 @@ import java.util.Optional;
 @Service("securityUserService")
 public class SpringSecurityBasedUserService implements UserService {
 
-    private final CrudUserRepository repository;
+    private final UserRepository repository;
     private final PasswordEncoder encoder;
     private final TokenService tokenService;
 
     @Autowired
     public SpringSecurityBasedUserService(
-            CrudUserRepository repository,
+            UserRepository repository,
             PasswordEncoder encoder,
             TokenService tokenService) {
         this.repository = repository;

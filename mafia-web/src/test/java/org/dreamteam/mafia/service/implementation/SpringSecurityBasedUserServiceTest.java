@@ -6,7 +6,7 @@ import org.dreamteam.mafia.exceptions.UserAuthenticationException;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
 import org.dreamteam.mafia.model.SecurityUserDetails;
 import org.dreamteam.mafia.model.User;
-import org.dreamteam.mafia.repository.api.CrudUserRepository;
+import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.TokenService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +29,7 @@ public class SpringSecurityBasedUserServiceTest {
     private SpringSecurityBasedUserService testedService;
 
     @Mock
-    CrudUserRepository mockRepository;
+    UserRepository mockRepository;
     @Mock
     PasswordEncoder mockEncoder;
     @Mock

@@ -2,7 +2,7 @@ package org.dreamteam.mafia.security;
 
 import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.model.SignedJsonWebToken;
-import org.dreamteam.mafia.repository.api.CrudUserRepository;
+import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.TokenService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class TokenAuthenticationProviderTest {
 
     @Mock
-    CrudUserRepository mockRepository;
+    UserRepository mockRepository;
     @Mock
     TokenService mockTokenService;
     @Mock
