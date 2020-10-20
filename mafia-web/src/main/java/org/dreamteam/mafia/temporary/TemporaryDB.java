@@ -1,6 +1,7 @@
 package org.dreamteam.mafia.temporary;
 
 import org.dreamteam.mafia.model.Message;
+import org.dreamteam.mafia.model.Room;
 import org.dreamteam.mafia.model.User;
 
 import java.util.ArrayList;
@@ -12,9 +13,9 @@ import java.util.concurrent.ScheduledFuture;
 public class TemporaryDB {
 
     /**
-     * Хранит текущие комнаты в игре
+     * Хранит текущие комнаты в игре, key = roomId.
      */
-    public static List<String> rooms = new ArrayList<>();
+    public static Map<String, Room> rooms = new HashMap<>();
 
     /**
      * Хранит специальные сообщение от хоста.

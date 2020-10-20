@@ -57,7 +57,7 @@ public class TBot extends TelegramLongPollingBot {
 
                 // То проверяем существует ли комната, если да то добавляем пользователя в комнату,
                 String room = update.getMessage().getText();
-                if (TemporaryDB.rooms.contains(room)) {
+                if (TemporaryDB.rooms.containsKey(room)) {
                     user.setRoom(room);
 
                     // Добавляем пользователя в комнаты

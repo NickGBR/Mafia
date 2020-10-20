@@ -1,7 +1,8 @@
 package org.dreamteam.mafia.controller;
 
+import org.apache.http.HttpResponse;
 import org.dreamteam.mafia.bot.TBot;
-import org.dreamteam.mafia.constants.WebChatConst;
+import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.model.*;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.temporary.TemporaryDB;
@@ -11,6 +12,10 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Map;
@@ -35,18 +40,53 @@ public class ChatController {
     @Autowired
     SimpMessagingTemplate messagingTemplate;
 
+    @PostMapping("/POST/checkUser")
+    public Boolean checkUser(@RequestBody SystemMessage systemMessage){
+        String login = systemMessage.getUser().getLogin();
+
+        //Добавляем нового пользователя в TemporaryDB, если его еще не существует.
+        if (!TemporaryDB.users.containsKey("web:"+login)){
+            User user = new User();
+            user.setId("web:" + login);
+            user.setName(login);
+            user.setLogin(login);
+            TemporaryDB.users.put(user.getId(), user);
+
+            System.out.println("MY: Пользователь " + systemMessage.getUser().getName() + " добавлен в TemporaryDB!");
+            return true;
+        }
+        else {
+            System.out.println("MY: Пользователь " + login + " существет в TemporaryDB!");
+            return false;
+        }
+    }
+
+    @PostMapping("/POST/checkRoom")
+    public Boolean checkRoom(@RequestBody Room room){
+        if(TemporaryDB.rooms.containsKey(room.getName())){
+            System.out.println("MY: Комната " + room.getName() + " уже существует.");
+            return false;
+        }
+        else {
+            TemporaryDB.rooms.put(room.getId(),room);
+            System.out.println("MY: Комната " + room.getName() + " добавлена в Temporary DB!");
+            return true;
+        }
+    }
+
+
     @MessageMapping("/civ_message")
     //@SendTo("/chat/civ_messages") //Можем использовать как комнату по умолчанию
     public void getCiviliansMessages(Message message) {
         message.setRole(Message.Role.CIVILIAN);
-        messagingTemplate.convertAndSend(WebChatConst.CIV_WEB_CHAT + message.getRoom(), message);
+        messagingTemplate.convertAndSend(SockConst.CIV_WEB_CHAT + message.getRoom(), message);
     }
 
     @MessageMapping("/mafia_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getMafiaMessages(Message message) throws TelegramApiException {
         message.setRole(Message.Role.MAFIA);
-        messagingTemplate.convertAndSend(WebChatConst.MAFIA_WEB_CHAT + message.getRoom(), message);
+        messagingTemplate.convertAndSend(SockConst.MAFIA_WEB_CHAT + message.getRoom(), message);
     }
 
     /**
@@ -57,45 +97,24 @@ public class ChatController {
     @MessageMapping("/system_message")
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getSystemMessages(SystemMessage systemMessage) {
-
-        //Добавляем нового пользователя в базу, его еще не существует.
-        if (systemMessage.isNewUser()) {
-
-                String login = userService.getCurrentUser().get().getLogin();
-                User user = new User();
-                user.setId("web:" + login);
-                user.setName(login);
-                user.setLogin(login);
-                TemporaryDB.users.put(user.getId(), user);
-
-                System.out.println("MY: Пользователь " + user.getName() + " добвлен в TemporaryDB!");
-
-                messagingTemplate.convertAndSendToUser(userService.getCurrentUser().get().getLogin(),
-                        WebChatConst.SYS_WEB_CHAT, systemMessage);
+        if(systemMessage.isNewRoom()){
+            System.out.println("NEW ROOOOOOOOOOOOOOOOOOOM !!!!!!!!!!!!!");
+            messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_CHAT, systemMessage);
         }
+        System.out.println("");
+
+        String login = userService.getCurrentUser().get().getLogin();
+
+
 
         //Добавляем сообщение для вывода.
         if (systemMessage.getMessage() != null) {
             TemporaryDB.systemMessages.put(systemMessage.getRoom().getName(), systemMessage.getMessage());
         }
 
-        // Проверяем наличие команты в игре.
-        if (systemMessage.getRoom() != null) {
-            if (!TemporaryDB.rooms.contains(systemMessage.getRoom().getName())) {
 
-                // Если комната новая, то добавляем ее в список существующих комнат.
-                messagingTemplate.convertAndSend(WebChatConst.SYS_WEB_CHAT_ROOMS, systemMessage);
-                TemporaryDB.rooms.add(systemMessage.getRoom().getName());
 
-                System.out.println("MY: Комната " + systemMessage.getRoom().getName() + " добавлена!");
 
-                Host host = new Host(systemMessage.getRoom().getName(), messagingTemplate, TemporaryDB.systemMessages);
-
-                // Создаем нового ведущего для игры, и добавляем его в список храниящий всех ведущих работающих на сервере.
-                ScheduledFuture<?> future = taskScheduler.scheduleWithFixedDelay(host, 10000);
-                TemporaryDB.tasks.put(systemMessage.getRoom().getName(), future);
-            }
-        }
 
         // Проверяем была ли игра остановлена.
         if (systemMessage.getRoom() != null) {
@@ -103,6 +122,10 @@ public class ChatController {
                 stopGame(systemMessage.getRoom());
             }
         }
+        Room room = new Room();
+        room.setName("lol");
+        systemMessage.setRoom(room);
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT, systemMessage);
     }
 
     /**
@@ -125,7 +148,7 @@ public class ChatController {
         message.setFrom("Host");
 
         // Отправляем сообщение в чат об остановке игры.
-        messagingTemplate.convertAndSend(WebChatConst.CIV_WEB_CHAT + room.getName(), message);
+        messagingTemplate.convertAndSend(SockConst.CIV_WEB_CHAT + room.getName(), message);
     }
 
     /**

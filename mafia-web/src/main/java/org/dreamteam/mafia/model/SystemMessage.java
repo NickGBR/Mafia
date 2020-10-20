@@ -9,5 +9,6 @@ public class SystemMessage {
     Room room;
     Message message;
     User user;
-    boolean isNewUser;
+    boolean isNewUser = false;
+    boolean isNewRoom = false;
 }

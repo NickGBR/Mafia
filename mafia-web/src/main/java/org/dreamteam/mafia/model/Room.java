@@ -1,12 +1,12 @@
 package org.dreamteam.mafia.model;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * Игра - набор данных, описывающих конкретную игру в целом
  */
-
 @Setter
 @Getter
 public class Room {
