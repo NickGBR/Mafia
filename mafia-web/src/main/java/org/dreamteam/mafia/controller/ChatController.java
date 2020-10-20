@@ -12,10 +12,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Map;
@@ -40,8 +37,9 @@ public class ChatController {
     @Autowired
     SimpMessagingTemplate messagingTemplate;
 
+
     @PostMapping("/POST/checkUser")
-    public Boolean checkUser(@RequestBody SystemMessage systemMessage){
+    public @ResponseBody Boolean checkUser(@RequestBody SystemMessage systemMessage){
         String login = systemMessage.getUser().getLogin();
 
         //Добавляем нового пользователя в TemporaryDB, если его еще не существует.
@@ -62,7 +60,7 @@ public class ChatController {
     }
 
     @PostMapping("/POST/checkRoom")
-    public Boolean checkRoom(@RequestBody Room room){
+    public @ResponseBody Boolean checkRoom(@RequestBody Room room){
         if(TemporaryDB.rooms.containsKey(room.getName())){
             System.out.println("MY: Комната " + room.getName() + " уже существует.");
             return false;
@@ -73,7 +71,6 @@ public class ChatController {
             return true;
         }
     }
-
 
     @MessageMapping("/civ_message")
     //@SendTo("/chat/civ_messages") //Можем использовать как комнату по умолчанию
@@ -95,26 +92,19 @@ public class ChatController {
      * @param systemMessage полученный Json преобразуется в объект SystemMessage.
      */
     @MessageMapping("/system_message")
-    //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getSystemMessages(SystemMessage systemMessage) {
+        String login = userService.getCurrentUser().get().getLogin();
+
+        // Отправляет информацию о добавленных комнатах всем пользователям.
         if(systemMessage.isNewRoom()){
-            System.out.println("NEW ROOOOOOOOOOOOOOOOOOOM !!!!!!!!!!!!!");
             messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_CHAT, systemMessage);
         }
         System.out.println("");
 
-        String login = userService.getCurrentUser().get().getLogin();
-
-
-
-        //Добавляем сообщение для вывода.
+        // Добавляем сообщение для вывода.
         if (systemMessage.getMessage() != null) {
             TemporaryDB.systemMessages.put(systemMessage.getRoom().getName(), systemMessage.getMessage());
         }
-
-
-
-
 
         // Проверяем была ли игра остановлена.
         if (systemMessage.getRoom() != null) {
@@ -122,10 +112,6 @@ public class ChatController {
                 stopGame(systemMessage.getRoom());
             }
         }
-        Room room = new Room();
-        room.setName("lol");
-        systemMessage.setRoom(room);
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT, systemMessage);
     }
 
     /**

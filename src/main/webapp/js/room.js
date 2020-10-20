@@ -75,11 +75,13 @@ function checkRoom() {
         if (request.readyState === XMLHttpRequest.DONE) {
             if (request.status === 200) {
                 const data = request.responseText
-                if (data === true) {
+                if (data === "true") {
                     /* Если комната новая, мы добавляем системное сообщение о новой комнате
                     и выводим ее в список комнат.
                      */
+                    sessionStorage.setItem('roomName',roomName);
                     sendMessageToServerAboutNewRoom(roomName);
+                    window.location.replace("/chat.html")
                 }
                 if (data === "false") {
                     alert("Комната " + roomName + " уже существует!");
@@ -107,7 +109,7 @@ function checkRoom() {
 // Будет вызвано при ошибке установления соединения
 function onError(error) {
     console.log("Не удалось установить подключение: " + error);
-    setErrorDisconnectInterface()
+    document.getElementById("room_input").disabled = true;
     document.getElementById("set_room_button").disabled = true;
 }
 
