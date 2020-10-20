@@ -1,5 +1,6 @@
 package org.dreamteam.mafia.config;
 
+import org.dreamteam.mafia.security.SignedJsonWebToken;
 import org.dreamteam.mafia.security.TokenAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +79,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
                 if ((accessor != null) && StompCommand.CONNECT.equals(accessor.getCommand())) {
                     String token = accessor.getFirstNativeHeader("x-auth-token");
                     logger.debug("WebSocket Connection attempt. Token: " + token);
-                    Authentication user = provider.authenticate(new UsernamePasswordAuthenticationToken(token, token));
+                    Authentication user = provider.authenticate(new SignedJsonWebToken(token));
                     accessor.setUser(user);
                 }
                 return message;
