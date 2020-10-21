@@ -5,11 +5,11 @@ package org.dreamteam.mafia.exceptions;
  */
 public class NotEnoughRightsException extends Exception {
 
-    NotEnoughRightsException() {
+    public NotEnoughRightsException() {
         super();
     }
 
-    NotEnoughRightsException(String msg) {
+    public NotEnoughRightsException(String msg) {
         super(msg);
     }
 }
