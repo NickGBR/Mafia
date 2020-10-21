@@ -1,6 +1,5 @@
 package org.dreamteam.mafia.controller;
 
-import org.apache.http.HttpResponse;
 import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.model.*;
 import org.dreamteam.mafia.service.api.UserService;
@@ -14,8 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.ScheduledFuture;
 
 /**
  * Контроллер для чата
@@ -33,8 +32,18 @@ public class ChatController {
     @Autowired
     SimpMessagingTemplate messagingTemplate;
 
+    @GetMapping(SockConst.REQUEST_GET_ROOMS)
+    public @ResponseBody ArrayList<Room> getRooms(){
+        if (!TemporaryDB.rooms.isEmpty()) {
+            System.out.println(TemporaryDB.rooms.values());
+            return new ArrayList<>(TemporaryDB.rooms.values());
+        }
+        else {
+            return null;
+        }
+    }
 
-    @PostMapping("/POST/checkUser")
+    @PostMapping(SockConst.REQUEST_POST_CHECK_USER)
     public @ResponseBody Boolean checkUser(@RequestBody SystemMessage systemMessage){
         String login = systemMessage.getUser().getLogin();
 
@@ -55,7 +64,7 @@ public class ChatController {
         }
     }
 
-    @PostMapping("/POST/checkRoom")
+    @PostMapping(SockConst.REQUEST_POST_CHECK_ROOM)
     public @ResponseBody Boolean checkRoom(@RequestBody Room room){
         if(TemporaryDB.rooms.containsKey(room.getName())){
             System.out.println("MY: Комната " + room.getName() + " уже существует.");
@@ -68,18 +77,18 @@ public class ChatController {
         }
     }
 
-    @MessageMapping("/civ_message")
+    @MessageMapping(SockConst.CIV_END_POINT)
     //@SendTo("/chat/civ_messages") //Можем использовать как комнату по умолчанию
     public void getCiviliansMessages(Message message) {
         message.setRole(Message.Role.CIVILIAN);
-        messagingTemplate.convertAndSend(SockConst.CIV_WEB_CHAT + message.getRoom(), message);
+        messagingTemplate.convertAndSend(SockConst.CIV_WEB_CHAT + message.getRoomName(), message);
     }
 
-    @MessageMapping("/mafia_message")
+    @MessageMapping(SockConst.MAFIA_END_POINT)
     //@SendTo("/chat/mafia_messages/")  //Можем использовать как комнату по умолчанию
     public void getMafiaMessages(Message message) throws TelegramApiException {
         message.setRole(Message.Role.MAFIA);
-        messagingTemplate.convertAndSend(SockConst.MAFIA_WEB_CHAT + message.getRoom(), message);
+        messagingTemplate.convertAndSend(SockConst.MAFIA_WEB_CHAT + message.getRoomName(), message);
     }
 
     /**
@@ -87,7 +96,7 @@ public class ChatController {
      *
      * @param systemMessage полученный Json преобразуется в объект SystemMessage.
      */
-    @MessageMapping("/system_message")
+    @MessageMapping(SockConst.SYSTEM_END_POINT)
     public void getSystemMessages(SystemMessage systemMessage) {
         String login = userService.getCurrentUser().get().getLogin();
 
@@ -110,6 +119,13 @@ public class ChatController {
         }
     }
 
+    @MessageMapping(SockConst.ROOM_END_POINT)
+    public void getRoomMessages(Message message){
+        System.out.println("MY: Получено сообщение " + message.getText() + ",");
+        System.out.println("MY: От пользователя " + message.getFrom() + ", комната: " + message.getRoomName() + ".");
+        messagingTemplate.convertAndSend(SockConst.ROOM_WEB_CHAT + message.getRoomName(), message);
+    }
+
     /**
      * Метод для остановки игры.
      *
@@ -125,7 +141,7 @@ public class ChatController {
         //Собираем сообщение для отправки в пользовательский чат
         Message message = new Message();
         message.setText("Игра была остановлена!");
-        message.setRoom(room.getName());
+        message.setRoomName(room.getName());
         message.setRole(Message.Role.HOST);
         message.setFrom("Host");
 

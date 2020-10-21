@@ -39,4 +39,10 @@ public class TemporaryDB {
      */
     public static Map<String, Map<String, User>> usersByRooms = new HashMap<>();
 
+
+    /**
+     * Хранит сообщения пользователей, в конкретных комнатах. Key = roomId
+     */
+    public static Map<String, List<Message>> messagesByRooms = new HashMap<>();
+
 }

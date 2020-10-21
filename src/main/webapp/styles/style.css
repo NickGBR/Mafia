@@ -19,16 +19,17 @@
     overflow:auto;
 }
 
-#rooms_box{
+.room_box{
     position: relative;
     text-align:left;
     padding:10px;
-    background:#fff;
+    background: #ffffff;
     height:270px;
     width:60%;
-    border:3px solid #FF0000;
+    border:3px solid #000dff;
     overflow:auto;
 }
+
 /* Style the tab */
 .tab {
     overflow: hidden;

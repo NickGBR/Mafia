@@ -19,4 +19,4 @@ public class Application {
         ApiContextInitializer.init();
         SpringApplication.run(Application.class, args);
     }
-    }
+}
