@@ -140,12 +140,10 @@ public class ChatController {
         return TemporaryDB.usersByRooms.get(roomName);
     }
 
-    @GetMapping(SockConst.REQUEST_GET_ROOM_ADMIN)
+    @GetMapping(SockConst.REQUEST_GET_ROOM_ADMIN_NAME)
     public @ResponseBody
     String getRoomAdminName(@RequestParam String roomName) {
-        System.out.println(roomName + " ROOOOOOOOOOOOOOOOOOOMNAMEEEEEEEEE");
-        System.out.println(getRoomAdmin(roomName));
-        return "lol";
+        return TemporaryDB.rooms.get(roomName).getAdmin().getName();
     }
 
     /**
@@ -175,7 +173,7 @@ public class ChatController {
         TemporaryDB.usersByRooms.put(roomName, users);
         System.out.println(users);
         System.out.println(TemporaryDB.rooms.get(roomName).getAdmin());
-        User admin = getRoomAdmin(roomName);
+        User admin = TemporaryDB.rooms.get(roomName).getAdmin();
         messagingTemplate.convertAndSend(SockConst.SYS_WEB_USERS_INFO + roomName, users);
 
         if (admin != null) {
@@ -288,10 +286,4 @@ public class ChatController {
         }
     }
 
-    private User getRoomAdmin(String roomName) {
-        if (TemporaryDB.rooms.containsKey(roomName)) {
-            return TemporaryDB.rooms.get(roomName).getAdmin();
-        } else
-            return null;
-    }
 }

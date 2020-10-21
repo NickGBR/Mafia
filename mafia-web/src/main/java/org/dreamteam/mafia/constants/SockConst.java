@@ -15,7 +15,7 @@ public class SockConst {
     public static final String SYS_WEB_USERS_INFO = "/chat/system_messages/users/";
 
     public static final String REQUEST_GET_ADD_USER_TO_ROOM = "api/GET/addUserToRoom";
-    public static final String REQUEST_GET_ROOM_ADMIN = "api/GET/get_room_admin_name";
+    public static final String REQUEST_GET_ROOM_ADMIN_NAME = "api/GET/get_room_admin_name";
     public static final String REQUEST_GET_MESSAGES = "api/GET/getMessages";
     public static final String REQUEST_GET_ROOMS = "api/GET/getRooms";
     public static final String REQUEST_GET_USERS = "api/GET/getRoomUsers";

@@ -1,4 +1,4 @@
-//In session storage we have "login" and "roomName"
+//In session storage we have "login", "roomName", isRoomAdmin
 
 let roomName;
 let userName;
@@ -142,6 +142,7 @@ function checkRoom() {
                     /* Если комната новая, мы добавляем системное сообщение о новой комнате
                     и выводим ее в список комнат.
                      */
+                    sessionStorage.setItem("isRoomAdmin","true"); // Так это первый пользователь вошедший в комнату, он становится ее админом.
                     sessionStorage.setItem('roomName', roomName);
                     sendMessageToServerAboutNewRoom(roomName);
                     window.open("roomChat.html", "_self");
@@ -217,10 +218,12 @@ function addRoomToInterface(name) {
  */
 function goToRoom(id){
     addUserToRoom(id);
-    window.open("roomChat.html", "_self");
-    stompClient.send()
+    sessionStorage.setItem('isRoomAdmin',"false");
     sessionStorage.setItem("roomName",id);
     sessionStorage.setItem("roomId",roomName);
+    window.open("roomChat.html", "_self");
+    stompClient.send()
+
 }
 
 /**

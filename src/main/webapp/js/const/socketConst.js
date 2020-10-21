@@ -12,7 +12,7 @@ var sockConst = {
     SYS_WEB_ROOMS_INFO: '/chat/system_messages/rooms/',
     SYS_WEB_USERS_INFO : '/chat/system_messages/users/',
 
-    REQUEST_GET_ROOM_ADMIN : "api/GET/get_room_admin_name",
+    REQUEST_GET_ROOM_ADMIN_NAME : "api/GET/get_room_admin_name",
     REQUEST_GET_USERS : "api/GET/getRoomUsers",
     REQUEST_GET_ROOMS: "api/GET/getRooms",
     REQUEST_GET_ADD_USER_TO_ROOM : 'api/GET/addUserToRoom',
