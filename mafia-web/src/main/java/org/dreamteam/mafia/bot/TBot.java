@@ -58,13 +58,14 @@ public class TBot extends TelegramLongPollingBot {
                 String room = update.getMessage().getText();
                 if (TemporaryDB.rooms.containsKey(room)) {
                     telegramUser.setRoom(room);
+                    telegramUser.setId("@t_" + telegramUser.getName());
 
                     // Добавляем пользователя в комнаты
                     if (TemporaryDB.usersByRooms.containsKey(room)) {
-                        TemporaryDB.usersByRooms.get(room).put(userId, telegramUser);
-                    } else{ TemporaryDB.usersByRooms.put(room, new HashMap<>());
-                        TemporaryDB.usersByRooms.get(room).put(userId, telegramUser);
-                        System.out.println(TemporaryDB.usersByRooms.get(room).get(userId));
+                        TemporaryDB.usersByRooms.get(room).add(telegramUser);
+                    } else{ TemporaryDB.usersByRooms.put(room, new ArrayList<>());
+                        TemporaryDB.usersByRooms.get(room).add(telegramUser);
+                        System.out.println(TemporaryDB.usersByRooms.get(room).add(telegramUser));
                     }
                 }
                 // если нет, то просим повторить попытку.

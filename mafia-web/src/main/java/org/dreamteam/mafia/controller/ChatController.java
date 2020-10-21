@@ -15,10 +15,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+
 
 /**
  * Контроллер для чата
+ * userId  = web: + login;
  */
 @Controller
 public class ChatController {
@@ -33,6 +35,11 @@ public class ChatController {
     @Autowired
     SimpMessagingTemplate messagingTemplate;
 
+    /**
+     * Метод получения списка комнанат, для нового пользователя, вошедшего на страницу выбора комнат.
+     *
+     * @return
+     */
     @GetMapping(SockConst.REQUEST_GET_ROOMS)
     public @ResponseBody
     ArrayList<Room> getRooms() {
@@ -47,17 +54,20 @@ public class ChatController {
     @PostMapping(SockConst.REQUEST_POST_CHECK_USER)
     public @ResponseBody
     Boolean checkUser(@RequestBody SystemMessage systemMessage) {
+
         String login = systemMessage.getUser().getLogin();
 
         //Добавляем нового пользователя в TemporaryDB, если его еще не существует.
         if (!TemporaryDB.users.containsKey("web:" + login)) {
+
             User user = new User();
             user.setId("web:" + login);
             user.setName(login);
             user.setLogin(login);
             TemporaryDB.users.put(user.getId(), user);
 
-            System.out.println("MY: Пользователь " + systemMessage.getUser().getName() + " добавлен в TemporaryDB!");
+            System.out.println("MY: Пользователь " + systemMessage.getUser().getName()
+                    + " добавлен в TemporaryDB! userId = " + user.getId() + ".");
             return true;
         } else {
             System.out.println("MY: Пользователь " + login + " существет в TemporaryDB!");
@@ -65,17 +75,60 @@ public class ChatController {
         }
     }
 
+
+    /**
+     * Проверяем наличие комнаты. Если комната существует, отклоняем запрос на создаение комнаты.
+     * Также создаем для новой комнаты базу хранящую сообщения отправленные в этой комнате.
+     *
+     * @param room
+     * @return
+     */
     @PostMapping(SockConst.REQUEST_POST_CHECK_ROOM)
     public @ResponseBody
     Boolean checkRoom(@RequestBody Room room) {
+        String login = userService.getCurrentUser().get().getLogin();
+        String roomName = room.getName();
+
+        // Проверяем существует ли указанная комната.
         if (TemporaryDB.rooms.containsKey(room.getName())) {
-            System.out.println("MY: Комната " + room.getName() + " уже существует.");
+            if (TemporaryDB.rooms.containsKey(roomName))
+                System.out.println("MY: Комната " + room.getName() + " уже существует.");
             return false;
         } else {
+            /* Если комната новая, то делаем пользоателя администратором этой комнаты,
+               и добавляем его в нее, как в БД так и на пользователькой стороне.*/
             TemporaryDB.rooms.put(room.getId(), room);
-            System.out.println("MY: Комната " + room.getName() + " добавлена в Temporary DB!");
+
+            // Так как комната новая, то пользователь создавший ее, будет модератором.
+            User user = TemporaryDB.users.get("web:" + login);
+
+            // Создаем список пользователей находящихся в данной комнате.
+            List<User> users = new ArrayList<>();
+
+            // Добавляем в список пользовотелей нашего пользователя, он будет первым.
+            user.setRoom(roomName);
+            users.add(user);
+
+            // Далаем нашего пользователя Админимтратором комнаты.
+            TemporaryDB.rooms.get(roomName).setAdmin(user);
+
+            //Добавляем пользователей текущей комнаты, в их комнату.
+            TemporaryDB.usersByRooms.put(roomName, users);
+            System.out.println(TemporaryDB.rooms.get(roomName).getAdmin());
+            System.out.println("MY: Комната " + room.getName() + " добавлена в Temporary DB! Админстратор комнаты: " + user.getName());
             return true;
         }
+    }
+
+    /**
+     * Данные метод отпраляем пользователю сообщение оставленные в комнате, до его захода.
+     */
+    @GetMapping(SockConst.REQUEST_GET_MESSAGES)
+    public @ResponseBody
+    List<Message> getMessages(@RequestParam String roomName) {
+        if (TemporaryDB.messagesByRooms.get(roomName).isEmpty()) {
+            return null;
+        } else return TemporaryDB.messagesByRooms.get(roomName);
     }
 
     @MessageMapping(SockConst.CIV_END_POINT)
@@ -136,7 +189,6 @@ public class ChatController {
 
         messages.add(message);
         TemporaryDB.messagesByRooms.put(roomName, messages);
-
         messagingTemplate.convertAndSend(SockConst.ROOM_WEB_CHAT + message.getRoomName(), message);
     }
 
@@ -171,12 +223,12 @@ public class ChatController {
      */
     private void cleanTelegramUsersRoom(String room) {
         if (!TemporaryDB.usersByRooms.isEmpty()) {
-            Map<String, User> users = TemporaryDB.usersByRooms.get(room);
+            List<User> users = TemporaryDB.usersByRooms.get(room);
             System.out.println(users);
-            for (Map.Entry<String, User> pair : users.entrySet()) {
-                System.out.println("before: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
-                users.get(pair.getKey()).setRoom(null);
-                System.out.println("after: " + pair.getValue().getName() + " room: " + pair.getValue().getRoom());
+            for (User user : users) {
+                System.out.println("before: " + user.getName() + " room: " + user.getRoom());
+                user.setRoom(null);
+                System.out.println("after: " + user.getName() + " room: " + user.getRoom());
             }
         }
     }

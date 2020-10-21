@@ -11,6 +11,8 @@ var sockConst = {
     SYS_WEB_CHAT: '/chat/system_messages/',
     SYS_WEB_ROOMS_CHAT: '/chat/system_messages/rooms/',
     REQUEST_GET_ROOMS: "/GET/getRooms",
+
+    REQUEST_GET_MESSAGES: "/GET/getMessages",
     REQUEST_POST_CHECK_USER: "/POST/checkUser",
-    REQUEST_POST_CHECK_ROOM: "/POST/checkRoom",
+    REQUEST_POST_CHECK_ROOM: "api/POST/checkRoom",
 }

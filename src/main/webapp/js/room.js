@@ -34,6 +34,7 @@ function getRooms() {
     const request = new XMLHttpRequest();
     request.open("GET", sockConst.REQUEST_GET_ROOMS, true)
     request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
 
     request.onreadystatechange = function () {
         if (request.readyState === XMLHttpRequest.DONE) {
@@ -63,6 +64,7 @@ function checkUser() {
     const request = new XMLHttpRequest();
     request.open("POST", sockConst.REQUEST_POST_CHECK_USER, true);
     request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
 
     request.onreadystatechange = function () {
         if (request.readyState === XMLHttpRequest.DONE) {
@@ -104,6 +106,7 @@ function checkRoom() {
     const request = new XMLHttpRequest();
     request.open("POST", sockConst.REQUEST_POST_CHECK_ROOM, true)
     request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
 
     request.onreadystatechange = function () {
         if (request.readyState === XMLHttpRequest.DONE) {
@@ -118,7 +121,7 @@ function checkRoom() {
                     window.open("roomChat.html", "_self");
                 }
                 if (data === "false") {
-                    alert("Комната " + roomName + " уже существует!");
+                    alert("Комната " + roomName + " уже существует, либо заполненна!");
                     roomName = null;
                 }
             } else if (request.status === 400) {
@@ -177,14 +180,26 @@ function addRoomToInterface(name) {
     const buttonName = document.createTextNode(name);                 // Создаем текстовый элемент
 
     button.appendChild(buttonName);
-    dd.appendChild(button)// Вставляем текстовый внутрь элемента списка
+    dd.appendChild(button)// Вставляем кнопку внутрь элемента списка
     document.getElementById('rooms_list').appendChild(dd);
 }
 
 function goToRoom(id){
     window.open("roomChat.html", "_self");
+    stompClient.send()
     sessionStorage.setItem("roomName",id);
     sessionStorage.setItem("roomId",roomName);
+}
+
+function newRoomUserSysMessage(){
+    const systemMessage = JSON.stringify({
+        // Это работает на JQuery
+        // 'message': $("#message_input_value").val()
+        // А это на чистом JavaScript
+        'roomName': roomName,
+    });
+    console.log(message);
+    stompClient.send(sockConst.SYSTEM_END_POINT, {}, message);
 }
 
 /**

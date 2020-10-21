@@ -30,6 +30,15 @@
     overflow:auto;
 }
 
+.user_ready_button{
+    background-color: #9cee9c;
+    color: #ffffff;
+}
+.user_not_ready_button{
+    background-color: #f35858;
+    color: black;
+}
+
 /* Style the tab */
 .tab {
     overflow: hidden;

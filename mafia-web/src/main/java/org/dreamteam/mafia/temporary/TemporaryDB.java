@@ -6,6 +6,7 @@ import org.dreamteam.mafia.model.User;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
@@ -36,7 +37,7 @@ public class TemporaryDB {
      * Хранит пользователей подключившихся через Телеграм. Ключем является комната которая содержит в себе Map с
      * пользователями комнаты, досткуп к которым можно получить по id.
      */
-    public static Map<String, Map<String, User>> usersByRooms = new HashMap<>();
+    public static Map<String, List<User>> usersByRooms = new HashMap<>();
 
 
     /**

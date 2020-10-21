@@ -12,9 +12,10 @@ public class SockConst {
     public static final String SYS_WEB_CHAT = "/chat/system_messages/";
     public static final String SYS_WEB_ROOMS_CHAT = "/chat/system_messages/rooms/";
 
+    public static final String REQUEST_GET_MESSAGES = "/GET/getMessages";
     public static final String REQUEST_GET_ROOMS = "/GET/getRooms";
     public static final String REQUEST_POST_CHECK_USER = "/POST/checkUser";
-    public static final String REQUEST_POST_CHECK_ROOM = "/POST/checkRoom";
+    public static final String REQUEST_POST_CHECK_ROOM = "api/POST/checkRoom";
 
 
 }

@@ -3,7 +3,7 @@ let roomName;
 const roomChatId = "room_chat_box";
 
 
-    function connect() {
+function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
     // или имитировать их другими средствами
     const socket = new SockJS("http://localhost:8080/chat-messaging");
@@ -14,12 +14,13 @@ const roomChatId = "room_chat_box";
     // Пытаемся подключиться, передав токен в заголовке.
     // И две функции: одну для обработки успешного подключения,
     // и вторую для обработки ошибки подключения
-    stompClient.connect({'x-auth-token': token}, afterConnect, onError);
 
+    stompClient.connect({'x-auth-token': token}, afterConnect, onError);
 }
 
 // Будем вызвано после установления соединения
 function afterConnect(connection) {
+
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
     // Включаем кнопку создания комнаты.
@@ -27,6 +28,7 @@ function afterConnect(connection) {
     // Отправляем на сервер информацию, о пользователе вошедшем в чат.
     // Добавляем информацию о пользователе в чат.
     setUserInfoToInterface();
+    getUsersMessages();
     stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomName, getMessage);
 }
 
@@ -36,7 +38,7 @@ function onError(error) {
     document.getElementById("set_room_button").disabled = true;
 }
 
-function setUserInfoToInterface(){
+function setUserInfoToInterface() {
     userName = sessionStorage.getItem("login");
     roomName = sessionStorage.getItem("roomName")
 
@@ -75,3 +77,54 @@ function addToChat(text, chat) {
     node.appendChild(textNode);                             // Вставляем текстовый внутрь элемента списка
     document.getElementById(chat).appendChild(node);
 }
+
+/**
+ * Отправляем серверу название комнаты, для получения истории чата.
+ */
+function getUsersMessages() {
+    const request = new XMLHttpRequest();
+    request.open("GET", sockConst.REQUEST_GET_MESSAGES + "?roomName=" + roomName, true)
+    request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
+
+    request.onreadystatechange = function () {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            if (request.status === 200) {
+                const data = JSON.parse(request.responseText);
+                console.log(data);
+                data.forEach((message) => {
+                    addToChat(message.from + ": " + message.text, roomChatId);
+                });
+
+            } else if (request.status === 400) {
+
+            } else if (request.status === 500) {
+                const data = JSON.parse(request.responseText);
+                if (data.answerMessage === null) {
+                    console.log("В истории чата нет сообщений.")
+                }
+
+                console.log("ERROR 500")
+            } else {
+
+            }
+        }
+    }
+    request.send();
+}
+
+var checkButtonStat = false;
+
+function setReadyStatus() {
+    const button = document.getElementById("user_ready_button");
+    if (checkButtonStat) {
+        button.className = "user_ready_button";
+        button.value = "Готов"
+    } else {
+        button.className = "user_not_ready_button";
+        button.value = "Не готов";
+    }
+    checkButtonStat = !checkButtonStat;
+}
+
+
