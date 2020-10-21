@@ -33,7 +33,11 @@ public class UserDAO {
     private String passwordHash;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "room_id")
+    @JoinTable(
+            name = "users2rooms",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "room_id")}
+    )
     @NotFound(action = NotFoundAction.IGNORE)
     private RoomDAO room;
 
@@ -58,15 +62,16 @@ public class UserDAO {
 
     @Override
     public String toString() {
-        return "UserDAO{" +
-                "userId=" + userId +
-                ", login='" + login + '\'' +
-                ", passwordHash='" + passwordHash + '\'' +
-                ", roomId=" + room.getRoomId() +
-                ", isReady=" + isReady +
-                ", character=" + character +
-                ", characterStatus=" + characterStatus +
-                ", votesAgainst=" + votesAgainst +
-                '}';
+        final StringBuilder sb = new StringBuilder("UserDAO{");
+        sb.append("userId=").append(userId);
+        sb.append(", login='").append(login).append('\'');
+        sb.append(", passwordHash='").append(passwordHash).append('\'');
+        sb.append(", roomId=").append(room.getRoomId());
+        sb.append(", isReady=").append(isReady);
+        sb.append(", character=").append(character);
+        sb.append(", characterStatus=").append(characterStatus);
+        sb.append(", votesAgainst=").append(votesAgainst);
+        sb.append('}');
+        return sb.toString();
     }
 }
