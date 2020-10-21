@@ -28,8 +28,7 @@ function sendUserInformation() {
                         console.log("Error: login is taken");
                         break;
                     }
-                    case 3:
-                    case 4: {
+                    default: {
                         console.log("Error: internal logic failure. Registration was successful, but login  of the same user failed.")
                     }
                 }

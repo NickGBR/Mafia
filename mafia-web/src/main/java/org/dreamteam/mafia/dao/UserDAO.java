@@ -9,6 +9,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * Объект, связанный с таблицей пользователей в БД
@@ -58,6 +59,23 @@ public class UserDAO {
     public UserDAO(String login, String passwordHash) {
         this.login = login;
         this.passwordHash = passwordHash;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(login);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UserDAO userDAO = (UserDAO) o;
+        return login.equals(userDAO.login);
     }
 
     @Override

@@ -12,8 +12,17 @@ import org.dreamteam.mafia.dao.UserDAO;
 public class User {
 
     private String login;
+    private boolean isStartButtonPressed = false;
+    private String id;
+    private String room;
+    private String name; //У телеграм юзеров имя начинается с @t_UserName
+    private Message.Role role;
 
     public User(UserDAO dao) {
         login = dao.getLogin();
+    }
+
+    public User(){
+
     }
 }

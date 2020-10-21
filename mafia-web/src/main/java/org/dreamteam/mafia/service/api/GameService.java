@@ -24,31 +24,31 @@ public interface GameService {
      * @return - игра, идущая в комнате
      * @throws GameNotStartedException - если игра в комнате еще не началась
      */
-    Game getGameInRoom(Room room) throws GameNotStartedException;
+    Room getGameInRoom(Room room) throws GameNotStartedException;
 
     /**
      * Возвращает список всех персонажей в игре
      *
-     * @param game - игра
+     * @param room - игра
      * @return - список персонажей
      */
-    List<Character> getCharactersInGame(Game game);
+    List<Character> getCharactersInGame(Room room);
 
     /**
      * Возвращает список всех сообщений в чате игры
      *
-     * @param game - игра
+     * @param room - игра
      * @return - список сообщений
      */
-    List<Message> getMessageLog(Game game);
+    List<Message> getMessageLog(Room room);
 
     /**
      * Переводит игру в следующую фазу
      *
-     * @param game - игра
+     * @param room - игра
      * @throws GameIsOverException - если игра уже окончена
      */
-    void advancePhase(Game game) throws GameIsOverException;
+    void advancePhase(Room room) throws GameIsOverException;
 
     /**
      * Выдвигает персонажа на голосование

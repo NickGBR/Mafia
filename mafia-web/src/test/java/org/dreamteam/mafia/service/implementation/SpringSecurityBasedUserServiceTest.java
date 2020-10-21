@@ -8,6 +8,7 @@ import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.security.SecurityUserDetails;
 import org.dreamteam.mafia.service.api.TokenService;
+import org.dreamteam.mafia.util.ClientErrorCode;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,7 +81,8 @@ public class SpringSecurityBasedUserServiceTest {
         try {
             testedService.loginUser(dtoNormal.getLoginData());
             Assert.fail("Successfully logged in user, which had wrong password");
-        } catch (UserAuthenticationException ignored) {
+        } catch (UserAuthenticationException e) {
+            Assert.assertEquals(ClientErrorCode.INCORRECT_PASSWORD, e.getCode());
         }
         Mockito.verify(mockRepository, Mockito.times(1)).findByLogin(Mockito.anyString());
         Mockito.verify(mockTokenService, Mockito.never()).getTokenFor(Mockito.any(User.class));
@@ -94,7 +96,8 @@ public class SpringSecurityBasedUserServiceTest {
         try {
             testedService.loginUser(dtoNormal.getLoginData());
             Assert.fail("Successfully logged in user, which was not present in repository");
-        } catch (UserAuthenticationException ignored) {
+        } catch (UserAuthenticationException e) {
+            Assert.assertEquals(ClientErrorCode.USER_NOT_EXISTS, e.getCode());
         }
         Mockito.verify(mockRepository, Mockito.times(1)).findByLogin(Mockito.anyString());
         Mockito.verify(mockTokenService, Mockito.never()).getTokenFor(Mockito.any(User.class));
@@ -115,7 +118,8 @@ public class SpringSecurityBasedUserServiceTest {
         try {
             testedService.registerNewUser(dtoPasswordMismatch);
             Assert.fail("Registered user with mismatched passwords");
-        } catch (UserRegistrationException ignored) {
+        } catch (UserRegistrationException e) {
+            Assert.assertEquals(ClientErrorCode.PASSWORD_MISMATCH, e.getCode());
         }
         Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(UserDAO.class));
     }
@@ -126,8 +130,9 @@ public class SpringSecurityBasedUserServiceTest {
                 .thenReturn(Optional.of(daoNormal));
         try {
             testedService.registerNewUser(dtoNormal);
-            Assert.fail("Registered user when repository refused to perform saving");
-        } catch (UserRegistrationException ignored) {
+            Assert.fail("Registered user when login already exist in repository");
+        } catch (UserRegistrationException e) {
+            Assert.assertEquals(ClientErrorCode.USER_ALREADY_EXISTS, e.getCode());
         }
         Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(UserDAO.class));
     }
