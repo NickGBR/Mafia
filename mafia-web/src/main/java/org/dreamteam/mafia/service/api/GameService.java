@@ -64,4 +64,18 @@ public interface GameService {
      * @throws IllegalMoveException - если голосование нарушает правила игры
      */
     void voteCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException;
+
+    /**
+     * Проверка является ли игрок шерифом.
+     * @param user - игрок
+     * @return - true, если игрок явлеятся шерифом, нет в противном случае
+     */
+    boolean isSheriff(User user);
+
+    /**
+     * Проверка является ли игрок доном.
+     * @param user - игрок
+     * @return - true, если игрок явлеятся доном, нет в противном случае
+     */
+    boolean isDon(User user);
 }

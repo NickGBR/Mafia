@@ -47,4 +47,5 @@ public interface UserRepository extends CrudRepository<UserDAO, Long> {
      * @return количество игроков готовых к игре
      */
     @Query("select count(u) from UserDAO u where u.room.roomId = ?1 and u.isReady = true")
-    Integer findUsersAmountByRoomIdReadyToPlay(Integer roomId);}
+    Integer findUsersAmountByRoomIdReadyToPlay(Integer roomId);
+}
