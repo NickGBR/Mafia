@@ -18,6 +18,11 @@ public interface RoomRepository extends CrudRepository<RoomDAO, Long> {
      */
     List<RoomDAO> findRoomDAOByGameStatus(GameStatusEnum gameStatusEnum);
 
+    /**
+     * Возвращает комнату, в которой находится указанный пользователь
+     *
+     * @param user - пользователь, для которого нужна найти комнату
+     * @return - комнату пользователя или пустой Optional, если пользователь не находится в комнате
+     */
     Optional<RoomDAO> findRoomDAOByUserListContains(UserDAO user);
-
 }

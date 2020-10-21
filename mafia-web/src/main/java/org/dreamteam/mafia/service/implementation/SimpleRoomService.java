@@ -3,6 +3,7 @@ package org.dreamteam.mafia.service.implementation;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
+import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.AlreadyInRoomException;
@@ -23,6 +24,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Стандартная реализации сервиса комнат
+ */
 @Service
 public class SimpleRoomService implements RoomService {
 
@@ -96,13 +100,7 @@ public class SimpleRoomService implements RoomService {
     }
 
     @Override
-    public boolean joinRoom(User user, Room room, String roomPassword) {
-        return false;
-    }
-
-    @Override
-    public boolean joinRoom(User user, Room room) {
-        return false;
+    public void joinRoom(JoinRoomDTO dto) {
     }
 
     @Override
@@ -115,7 +113,7 @@ public class SimpleRoomService implements RoomService {
             dto.setId(dao.getRoomId());
             dto.setDescription(dao.getDescription());
             dto.setMaxPlayers(dao.getMaxUsersAmount());
-            dto.setPrivateRoom(dao.getPasswordHash().equals(""));
+            dto.setPrivateRoom(!dao.getPasswordHash().equals(""));
             dto.setCurrPlayers(dao.getUserList().size());
             return dto;
         }).collect(Collectors.toCollection(() -> dtoRooms));

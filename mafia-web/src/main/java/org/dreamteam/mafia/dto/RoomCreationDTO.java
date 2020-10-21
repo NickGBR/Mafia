@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Описание комнаты, принимаемое от клиента
+ * Описание комнаты для ее создания, принимаемое от клиента
  */
 @Getter
 @Setter
@@ -20,4 +20,17 @@ public class RoomCreationDTO {
     private int mafia = 1;
     private boolean don = false;
     private boolean sheriff = true;
+
+    @Override
+    public String toString() {
+        return "RoomCreationDTO{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", password='" + password + '\'' +
+                ", maxPlayers=" + maxPlayers +
+                ", mafia=" + mafia +
+                ", don=" + don +
+                ", sheriff=" + sheriff +
+                '}';
+    }
 }

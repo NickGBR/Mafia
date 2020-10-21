@@ -1,5 +1,6 @@
 package org.dreamteam.mafia.service.api;
 
+import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.AlreadyInRoomException;
@@ -57,23 +58,12 @@ public interface RoomService {
     boolean isRoomPrivate(Room room);
 
     /**
-     * Пытается добавить пользователя в приватную комнату
+     * Пытается добавить текущего пользователя в комнату с заданным ID
      *
-     * @param user         - пользователь
-     * @param room         - комната
-     * @param roomPassword - пароль от комнаты
-     * @return -  true, если удалось добавить пользователя в комнату, false -иначе
+     * @param dto - данные, необходимые для попытки входа в комнату
      */
-    boolean joinRoom(User user, Room room, String roomPassword);
+    void joinRoom(JoinRoomDTO dto);
 
-    /**
-     * Пытается добавить пользователя в публичную комнату
-     *
-     * @param user - пользователь
-     * @param room - комната
-     * @return -  true, если удалось добавить пользователя в комнату, false -иначе
-     */
-    boolean joinRoom(User user, Room room);
 
     /**
      * Возвращает все незаполненные (доступные для присоединения) комнаты в приложении
