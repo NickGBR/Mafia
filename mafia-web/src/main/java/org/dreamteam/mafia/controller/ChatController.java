@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,22 +34,23 @@ public class ChatController {
     SimpMessagingTemplate messagingTemplate;
 
     @GetMapping(SockConst.REQUEST_GET_ROOMS)
-    public @ResponseBody ArrayList<Room> getRooms(){
+    public @ResponseBody
+    ArrayList<Room> getRooms() {
         if (!TemporaryDB.rooms.isEmpty()) {
             System.out.println(TemporaryDB.rooms.values());
             return new ArrayList<>(TemporaryDB.rooms.values());
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     @PostMapping(SockConst.REQUEST_POST_CHECK_USER)
-    public @ResponseBody Boolean checkUser(@RequestBody SystemMessage systemMessage){
+    public @ResponseBody
+    Boolean checkUser(@RequestBody SystemMessage systemMessage) {
         String login = systemMessage.getUser().getLogin();
 
         //Добавляем нового пользователя в TemporaryDB, если его еще не существует.
-        if (!TemporaryDB.users.containsKey("web:"+login)){
+        if (!TemporaryDB.users.containsKey("web:" + login)) {
             User user = new User();
             user.setId("web:" + login);
             user.setName(login);
@@ -57,21 +59,20 @@ public class ChatController {
 
             System.out.println("MY: Пользователь " + systemMessage.getUser().getName() + " добавлен в TemporaryDB!");
             return true;
-        }
-        else {
+        } else {
             System.out.println("MY: Пользователь " + login + " существет в TemporaryDB!");
             return false;
         }
     }
 
     @PostMapping(SockConst.REQUEST_POST_CHECK_ROOM)
-    public @ResponseBody Boolean checkRoom(@RequestBody Room room){
-        if(TemporaryDB.rooms.containsKey(room.getName())){
+    public @ResponseBody
+    Boolean checkRoom(@RequestBody Room room) {
+        if (TemporaryDB.rooms.containsKey(room.getName())) {
             System.out.println("MY: Комната " + room.getName() + " уже существует.");
             return false;
-        }
-        else {
-            TemporaryDB.rooms.put(room.getId(),room);
+        } else {
+            TemporaryDB.rooms.put(room.getId(), room);
             System.out.println("MY: Комната " + room.getName() + " добавлена в Temporary DB!");
             return true;
         }
@@ -101,7 +102,7 @@ public class ChatController {
         String login = userService.getCurrentUser().get().getLogin();
 
         // Отправляет информацию о добавленных комнатах всем пользователям.
-        if(systemMessage.isNewRoom()){
+        if (systemMessage.isNewRoom()) {
             messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_CHAT, systemMessage);
         }
         System.out.println("");
@@ -120,9 +121,22 @@ public class ChatController {
     }
 
     @MessageMapping(SockConst.ROOM_END_POINT)
-    public void getRoomMessages(Message message){
+    public void getRoomMessages(Message message) {
         System.out.println("MY: Получено сообщение " + message.getText() + ",");
         System.out.println("MY: От пользователя " + message.getFrom() + ", комната: " + message.getRoomName() + ".");
+        String roomName = message.getRoomName();
+        List<Message> messages;
+
+        if (TemporaryDB.messagesByRooms.containsKey(message.getRoomName())) {
+            // Добавляем новое сообщение в лист.
+            messages = TemporaryDB.messagesByRooms.get(roomName);
+        } else {
+            messages = new ArrayList<>();
+        }
+
+        messages.add(message);
+        TemporaryDB.messagesByRooms.put(roomName, messages);
+
         messagingTemplate.convertAndSend(SockConst.ROOM_WEB_CHAT + message.getRoomName(), message);
     }
 

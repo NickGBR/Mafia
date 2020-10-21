@@ -39,8 +39,8 @@ function onError(error) {
 function setUserInfoToInterface(){
     userName = sessionStorage.getItem("login");
     roomName = sessionStorage.getItem("roomName")
+
     const userInfo = document.createTextNode("User: " + userName + ", room: " + roomName);
-    //console.log(userInfo);
     document.getElementById("user_info_label").appendChild(userInfo);
 }
 
