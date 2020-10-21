@@ -14,10 +14,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.web.util.matcher.*;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
@@ -29,10 +26,16 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    // Доступны анонимным пользователя URL среди API
+    private static final RequestMatcher PUBLIC_API_URLS = new OrRequestMatcher(
+            new AntPathRequestMatcher("/api/user/register"),
+            new AntPathRequestMatcher("/api/user/login"));
     // Защищаемые URL
-    private static final RequestMatcher SECURED_URLS = new OrRequestMatcher(
-            new AntPathRequestMatcher("/api/room/*"),
-            new AntPathRequestMatcher("/api/game/*"));
+    private static final RequestMatcher SECURED_URLS = new AndRequestMatcher(
+            new NegatedRequestMatcher(PUBLIC_API_URLS),
+            new AntPathRequestMatcher("/api/**"));
+    // Доступные любым пользователям URL
+    private static final RequestMatcher PUBLIC_URLS = new NegatedRequestMatcher(SECURED_URLS);
     private final TokenAuthenticationProvider provider;
 
     @Autowired
@@ -58,9 +61,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     public void configure(WebSecurity web) {
-        // Spring Security не распространяется на все URL, не попадающие в SECURED_URLS
-        web.ignoring().requestMatchers(
-                new NegatedRequestMatcher(SECURED_URLS));
+        // Spring Security не распространяется на все доступные любым пользователям URL
+        web.ignoring().requestMatchers(PUBLIC_URLS);
     }
 
     /**

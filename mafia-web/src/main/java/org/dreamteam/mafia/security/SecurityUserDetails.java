@@ -1,4 +1,4 @@
-package org.dreamteam.mafia.model;
+package org.dreamteam.mafia.security;
 
 import org.dreamteam.mafia.dao.UserDAO;
 import org.springframework.security.core.GrantedAuthority;
