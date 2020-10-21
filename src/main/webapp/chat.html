@@ -22,7 +22,7 @@
 </p>
 <p>
     <input class="message_input" id="room_input" placeholder="Введите название комнаты"/>
-    <button class="text" disabled="disabled" id="set_room_button" onclick="setRoom()">Установть комнату</button>
+    <button class="text" disabled="disabled" id="set_room_button" onclick="addRoom()">Установть комнату</button>
 </p>
 <p>
     <button disabled="disabled" id="civilians_role_button" onclick="chooseRole(this.id)">Играть за мирного</button>
@@ -30,8 +30,8 @@
 </p>
 
 <p>
-    <button disabled="disabled" id="start_game_button" onclick="startGame('/app/host_message')">Начать игру!</button>
-    <button disabled="disabled" id="stop_game_button" onclick="stopGame('/app/host_message')">Остановить игру!</button>
+    <button disabled="disabled" id="start_game_button" onclick="startGame('/app/system_message')">Начать игру!</button>
+    <button disabled="disabled" id="stop_game_button" onclick="stopGame('/app/system_message')">Остановить игру!</button>
 </p>
 
 <div class="tab">
@@ -84,7 +84,7 @@
 <p>
     <input class="message_input" id="message_input_host_value" placeholder="Введите сообщение..."/>
     <button class="text" id="send_host_button"
-            onclick="sendHostMessage('/app/host_message','message_input_host_value')">
+            onclick="sendSystemMessage('/app/system_message','message_input_host_value')">
         Send host message
     </button>
 </p>

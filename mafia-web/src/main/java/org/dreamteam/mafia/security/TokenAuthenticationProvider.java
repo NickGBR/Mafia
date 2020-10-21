@@ -42,6 +42,7 @@ public final class TokenAuthenticationProvider implements AuthenticationProvider
         if (login.isPresent()) {
             Optional<UserDAO> userDAO = repository.findByLogin(login.get());
             if (userDAO.isPresent()) {
+                logger.debug("User successfully found: " + userDAO.get().getLogin());
                 return new SignedJsonWebToken(login.get(), (String) token, Collections.singleton(
                         new SimpleGrantedAuthority("ROLE_USER")));
             }

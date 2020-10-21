@@ -11,16 +11,14 @@ function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
     // или имитировать их другими средствами
     const socket = new SockJS("http://localhost:8080/chat-messaging");
+    console.log("Connected successfully");
     stompClient = Stomp.over(socket);
-
-    // Пытаемся подключиться, передавая пустой список заголовков - {}
+    // Получем токен достпа для конкретного пользователя.
+    let token = sessionStorage.getItem('token');
+    // Пытаемся подключиться, передав токен в заголовке.
     // И две функции: одну для обработки успешного подключения,
     // и вторую для обработки ошибки подключения
-    stompClient.connect({}, afterConnect, onError);
-    // Отключаем кнопку подключения, чтобы пользователь не
-    // начинал несколько попыток подключения за раз
-    document.getElementById("connect_button").disabled = true;
-
+    stompClient.connect({'x-auth-token': token}, afterConnect, onError);
 }
 
 // Будем вызвано после установления соединения
@@ -29,7 +27,7 @@ function afterConnect(connection) {
     // Теперь когда подключение установлено
     // Включаем кнопки для отправки сообщений и отключения от сервера
     document.getElementById("set_name_button").disabled = false;
-    document.getElementById("disconnect_button").disabled = false;
+    //document.getElementById("disconnect_button").disabled = false;
 
 }
 
@@ -74,6 +72,22 @@ function addToChat(text, chat) {
     document.getElementById(chat).appendChild(node);
 }
 
+function addRoomToInterface(response){
+    const data = JSON.parse(response.body);
+    room = data.room;
+
+    //Отправляем сообщение о времени суток
+    const dd = document.createElement("dd")           // Создаем элемент списка <dd>
+    const button = document.createElement("button")     // Создаем кнопку
+    button.setAttribute("id", room);                 // Устанавливаем id как название комнаты
+    button.setAttribute("onclick","alert(this.id)"); // Действие при нажатии кнопки
+    const buttonName = document.createTextNode(room);                 // Создаем текстовый элемент
+
+    button.appendChild(buttonName);
+    dd.appendChild(button)// Вставляем текстовый внутрь элемента списка
+    document.getElementById('rooms_list').appendChild(dd);
+}
+
 function disconnect() {
     stompClient.disconnect();
     // Отключаем кнопки отправки\отключения и включаем кнопку подключения
@@ -95,7 +109,7 @@ function sendMessage(chat, view) {
     stompClient.send(chat, {}, str);
 }
 
-function sendHostMessage(chat, view) {
+function sendSystemMessage(chat, view) {
     const str = JSON.stringify({
         // Это работает на JQuery
         // 'message': $("#message_input_value").val()
@@ -112,19 +126,14 @@ function sendHostMessage(chat, view) {
 
 //Метод установки ника пользователя в чате.
 function setName() {
+    stompClient.subscribe("/chat/system_messages/rooms/", addRoomToInterface)
     name = document.getElementById("name_input").value;
     document.getElementById("set_name_button").disabled = true;
     document.getElementById("name_input").disabled = true;
     document.getElementById("set_room_button").disabled = false;
 }
 
-function setRoom() {
-    room = document.getElementById("room_input").value;
-    document.getElementById("mafia_role_button").disabled = false;
-    document.getElementById("civilians_role_button").disabled = false;
-    document.getElementById("set_room_button").disabled = true;
-    document.getElementById("room_input").disabled = true;
-}
+
 
 // Метод устанавливающий начальную конфигурацию пользовательского интерфейса в зависимости от роли игрока.
 function setRoleInterface(isMafia) {
@@ -184,10 +193,14 @@ function chooseRole(id) {
 
 function startGame(chat) {
     sendStartGameMessage(chat);
-    stompClient.subscribe("/chat/game_stat/" + room, getStat);
+    //  Подписываемя на топик информации об игре, передаем метод для обработки ответа, устанавливаем id для
+    // возможноти отписаться от топика, если не отписаться, клиен подписывается на один и тот-же топик два раза
+    // и сообщения дублируются.
+    stompClient.subscribe("/chat/game_stat/" + room, getStat, {id:"game_stat_chat"});
 
     document.getElementById("start_game_button").disabled = true;
     document.getElementById("stop_game_button").disabled = false;
+    document.getElementById("send_host_button").disabled = false;
 }
 
 function sendStartGameMessage(chat) {
@@ -199,8 +212,10 @@ function sendStartGameMessage(chat) {
 
 function stopGame(chat) {
     sendStopGameMessage(chat);
+    console.log(stompClient.unsubscribe("game_stat_chat") + "!!!!!!!");
     document.getElementById("start_game_button").disabled = false;
     document.getElementById("stop_game_button").disabled = true;
+    document.getElementById("send_host_button").disabled = true;
 }
 
 function sendStopGameMessage(chat) {
