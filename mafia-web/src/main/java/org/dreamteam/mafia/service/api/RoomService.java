@@ -1,12 +1,14 @@
 package org.dreamteam.mafia.service.api;
 
 import org.dreamteam.mafia.dto.RoomDTO;
+import org.dreamteam.mafia.exceptions.AlreadyInRoomException;
 import org.dreamteam.mafia.exceptions.NoSuchRoomException;
 import org.dreamteam.mafia.exceptions.NotEnoughRightsException;
 import org.dreamteam.mafia.model.Room;
 import org.dreamteam.mafia.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Интерфейс с ервиса, обслуживающего систему комнат
@@ -23,13 +25,11 @@ public interface RoomService {
     Room getRoomFromDTO(RoomDTO roomDTO) throws NoSuchRoomException;
 
     /**
-     * Возвращает комнату, в которой находится указанный пользователь
+     * Возвращает комнату, в которой находится текущий пользователь
      *
-     * @param user - пользователь, комнату которого нужно найти
-     * @return - найденная комната
-     * @throws NoSuchRoomException - если пользователь не находится в комнате
+     * @return - найденная комната или пустой Optional, если пользователь не находится в комнате
      */
-    Room getUsersRoom(User user) throws NoSuchRoomException;
+    Optional<Room> getCurrentUserRoom();
 
     /**
      * Возвращает администратора заданной комнаты
@@ -40,12 +40,12 @@ public interface RoomService {
     User getRoomAdmin(Room room);
 
     /**
-     * Создает новую комнату
+     * Создает новую комнату и сохраняет ее в базу, назначая текущего пользователя
+     * администратором комнаты.
      *
      * @param roomDTO - описание комнаты, полученние из интерфейса
-     * @return - созданная комната
      */
-    Room createRoom(RoomDTO roomDTO);
+    void createRoom(RoomDTO roomDTO) throws AlreadyInRoomException;
 
     /**
      * Проверяет является ли заданная комната приватной

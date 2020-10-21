@@ -2,6 +2,7 @@ package org.dreamteam.mafia.controller;
 
 import org.dreamteam.mafia.dto.ErrorResponse;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.util.ClientErrorCode;
 import org.dreamteam.mafia.util.ServerErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,22 @@ public class ExceptionHandlingAdvice {
         logger.debug("User request caused exception: " + exception.getCode() + ", "
                              + exception.getLocalizedMessage());
         return new ErrorResponse(exception.getCode().getValue(), exception.getLocalizedMessage());
+    }
+
+    /**
+     * Обрабатывает исключения, вызванные нарушением безопасности
+     *
+     * @param exception - обрабатываемое исключение
+     * @return - JSON ответ для отправки клиенту вместе с кодом 400
+     */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)  // 401
+    @ExceptionHandler(SecurityException.class)
+    @ResponseBody
+    public ErrorResponse handleClientError(SecurityException exception) {
+        logger.error("Security violation caused exception: "
+                             + exception.getLocalizedMessage());
+        return new ErrorResponse(ClientErrorCode.SECURITY_VIOLATION.getValue(),
+                                 exception.getLocalizedMessage());
     }
 
     /**
