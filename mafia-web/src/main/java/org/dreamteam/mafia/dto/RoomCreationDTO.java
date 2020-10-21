@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Описание комнаты, отправляемое клиенту
+ * Описание комнаты, принимаемое от клиента
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoomDTO {
+public class RoomCreationDTO {
     private String name = "";
     private String description = "";
     private String password = "";

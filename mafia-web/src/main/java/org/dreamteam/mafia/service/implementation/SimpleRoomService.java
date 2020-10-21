@@ -2,7 +2,9 @@ package org.dreamteam.mafia.service.implementation;
 
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dto.RoomDTO;
+import org.dreamteam.mafia.dao.enums.GameStatusEnum;
+import org.dreamteam.mafia.dto.RoomCreationDTO;
+import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.AlreadyInRoomException;
 import org.dreamteam.mafia.exceptions.NoSuchRoomException;
 import org.dreamteam.mafia.exceptions.NotEnoughRightsException;
@@ -16,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SimpleRoomService implements RoomService {
@@ -36,7 +40,7 @@ public class SimpleRoomService implements RoomService {
     }
 
     @Override
-    public Room getRoomFromDTO(RoomDTO roomDTO) throws NoSuchRoomException {
+    public Room getRoomFromDTO(RoomCreationDTO roomDTO) throws NoSuchRoomException {
         return null;
     }
 
@@ -57,7 +61,7 @@ public class SimpleRoomService implements RoomService {
     }
 
     @Override
-    public void createRoom(RoomDTO roomDTO) throws AlreadyInRoomException {
+    public void createRoom(RoomCreationDTO roomDTO) throws AlreadyInRoomException {
         RoomDAO dao = new RoomDAO();
         dao.setName(roomDTO.getName());
         if (roomDTO.getPassword().isEmpty()) {
@@ -102,8 +106,20 @@ public class SimpleRoomService implements RoomService {
     }
 
     @Override
-    public List<Room> getNonFullRooms() {
-        return null;
+    public List<RoomDisplayDTO> getAvailableRooms() {
+        List<RoomDAO> availableRooms = repository.findRoomDAOByGameStatus(GameStatusEnum.NOT_STARTED);
+        List<RoomDisplayDTO> dtoRooms = new ArrayList<>();
+        availableRooms.stream().map((dao) -> {
+            RoomDisplayDTO dto = new RoomDisplayDTO();
+            dto.setName(dao.getName());
+            dto.setId(dao.getRoomId());
+            dto.setDescription(dao.getDescription());
+            dto.setMaxPlayers(dao.getMaxUsersAmount());
+            dto.setPrivateRoom(dao.getPasswordHash().equals(""));
+            dto.setCurrPlayers(dao.getUserList().size());
+            return dto;
+        }).collect(Collectors.toCollection(() -> dtoRooms));
+        return dtoRooms;
     }
 
     @Override

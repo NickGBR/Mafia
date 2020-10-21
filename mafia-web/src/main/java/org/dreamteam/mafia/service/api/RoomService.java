@@ -1,6 +1,7 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.dto.RoomDTO;
+import org.dreamteam.mafia.dto.RoomCreationDTO;
+import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.AlreadyInRoomException;
 import org.dreamteam.mafia.exceptions.NoSuchRoomException;
 import org.dreamteam.mafia.exceptions.NotEnoughRightsException;
@@ -22,7 +23,7 @@ public interface RoomService {
      * @return - найденная комната
      * @throws NoSuchRoomException - если описываемая комната не существует
      */
-    Room getRoomFromDTO(RoomDTO roomDTO) throws NoSuchRoomException;
+    Room getRoomFromDTO(RoomCreationDTO roomDTO) throws NoSuchRoomException;
 
     /**
      * Возвращает комнату, в которой находится текущий пользователь
@@ -45,7 +46,7 @@ public interface RoomService {
      *
      * @param roomDTO - описание комнаты, полученние из интерфейса
      */
-    void createRoom(RoomDTO roomDTO) throws AlreadyInRoomException;
+    void createRoom(RoomCreationDTO roomDTO) throws AlreadyInRoomException;
 
     /**
      * Проверяет является ли заданная комната приватной
@@ -79,7 +80,7 @@ public interface RoomService {
      *
      * @return - список незаполненных комнат
      */
-    List<Room> getNonFullRooms();
+    List<RoomDisplayDTO> getAvailableRooms();
 
     /**
      * Возвращает список пользователей внутри комнат
