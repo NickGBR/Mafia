@@ -3,10 +3,12 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
+import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 
 import javax.persistence.*;
+import java.util.Set;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -19,28 +21,75 @@ public class RoomDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id", unique = true, nullable = false)
-    private int roomId;
+    private Integer roomId;
+
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private UserDAO admin;
 
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "password_hash")
-    private long passwordHash;
+    @Column(name = "description")
+    private String description;
 
-    @Column(name = "users_amount", nullable = false)
-    private int usersAmount;
+    @Column(name = "max_users_amount", nullable = false)
+    private Integer maxUsersAmount;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "game_id")
-    @NotFound(action = NotFoundAction.IGNORE)
-    private GameDAO game;
+    @Column(name = "game_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private GameStatusEnum gameStatus;
 
-    //@OneToMany(mappedBy = "room")
-    //private List<User> userList;
+    @Column(name = "day_number")
+    private Integer dayNumber;
+
+    @Column(name = "game_phase")
+    @Enumerated(EnumType.STRING)
+    private GamePhaseEnum gamePhase;
+
+    @Column(name = "mafia")
+    private Integer mafia;
+
+    @Column(name = "sheriff")
+    private Boolean sheriff;
+
+    @Column(name = "don")
+    private Boolean don;
+
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
+    private Set<UserDAO> userList;
+
+    @OneToMany(mappedBy = "messageId", fetch = FetchType.EAGER)
+    private Set<MessageDAO> messageList;
+
+    public RoomDAO(String passwordHash, UserDAO admin, String name, Integer maxUsersAmount, GameStatusEnum gameStatus) {
+        this.passwordHash = passwordHash;
+        this.admin = admin;
+        this.name = name;
+        this.maxUsersAmount = maxUsersAmount;
+        this.gameStatus = gameStatus;
+    }
 
     @Override
     public String toString() {
-        return "Room{#" + roomId +
+        return "RoomDAO{" +
+                "roomId=" + roomId +
+                ", passwordHash='" + passwordHash + '\'' +
+                ", admin=" + admin.getLogin() +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", maxUsersAmount=" + maxUsersAmount +
+                ", gameStatus='" + gameStatus + '\'' +
+                ", dayNumber=" + dayNumber +
+                ", gamePhase='" + gamePhase + '\'' +
+                ", mafia=" + mafia +
+                ", sheriff=" + sheriff +
+                ", don=" + don +
+                ", userList=" + userList +
+                ", messageList=" + messageList +
                 '}';
     }
 }

@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -43,7 +42,7 @@ public final class TokenAuthenticationFilter extends AbstractAuthenticationProce
                 .map(String::trim)
                 .orElseThrow(() -> new BadCredentialsException("Missing Authentication Token"));
 
-        final Authentication auth = new UsernamePasswordAuthenticationToken(token, token);
+        final Authentication auth = new SignedJsonWebToken(token);
         return getAuthenticationManager().authenticate(auth);
     }
 

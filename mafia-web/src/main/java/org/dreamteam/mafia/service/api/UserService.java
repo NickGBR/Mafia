@@ -4,8 +4,8 @@ import org.dreamteam.mafia.dto.LoginDTO;
 import org.dreamteam.mafia.dto.RegistrationDTO;
 import org.dreamteam.mafia.exceptions.UserAuthenticationException;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
-import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.security.SignedJsonWebToken;
 
 import java.util.Optional;
 

@@ -3,6 +3,7 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 
@@ -17,25 +18,32 @@ public class MessageDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "message_id", unique = true, nullable = false)
-    private int messageId;
+    private Integer messageId;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "room_id")
+    private RoomDAO room;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserDAO user;
 
     @Column(name = "text", nullable = false)
     private String text;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserDAO user;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "game_id", nullable = false)
-    private GameDAO game;
-
-    @Column(name = "addressee", nullable = false)
-    private int addressee;
+    public MessageDAO(RoomDAO room, UserDAO user, String text) {
+        this.room = room;
+        this.user = user;
+        this.text = text;
+    }
 
     @Override
     public String toString() {
-        return "Message{" + text +
+        return "MessageDAO{" +
+                "messageId=" + messageId +
+                ", roomId=" + room.getRoomId() +
+                ", user=" + user.getLogin() +
+                ", text='" + text + '\'' +
                 '}';
     }
 }
