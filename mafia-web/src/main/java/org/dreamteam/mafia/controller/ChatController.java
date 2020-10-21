@@ -15,7 +15,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 /**
@@ -23,6 +22,7 @@ import java.util.Optional;
  * userId  = web: + login;
  */
 @Controller
+//@RequestMapping
 public class ChatController {
 
     @Autowired
@@ -75,7 +75,6 @@ public class ChatController {
         }
     }
 
-
     /**
      * Проверяем наличие комнаты. Если комната существует, отклоняем запрос на создаение комнаты.
      * Также создаем для новой комнаты базу хранящую сообщения отправленные в этой комнате.
@@ -95,8 +94,12 @@ public class ChatController {
                 System.out.println("MY: Комната " + room.getName() + " уже существует.");
             return false;
         } else {
+
+
             /* Если комната новая, то делаем пользоателя администратором этой комнаты,
                и добавляем его в нее, как в БД так и на пользователькой стороне.*/
+
+            //Добавляем новую комнату в список комнат.
             TemporaryDB.rooms.put(room.getId(), room);
 
             // Так как комната новая, то пользователь создавший ее, будет модератором.
@@ -131,6 +134,58 @@ public class ChatController {
         } else return TemporaryDB.messagesByRooms.get(roomName);
     }
 
+    @GetMapping(SockConst.REQUEST_GET_USERS)
+    public @ResponseBody
+    List<User> getUsers(@RequestParam String roomName) {
+        return TemporaryDB.usersByRooms.get(roomName);
+    }
+
+    @GetMapping(SockConst.REQUEST_GET_ROOM_ADMIN)
+    public @ResponseBody
+    String getRoomAdminName(@RequestParam String roomName) {
+        System.out.println(roomName + " ROOOOOOOOOOOOOOOOOOOMNAMEEEEEEEEE");
+        System.out.println(getRoomAdmin(roomName));
+        return "lol";
+    }
+
+    /**
+     * Добавляет пользователя в комнату.
+     *
+     * @param roomName
+     * @return
+     */
+    @GetMapping(SockConst.REQUEST_GET_ADD_USER_TO_ROOM)
+    public @ResponseBody
+    List<User> addUserToRoom(@RequestParam String roomName) {
+        String login = userService.getCurrentUser().get().getLogin();
+
+        User user = TemporaryDB.users.get("web:" + login);
+
+        // Получаем список пользователей находящихся в комнате.
+        List<User> users = TemporaryDB.usersByRooms.get(roomName);
+        System.out.println("MY: список пользователей комнаты, " + roomName + ": " + users);
+
+        // Добавляем в список пользовотелей нашего пользователя.
+        if (!users.contains(user)) {
+            user.setRoom(roomName);
+            users.add(user);
+        }
+
+        //Добавляем пользователей текущей комнаты, в их комнату.
+        TemporaryDB.usersByRooms.put(roomName, users);
+        System.out.println(users);
+        System.out.println(TemporaryDB.rooms.get(roomName).getAdmin());
+        User admin = getRoomAdmin(roomName);
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_USERS_INFO + roomName, users);
+
+        if (admin != null) {
+            System.out.println("MY: пользователь " + user.getName() + " добавлен в комнату " + roomName +
+                    " администатор комнаты " + admin.getName());
+        }
+
+        return users;
+    }
+
     @MessageMapping(SockConst.CIV_END_POINT)
     //@SendTo("/chat/civ_messages") //Можем использовать как комнату по умолчанию
     public void getCiviliansMessages(Message message) {
@@ -156,7 +211,7 @@ public class ChatController {
 
         // Отправляет информацию о добавленных комнатах всем пользователям.
         if (systemMessage.isNewRoom()) {
-            messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_CHAT, systemMessage);
+            messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO, systemMessage);
         }
         System.out.println("");
 
@@ -176,7 +231,7 @@ public class ChatController {
     @MessageMapping(SockConst.ROOM_END_POINT)
     public void getRoomMessages(Message message) {
         System.out.println("MY: Получено сообщение " + message.getText() + ",");
-        System.out.println("MY: От пользователя " + message.getFrom() + ", комната: " + message.getRoomName() + ".");
+        System.out.println("    От пользователя " + message.getFrom() + ", комната: " + message.getRoomName() + ".");
         String roomName = message.getRoomName();
         List<Message> messages;
 
@@ -231,5 +286,12 @@ public class ChatController {
                 System.out.println("after: " + user.getName() + " room: " + user.getRoom());
             }
         }
+    }
+
+    private User getRoomAdmin(String roomName) {
+        if (TemporaryDB.rooms.containsKey(roomName)) {
+            return TemporaryDB.rooms.get(roomName).getAdmin();
+        } else
+            return null;
     }
 }

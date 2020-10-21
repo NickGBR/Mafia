@@ -9,10 +9,14 @@ var sockConst = {
     MAFIA_WEB_CHAT: '/chat/mafia_messages/',
     CIV_WEB_CHAT: '/chat/civ_messages/',
     SYS_WEB_CHAT: '/chat/system_messages/',
-    SYS_WEB_ROOMS_CHAT: '/chat/system_messages/rooms/',
-    REQUEST_GET_ROOMS: "/GET/getRooms",
+    SYS_WEB_ROOMS_INFO: '/chat/system_messages/rooms/',
+    SYS_WEB_USERS_INFO : '/chat/system_messages/users/',
 
-    REQUEST_GET_MESSAGES: "/GET/getMessages",
-    REQUEST_POST_CHECK_USER: "/POST/checkUser",
+    REQUEST_GET_ROOM_ADMIN : "api/GET/get_room_admin_name",
+    REQUEST_GET_USERS : "api/GET/getRoomUsers",
+    REQUEST_GET_ROOMS: "api/GET/getRooms",
+    REQUEST_GET_ADD_USER_TO_ROOM : 'api/GET/addUserToRoom',
+    REQUEST_GET_MESSAGES: "api/GET/getMessages",
+    REQUEST_POST_CHECK_USER: "api/POST/checkUser",
     REQUEST_POST_CHECK_ROOM: "api/POST/checkRoom",
 }

@@ -1,7 +1,8 @@
 let userName;
 let roomName;
+let roomAdminName;
 const roomChatId = "room_chat_box";
-
+const usersListId = "users_list";
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -21,15 +22,26 @@ function connect() {
 // Будем вызвано после установления соединения
 function afterConnect(connection) {
 
+    roomName = sessionStorage.getItem('roomName');
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
     // Включаем кнопку создания комнаты.
     document.getElementById("send_message_button").disabled = false;
     // Отправляем на сервер информацию, о пользователе вошедшем в чат.
     // Добавляем информацию о пользователе в чат.
-    setUserInfoToInterface();
+    showCurrentUserInfo();
+
+    // Получаем историю чата.
     getUsersMessages();
+
+    // Получем список пользователей в комнате.
+    getRoomUsers()
+
+    // Получаем имя администратора комнаты.
+    getRoomAdminName();
+
     stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomName, getMessage);
+    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomName, updateUsersInfo)
 }
 
 function onError(error) {
@@ -38,7 +50,10 @@ function onError(error) {
     document.getElementById("set_room_button").disabled = true;
 }
 
-function setUserInfoToInterface() {
+/**
+ * Выводит информацю о пользователе в браузер.
+ */
+function showCurrentUserInfo() {
     userName = sessionStorage.getItem("login");
     roomName = sessionStorage.getItem("roomName")
 
@@ -46,6 +61,9 @@ function setUserInfoToInterface() {
     document.getElementById("user_info_label").appendChild(userInfo);
 }
 
+/**
+ * Отправляет сообщения пользователей в end point.
+ */
 function sendMessage() {
     const message = JSON.stringify({
         // Это работает на JQuery
@@ -127,4 +145,98 @@ function setReadyStatus() {
     checkButtonStat = !checkButtonStat;
 }
 
+/**
+ * Отвечает за обновление информации о пользователях.
+ * Когда в комнату заходит новый пользователь, сервер отправляет
+ * сообщение всем пользователям комнаты, со списком пользователей комнаты.
+ * @param response
+ */
+function updateUsersInfo(response){
+    clearUsersList();
+    document.getElementById('users_list').innerText="";
+    const data = JSON.parse(response.body);
+    console.log(data);
+    data.forEach((user) => {
+        showUser(user.name, usersListId);});
+}
 
+/**
+ * Отображает пользователей на экране
+ * @param text - имя пользователя.
+ * @param listId - id эллимента для вывода пользователей.
+ */
+function showUser(text, listId) {
+    const container = document.createElement("span") // Атрибуд добавления свете нашуму тексту.
+
+    //if(isAdmin === true) {
+        container.className="admin_user";
+    //}
+
+    const par = document.createElement("DIV");
+    const textNode = document.createTextNode(text);
+    par.appendChild(container);
+    container.appendChild(textNode);
+
+    document.getElementById(listId).appendChild(par);
+}
+
+/**
+ * Отвечает за получение пользователей при заходе в комнату.
+ */
+function getRoomUsers() {
+    const request = new XMLHttpRequest();
+    request.open("GET", sockConst.REQUEST_GET_USERS + "?roomName=" + roomName, true)
+    request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
+
+    request.onreadystatechange = function () {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            clearUsersList(); // Отчищаем список пользователей, перед обновлением.
+            if (request.status === 200) {
+                const data = JSON.parse(request.responseText);
+                data.forEach((user) => {
+                    showUser(user.name, usersListId);
+                });
+            } else if (request.status === 400) {
+                console.log("ERROR 400");
+            } else if (request.status === 500) {
+                console.log("ERROR 500");
+            } else {
+                console.log("ERROR, JUST ERROR");
+            }
+        }
+    }
+    request.send();
+}
+
+/**
+ * Получет имя Администратора комнаты.*
+ */
+function getRoomAdminName(){
+    function getRoomUsers() {
+        const request = new XMLHttpRequest();
+        request.open("GET", sockConst.REQUEST_GET_ROOM_ADMIN + "?roomName=" + roomName, true)
+        request.setRequestHeader("Content-Type", "application/json");
+        request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
+        request.onreadystatechange = function () {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                clearUsersList(); // Отчищаем список пользователей, перед обновлением.
+                if (request.status === 200) {
+                    roomAdminName = request.responseText;
+                    console.log(roomAdminName);
+                } else if (request.status === 400) {
+                    console.log("ERROR 400");
+                } else if (request.status === 500) {
+                    console.log("ERROR 500 in get room admin");
+                } else {
+                    console.log("ERROR, JUST ERROR");
+                }
+            }
+        }
+        request.send();
+    }
+}
+
+function clearUsersList(){
+    document.getElementById('users_list').innerText="";
+}

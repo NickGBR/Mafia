@@ -25,7 +25,7 @@ function afterConnect(connection) {
     // Включаем кнопку создания комнаты.
     document.getElementById("set_room_button").disabled = false;
     // Отправляем на сервер информацию, о пользователе вошедшем в чат.
-    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_CHAT, addNewRoomToInterface)
+    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO, addNewRoomToInterface)
     checkUser();
     getRooms();
 }
@@ -43,6 +43,32 @@ function getRooms() {
                 console.log(data);
                 data.forEach((room) => {
                 addRoomToInterface(room.name);
+                });
+            } else if (request.status === 400) {
+                console.log("ERROR 400");
+            } else if (request.status === 500) {
+                console.log("ERROR 500");
+            } else {
+                console.log("ERROR, JUST ERROR");
+            }
+        }
+    }
+    request.send();
+}
+
+function addUserToRoom(roomName) {
+    const request = new XMLHttpRequest();
+    request.open("GET", sockConst.REQUEST_GET_ADD_USER_TO_ROOM + "?roomName=" + roomName, true)
+    request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
+
+    request.onreadystatechange = function () {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            if (request.status === 200) {
+                const data = JSON.parse(request.responseText);
+                console.log(data);
+                data.forEach((room) => {
+                    console.log(room.name)
                 });
             } else if (request.status === 400) {
                 console.log("ERROR 400");
@@ -184,22 +210,17 @@ function addRoomToInterface(name) {
     document.getElementById('rooms_list').appendChild(dd);
 }
 
+/**
+ * Отвечает за переход пользователя в комнату чата, также
+ * вызывает метод, для добавления пользователя в БД, со списком пользователей комнаты.
+ * @param id - уникальные индификатор комнаты.
+ */
 function goToRoom(id){
+    addUserToRoom(id);
     window.open("roomChat.html", "_self");
     stompClient.send()
     sessionStorage.setItem("roomName",id);
     sessionStorage.setItem("roomId",roomName);
-}
-
-function newRoomUserSysMessage(){
-    const systemMessage = JSON.stringify({
-        // Это работает на JQuery
-        // 'message': $("#message_input_value").val()
-        // А это на чистом JavaScript
-        'roomName': roomName,
-    });
-    console.log(message);
-    stompClient.send(sockConst.SYSTEM_END_POINT, {}, message);
 }
 
 /**

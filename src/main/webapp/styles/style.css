@@ -18,7 +18,16 @@
     border:3px solid #FF0000;
     overflow:auto;
 }
-
+.admin_user{
+    color: purple;
+    font-size: x-large;
+}
+.ready_user{
+    color: green;
+}
+.not_ready_user{
+    color: red;
+}
 .room_box{
     position: relative;
     text-align:left;

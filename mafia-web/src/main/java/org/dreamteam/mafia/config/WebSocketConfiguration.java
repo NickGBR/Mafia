@@ -55,7 +55,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
      * @param config - настройки брокера сообщений
      */
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/chat");
+        config.enableSimpleBroker("/chat","/topic");
         //Установка префикса для URL
         config.setApplicationDestinationPrefixes("/app");
         //Установка префикса для отправки сообщений определенным юзерам
