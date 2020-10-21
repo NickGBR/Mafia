@@ -1,10 +1,13 @@
 package org.dreamteam.mafia.exceptions;
 
-public class IllegalGamePhaseException extends Exception {
-    public IllegalGamePhaseException() {
+import org.dreamteam.mafia.util.ClientErrorCode;
+
+public class IllegalGamePhaseException extends ClientErrorException {
+    public IllegalGamePhaseException(ClientErrorCode code) {
+        super(code);
     }
 
-    public IllegalGamePhaseException(String message) {
-        super(message);
+    public IllegalGamePhaseException(ClientErrorCode code, String message) {
+        super(message, code);
     }
 }

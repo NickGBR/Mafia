@@ -10,7 +10,8 @@ public enum ClientErrorCode {
     PASSWORD_MISMATCH(1),
     USER_ALREADY_EXISTS(2),
     USER_NOT_EXISTS(3),
-    INCORRECT_PASSWORD(4);
+    INCORRECT_PASSWORD(4),
+    WRONG_GAME_PHASE(5);
 
     private final int value;
 

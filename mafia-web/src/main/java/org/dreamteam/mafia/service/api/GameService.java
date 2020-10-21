@@ -70,19 +70,19 @@ public interface GameService {
 
     /**
      * Проверка является ли игрок шерифом.
-     * @param user - игрок
-     * @param room - комната
+     * @param login - логин игрока
      * @return - true, если игрок явлеятся шерифом, нет в противном случае
-     * @throws IllegalGamePhaseException - если не соответствует фаза голосования (днем голосуем против мафии/дона, ночью против шерифа)
+     * @throws IllegalGamePhaseException - если не соответствует фаза голосования
+     *                      (днем голосуем против мафии/дона, ночью против шерифа)
      */
-    public boolean isSheriff(UserDAO user, RoomDAO room) throws IllegalGamePhaseException;
+    boolean isSheriff(String login) throws IllegalGamePhaseException;
 
     /**
-     * Проверка является ли игрок доном.
-     * @param user - игрок
-     * @param room - комната
-     * @return - true, если игрок явлеятся доном, нет в противном случае
-     * @throws IllegalGamePhaseException - если не соответствует фаза голосования (днем голосуем против мафии/дона, ночью против шерифа)
+     * Проверка является ли игрок мафией/доном.
+     * @param login - логин игрока
+     * @return - true, если игрок явлеятся мафией/доном, нет в противном случае
+     * @throws IllegalGamePhaseException - если не соответствует фаза голосования
+     *                      (днем голосуем против мафии/дона, ночью против шерифа)
      */
-    boolean isDon(User user, Room room) throws IllegalGamePhaseException;
+    boolean isMafia(String login) throws IllegalGamePhaseException;
 }
