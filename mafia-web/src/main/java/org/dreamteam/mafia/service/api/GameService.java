@@ -1,8 +1,11 @@
 package org.dreamteam.mafia.service.api;
 
+import org.dreamteam.mafia.dao.RoomDAO;
+import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dto.CharacterDTO;
 import org.dreamteam.mafia.exceptions.GameIsOverException;
 import org.dreamteam.mafia.exceptions.GameNotStartedException;
+import org.dreamteam.mafia.exceptions.IllegalGamePhaseException;
 import org.dreamteam.mafia.exceptions.IllegalMoveException;
 import org.dreamteam.mafia.model.Character;
 import org.dreamteam.mafia.model.*;
@@ -68,14 +71,18 @@ public interface GameService {
     /**
      * Проверка является ли игрок шерифом.
      * @param user - игрок
+     * @param room - комната
      * @return - true, если игрок явлеятся шерифом, нет в противном случае
+     * @throws IllegalGamePhaseException - если не соответствует фаза голосования (днем голосуем против мафии/дона, ночью против шерифа)
      */
-    boolean isSheriff(User user);
+    public boolean isSheriff(UserDAO user, RoomDAO room) throws IllegalGamePhaseException;
 
     /**
      * Проверка является ли игрок доном.
      * @param user - игрок
+     * @param room - комната
      * @return - true, если игрок явлеятся доном, нет в противном случае
+     * @throws IllegalGamePhaseException - если не соответствует фаза голосования (днем голосуем против мафии/дона, ночью против шерифа)
      */
-    boolean isDon(User user);
+    boolean isDon(User user, Room room) throws IllegalGamePhaseException;
 }
