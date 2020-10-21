@@ -3,9 +3,9 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
+
 
 @Getter
 @Setter

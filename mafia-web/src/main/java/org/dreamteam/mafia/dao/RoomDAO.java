@@ -9,7 +9,6 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
-import java.util.Collections;
 import java.util.Set;
 
 @Getter
@@ -62,7 +61,7 @@ public class RoomDAO {
     private Boolean don;
 
     @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
-    @NotFound(action= NotFoundAction.IGNORE)
+    @NotFound(action = NotFoundAction.IGNORE)
     private Set<UserDAO> userList;
 
     @OneToMany(mappedBy = "messageId", fetch = FetchType.EAGER)

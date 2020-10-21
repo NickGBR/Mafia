@@ -1,6 +1,5 @@
 package org.dreamteam.mafia.repository.api;
 
-import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -24,6 +23,7 @@ public interface CrudUserRepository extends CrudRepository<UserDAO, Long> {
 
     /**
      * Поиск списка игроков комнаты по её номеру (идентификатору).
+     *
      * @param roomId идентификатор комнаты
      * @return список игроков
      */
@@ -32,6 +32,7 @@ public interface CrudUserRepository extends CrudRepository<UserDAO, Long> {
 
     /**
      * Текущее количество игроков в комнате.
+     *
      * @param roomId идентификатор комнаты
      * @return текущее количество игроков
      */
@@ -40,6 +41,7 @@ public interface CrudUserRepository extends CrudRepository<UserDAO, Long> {
 
     /**
      * Количество игроков в комнате готовых к игре.
+     *
      * @param roomId идентификатор комнаты
      * @return количество игроков готовых к игре
      */

@@ -35,7 +35,7 @@ public class UserDAO {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "users2rooms",
-            joinColumns = { @JoinColumn(name = "user_id") },
+            joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "room_id")}
     )
     @NotFound(action = NotFoundAction.IGNORE)
