@@ -37,7 +37,8 @@ public class GameServiceImpl {
         this.userService = userService;
     }
 
-    boolean isSheriff(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException, RoomsMismatchException, NotEnoughRightsException {
+    public boolean isSheriff(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
+                                            RoomsMismatchException, NotEnoughRightsException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
             throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
@@ -46,7 +47,7 @@ public class GameServiceImpl {
 
         Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
         if (!currentUserDAO.isPresent()) {
-            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist");
+            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
         }
 
         if (!Objects.equals(userDAO.get().getRoom().getRoomId(), currentUserDAO.get().getRoom().getRoomId())) {
@@ -67,17 +68,35 @@ public class GameServiceImpl {
 
     }
 
-/*    public boolean isSheriff(UserDAO user, RoomDAO room) throws IllegalGamePhaseException {
-        if (!room.getGamePhase().equals(GamePhaseEnum.NIGHT))
+
+    public boolean isMafia(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException, RoomsMismatchException, NotEnoughRightsException {
+        Optional<UserDAO> userDAO = userRepository.findByLogin(login);
+        if (!userDAO.isPresent()) {
+            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
+                    + "\' doesn't exist in a database");
+        }
+
+        Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
+        if (!currentUserDAO.isPresent()) {
+            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
+        }
+
+        if (!Objects.equals(userDAO.get().getRoom().getRoomId(), currentUserDAO.get().getRoom().getRoomId())) {
+            throw new RoomsMismatchException(ClientErrorCode.ROOMS_MISMATCH, "\'"
+                    + userDAO.get().getLogin() + "\' and \'"
+                    + currentUserDAO.get().getLogin() + "\' are in different rooms");
+        }
+
+        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.NIGHT)) {
             throw new IllegalGamePhaseException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
-        else return user.getCharacter().equals(CharacterEnum.SHERIFF);
+        }
+
+        if (!currentUserDAO.get().getCharacter().equals(CharacterEnum.SHERIFF)) {
+            throw new NotEnoughRightsException("Permission denied");
+        }
+
+        return userDAO.get().getCharacter().equals(CharacterEnum.DON) ||
+                userDAO.get().getCharacter().equals(CharacterEnum.MAFIA);
     }
 
-    boolean isMafia(String login) throws IllegalGamePhaseException {
-
-    public boolean isMafia(UserDAO user, RoomDAO room) throws IllegalGamePhaseException {
-        if (!room.getGamePhase().equals(GamePhaseEnum.DAY))
-          throw new IllegalGamePhaseException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
-        else return user.getCharacter().equals(CharacterEnum.DON);
-    }*/
 }

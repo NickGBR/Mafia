@@ -3,10 +3,7 @@ package org.dreamteam.mafia.service.api;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dto.CharacterDTO;
-import org.dreamteam.mafia.exceptions.GameIsOverException;
-import org.dreamteam.mafia.exceptions.GameNotStartedException;
-import org.dreamteam.mafia.exceptions.IllegalGamePhaseException;
-import org.dreamteam.mafia.exceptions.IllegalMoveException;
+import org.dreamteam.mafia.exceptions.*;
 import org.dreamteam.mafia.model.Character;
 import org.dreamteam.mafia.model.*;
 
@@ -72,10 +69,13 @@ public interface GameService {
      * Проверка является ли игрок шерифом.
      * @param login - логин игрока
      * @return - true, если игрок явлеятся шерифом, нет в противном случае
-     * @throws IllegalGamePhaseException - если не соответствует фаза голосования
-     *                      (днем голосуем против мафии/дона, ночью против шерифа)
+     * @throws IllegalGamePhaseException - если не соответствует фаза дня (ночью шериф ищет мафию/дона, мафия ищет шерифа)
+     * @throws UserDoesNotExistInDBException - если игрока нет в базе
+     * @throws RoomsMismatchException - если игроки находятся в разных комнатах
+     * @throws NotEnoughRightsException - если у игрока нет прав голосовать в данную фазу
      */
-    boolean isSheriff(String login) throws IllegalGamePhaseException;
+    boolean isSheriff(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
+                                            RoomsMismatchException, NotEnoughRightsException;
 
     /**
      * Проверка является ли игрок мафией/доном.
