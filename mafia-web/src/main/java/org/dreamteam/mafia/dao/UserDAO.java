@@ -3,9 +3,12 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dreamteam.mafia.dao.enums.CharacterEnum;
+import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
-import java.util.Set;
 
 /**
  * Объект, связанный с таблицей пользователей в БД
@@ -30,33 +33,45 @@ public class UserDAO {
     private String passwordHash;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "room_id")
+    @JoinTable(
+            name = "users2rooms",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "room_id")}
+    )
+    @NotFound(action = NotFoundAction.IGNORE)
     private RoomDAO room;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "statistics_id")
-    private StatisticsDAO statistics;
+    @Column(name = "is_ready")
+    private Boolean isReady;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private Set<MessageDAO> messageList;
+    @Column(name = "character")
+    @Enumerated(EnumType.STRING)
+    private CharacterEnum character;
 
-    public UserDAO(String login, String passwordHash, RoomDAO room, StatisticsDAO statistics, Set<MessageDAO> messageList) {
+    @Column(name = "character_status")
+    @Enumerated(EnumType.STRING)
+    private CharacterStatusEnum characterStatus;
+
+    @Column(name = "votes_against")
+    private Integer votesAgainst;
+
+    public UserDAO(String login, String passwordHash) {
         this.login = login;
         this.passwordHash = passwordHash;
-        this.room = room;
-        this.statistics = statistics;
-        this.messageList = messageList;
     }
 
     @Override
     public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", passwordHash='" + passwordHash + '\'' +
-                ", login='" + login + '\'' +
-                ", roomId=" + room.getRoomId() +
-                ", statisticsId=" + statistics.getStatisticsId() +
-                ", messageList=" + messageList +
-                '}';
+        final StringBuilder sb = new StringBuilder("UserDAO{");
+        sb.append("userId=").append(userId);
+        sb.append(", login='").append(login).append('\'');
+        sb.append(", passwordHash='").append(passwordHash).append('\'');
+        sb.append(", roomId=").append(room.getRoomId());
+        sb.append(", isReady=").append(isReady);
+        sb.append(", character=").append(character);
+        sb.append(", characterStatus=").append(characterStatus);
+        sb.append(", votesAgainst=").append(votesAgainst);
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -1,21 +1,19 @@
 package org.dreamteam.mafia.security;
 
 import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.model.SecurityUserDetails;
-import org.dreamteam.mafia.model.SignedJsonWebToken;
-import org.dreamteam.mafia.repository.api.CrudUserRepository;
+import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -24,39 +22,36 @@ import java.util.Optional;
  * а затем пытается найти такового в базе.
  */
 @Component
-public final class TokenAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+public final class TokenAuthenticationProvider implements AuthenticationProvider {
 
     private final Logger logger = LoggerFactory.getLogger(TokenAuthenticationProvider.class);
     private final TokenService tokenService;
-    private final CrudUserRepository repository;
+    private final UserRepository repository;
 
     @Autowired
-    public TokenAuthenticationProvider(TokenService tokenService, CrudUserRepository repository) {
+    public TokenAuthenticationProvider(TokenService tokenService, UserRepository repository) {
         this.tokenService = tokenService;
         this.repository = repository;
     }
 
     @Override
-    protected void additionalAuthenticationChecks(
-            UserDetails userDetails,
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
-        // Намеренно оставлено пустым.
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        final Object token = authentication.getCredentials();
+        logger.debug("Retrieving user via token : " + token);
+        Optional<String> login = tokenService.extractUsernameFrom((SignedJsonWebToken) authentication);
+        if (login.isPresent()) {
+            Optional<UserDAO> userDAO = repository.findByLogin(login.get());
+            if (userDAO.isPresent()) {
+                logger.debug("User successfully found: " + userDAO.get().getLogin());
+                return new SignedJsonWebToken(login.get(), (String) token, Collections.singleton(
+                        new SimpleGrantedAuthority("ROLE_USER")));
+            }
+        }
+        throw new UsernameNotFoundException("Cannot find user with authentication token: " + token);
     }
 
     @Override
-    protected UserDetails retrieveUser(
-            String userName,
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
-        final Object token = usernamePasswordAuthenticationToken.getCredentials();
-        logger.debug("Retrieving user via token: " + token);
-        Optional<String> login = tokenService.extractUsernameFrom(new SignedJsonWebToken(token.toString()));
-        if (login.isPresent()) {
-            List<UserDAO> userDAOS = repository.findByLogin(login.get());
-            if (userDAOS.size() > 0) {
-                logger.debug("User successfully found: " + userDAOS.get(0).getLogin());
-                return new SecurityUserDetails(userDAOS.get(0));
-            }
-        }
-        throw new UsernameNotFoundException("Cannot find user with authentication token=" + token);
+    public boolean supports(Class<?> aClass) {
+        return aClass.equals(SignedJsonWebToken.class);
     }
 }

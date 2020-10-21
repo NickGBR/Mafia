@@ -3,3 +3,4 @@
 .*
 *.iml
 target/
+/mafia-web/src/main/java/org/dreamteam/mafia/Testing.java
