@@ -28,7 +28,7 @@ public class GameController {
     }
 
     @RequestMapping(value = "/getIsMafia", method = RequestMethod.GET)
-    public Boolean checkMafia(@RequestParam String login) throws IllegalGamePhaseException {
+    public Boolean checkMafia(@RequestParam String login) throws IllegalGamePhaseException, NotEnoughRightsException, UserDoesNotExistInDBException, RoomsMismatchException {
         return gameService.isMafia(login);
     }
 }

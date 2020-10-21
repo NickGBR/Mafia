@@ -38,7 +38,7 @@ public class GameServiceImpl {
     }
 
     public boolean isSheriff(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
-                                            RoomsMismatchException, NotEnoughRightsException {
+                                                    RoomsMismatchException, NotEnoughRightsException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
             throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
@@ -69,7 +69,8 @@ public class GameServiceImpl {
     }
 
 
-    public boolean isMafia(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException, RoomsMismatchException, NotEnoughRightsException {
+    public boolean isMafia(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
+                                                RoomsMismatchException, NotEnoughRightsException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
             throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login

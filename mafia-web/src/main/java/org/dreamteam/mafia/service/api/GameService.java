@@ -81,8 +81,11 @@ public interface GameService {
      * Проверка является ли игрок мафией/доном.
      * @param login - логин игрока
      * @return - true, если игрок явлеятся мафией/доном, нет в противном случае
-     * @throws IllegalGamePhaseException - если не соответствует фаза голосования
-     *                      (днем голосуем против мафии/дона, ночью против шерифа)
+     * @throws IllegalGamePhaseException - если не соответствует фаза дня (ночью шериф ищет мафию/дона, мафия ищет шерифа)
+     * @throws UserDoesNotExistInDBException - если игрока нет в базе
+     * @throws RoomsMismatchException - если игроки находятся в разных комнатах
+     * @throws NotEnoughRightsException - если у игрока нет прав голосовать в данную фазу
      */
-    boolean isMafia(String login) throws IllegalGamePhaseException;
+    boolean isMafia(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
+                                                RoomsMismatchException, NotEnoughRightsException;
 }
