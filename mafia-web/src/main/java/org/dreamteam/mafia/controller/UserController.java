@@ -4,8 +4,8 @@ import org.dreamteam.mafia.dto.LoginDTO;
 import org.dreamteam.mafia.dto.RegistrationDTO;
 import org.dreamteam.mafia.exceptions.UserAuthenticationException;
 import org.dreamteam.mafia.exceptions.UserRegistrationException;
-import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.security.SignedJsonWebToken;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.temporary.TemporaryDB;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class UserController {
         logger.debug("Incoming registration request. DTO: " + dto);
         userService.registerNewUser(dto);
         SignedJsonWebToken jws = userService.loginUser(dto.getLoginData());
-        return jws.getValue();
+        return jws.getToken();
     }
 
     /**
@@ -61,17 +61,16 @@ public class UserController {
     public String login(@RequestBody LoginDTO dto) throws UserAuthenticationException {
         logger.debug("Incoming login request. DTO: " + dto);
         SignedJsonWebToken jws = userService.loginUser(dto);
-        return jws.getValue();
+        return jws.getToken();
     }
 
     /**
      * Обрабатывает запрос на получение имени текущего пользователя
      *
      * @return - имя текущего пользователя
-     * @throws UserAuthenticationException- при ошибках авторизации
      */
     @RequestMapping(value = "/getCurrentName", method = RequestMethod.GET)
-    public String getCurrentUserName() throws UserAuthenticationException {
+    public String getCurrentUserName() {
         logger.debug("Incoming request for current username.");
         Optional<User> currentUser = userService.getCurrentUser();
         if (currentUser.isPresent()) {

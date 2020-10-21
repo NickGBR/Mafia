@@ -1,7 +1,7 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.security.SignedJsonWebToken;
 
 import java.util.Optional;
 

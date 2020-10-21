@@ -1,8 +1,8 @@
 spring:
-  profiles.active: no_db
+  profiles.active: production
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format-sql: true

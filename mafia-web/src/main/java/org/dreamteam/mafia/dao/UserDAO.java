@@ -3,9 +3,12 @@ package org.dreamteam.mafia.dao;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dreamteam.mafia.dao.enums.CharacterEnum;
+import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
-import java.util.Set;
 
 /**
  * Объект, связанный с таблицей пользователей в БД
@@ -31,32 +34,39 @@ public class UserDAO {
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "room_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     private RoomDAO room;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "statistics_id")
-    private StatisticsDAO statistics;
+    @Column(name = "is_ready")
+    private Boolean isReady;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private Set<MessageDAO> messageList;
+    @Column(name = "character")
+    @Enumerated(EnumType.STRING)
+    private CharacterEnum character;
 
-    public UserDAO(String login, String passwordHash, RoomDAO room, StatisticsDAO statistics, Set<MessageDAO> messageList) {
+    @Column(name = "character_status")
+    @Enumerated(EnumType.STRING)
+    private CharacterStatusEnum characterStatus;
+
+    @Column(name = "votes_against")
+    private Integer votesAgainst;
+
+    public UserDAO(String login, String passwordHash) {
         this.login = login;
         this.passwordHash = passwordHash;
-        this.room = room;
-        this.statistics = statistics;
-        this.messageList = messageList;
     }
 
     @Override
     public String toString() {
-        return "User{" +
+        return "UserDAO{" +
                 "userId=" + userId +
-                ", passwordHash='" + passwordHash + '\'' +
                 ", login='" + login + '\'' +
+                ", passwordHash='" + passwordHash + '\'' +
                 ", roomId=" + room.getRoomId() +
-                ", statisticsId=" + statistics.getStatisticsId() +
-                ", messageList=" + messageList +
+                ", isReady=" + isReady +
+                ", character=" + character +
+                ", characterStatus=" + characterStatus +
+                ", votesAgainst=" + votesAgainst +
                 '}';
     }
 }

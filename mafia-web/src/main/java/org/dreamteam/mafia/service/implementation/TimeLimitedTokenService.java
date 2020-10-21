@@ -4,8 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import org.dreamteam.mafia.model.SignedJsonWebToken;
 import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.security.SignedJsonWebToken;
 import org.dreamteam.mafia.service.api.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,7 +54,7 @@ public class TimeLimitedTokenService implements TokenService {
                 .setSigningKey(secretKey)
                 .build();
         try {
-            Claims claims = parser.parseClaimsJws(token.getValue()).getBody();
+            Claims claims = parser.parseClaimsJws(token.getToken()).getBody();
             return Optional.ofNullable(claims.getSubject());
         } catch (JwtException e) {
             return Optional.empty();
