@@ -140,4 +140,15 @@ public class RoomController {
         logger.debug("Incoming kick request. Target user login: " + target);
         roomService.kickUser(target);
     }
+
+    /**
+     * Отвечает на запрос о том, в комнате ли текущий пользователь
+     *
+     * @return - true, если пользователь в комнате, false - в противном случае
+     */
+    @GetMapping("/isInRoom")
+    public Boolean isInRoom() {
+        logger.debug("Incoming request for current user room");
+        return roomService.isCurrentlyInRoom();
+    }
 }

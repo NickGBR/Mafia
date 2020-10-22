@@ -9,10 +9,7 @@ import org.dreamteam.mafia.service.api.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -76,5 +73,16 @@ public class UserController {
         } else {
             return "";
         }
+    }
+
+    /**
+     * Отвечает на запрос о том, вошел ли в систему данный пользователь
+     *
+     * @return - true, если пользователь опознается системой, false - в противном случае
+     */
+    @GetMapping("/isLoggedIn")
+    public Boolean isLoggedIn() {
+        logger.debug("Incoming request for current user authentication");
+        return userService.getCurrentUser().isPresent();
     }
 }

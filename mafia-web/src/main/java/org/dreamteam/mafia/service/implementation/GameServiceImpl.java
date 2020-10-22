@@ -41,17 +41,6 @@ public class GameServiceImpl implements GameService {
         this.userService = userService;
     }
 
-    /**
-     * Находит игру, идущую в указанной комнате
-     *
-     * @param room - комната
-     * @return - игра, идущая в комнате
-     * @throws GameNotStartedException - если игра в комнате еще не началась
-     */
-    @Override
-    public Room getGameInRoom(Room room) throws GameNotStartedException {
-        return null;
-    }
 
     /**
      * Возвращает список всех персонажей в игре
@@ -79,10 +68,10 @@ public class GameServiceImpl implements GameService {
      * Переводит игру в следующую фазу
      *
      * @param room - игра
-     * @throws GameIsOverException - если игра уже окончена
+     * @throws ClientErrorException - если игра уже окончена
      */
     @Override
-    public void advancePhase(Room room) throws GameIsOverException {
+    public void advancePhase(Room room) throws ClientErrorException {
 
     }
 
