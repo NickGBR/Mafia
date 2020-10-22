@@ -1,4 +1,6 @@
 let spinner;
+let initialisedUserName = "";
+let pageName = getCurrentName();
 
 function getCurrentName() {
     const path = window.location.pathname;
@@ -7,61 +9,59 @@ function getCurrentName() {
 
 
 function onLoadInit() {
-    spinner = new Spin.Spinner().spin("modal");
+    spinner = new Spin.Spinner().spin();
     document.getElementById("body").appendChild(spinner.el);
-    doRedirectToLogin();
+    doRedirect();
 }
 
-function doRedirectToLogin() {
+function doRedirect() {
     let callback = function (request) {
         const data = JSON.parse(request.responseText);
-        if (data) {
-            doRedirectToRoomList();
+        if (data["isLoggedIn"]) {
+            initialisedUserName = data["name"];
+            if (data["isInRoom"]) {
+                if (pageName !== "roomChat.html") {
+                    window.location.href = "roomChat.html";
+                } else {
+                    doInitRoom();
+                }
+            } else {
+                if (pageName !== "roomList.html") {
+                    window.location.href = "roomList.html";
+                } else {
+                    doInitRoomList();
+                }
+            }
         } else {
-            const name = getCurrentName();
-            if (name !== "login.html" && name !== "registration.html") {
+            if (pageName !== "login.html" && name !== "registration.html") {
                 window.location.href = "login.html";
             } else {
                 doInitLogin();
             }
         }
     };
-    sendRequest("GET", "/api/user/isLoggedIn", "", callback, []);
+    sendRequest("GET", "/api/init", "", callback, []);
 }
 
-function doRedirectToRoomList() {
-    let callback = function (request) {
-        const data = JSON.parse(request.responseText);
-        if (data) {
-            doRedirectToRoom();
-        } else {
-            const name = getCurrentName();
-            if (name !== "roomList.html") {
-                window.location.href = "roomList.html";
-            } else {
-                doInitRoomList();
-            }
-        }
-    };
-    sendRequest("GET", "/api/room/isInRoom", "", callback, []);
-}
-
-function doRedirectToRoom() {
-    if (name !== "roomChat.html") {
-        window.location.href = "roomChat.html";
-    } else {
-        doInitRoom();
-    }
-}
 
 function doInitLogin() {
     spinner.stop();
 }
 
 function doInitRoomList() {
+    connect();
+    setUserName();
     spinner.stop();
 }
 
 function doInitRoom() {
+    connect();
+    setUserName();
     spinner.stop();
+}
+
+function setUserName() {
+    let userNameNode = document.getElementById("userName");
+    const textNode = document.createTextNode(initialisedUserName);
+    userNameNode.appendChild(textNode);
 }
