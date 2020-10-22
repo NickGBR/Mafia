@@ -9,7 +9,7 @@ public class NoSuchRoomException extends Exception {
         super();
     }
 
-    NoSuchRoomException(String msg) {
+    public NoSuchRoomException(String msg) {
         super(msg);
     }
 }

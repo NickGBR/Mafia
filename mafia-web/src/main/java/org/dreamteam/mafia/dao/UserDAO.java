@@ -45,6 +45,9 @@ public class UserDAO {
     @Column(name = "is_ready")
     private Boolean isReady;
 
+    @Column(name = "is_admin")
+    private Boolean isAdmin;
+
     @Column(name = "character")
     @Enumerated(EnumType.STRING)
     private CharacterEnum character;

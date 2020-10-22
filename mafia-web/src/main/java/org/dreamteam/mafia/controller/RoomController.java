@@ -3,6 +3,7 @@ package org.dreamteam.mafia.controller;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.AlreadyInRoomException;
+import org.dreamteam.mafia.exceptions.NoSuchRoomException;
 import org.dreamteam.mafia.service.api.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,11 @@ public class RoomController {
     @PostMapping("/create")
     public void createRoom(@RequestBody RoomCreationDTO room) throws AlreadyInRoomException {
         roomService.createRoom(room);
+    }
+
+    @PostMapping("/disband")
+    public void disbandRoom() throws NoSuchRoomException {
+        roomService.disbandRoom();
     }
 
     /**

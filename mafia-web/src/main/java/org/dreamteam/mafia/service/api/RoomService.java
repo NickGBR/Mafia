@@ -50,6 +50,11 @@ public interface RoomService {
     void createRoom(RoomCreationDTO roomDTO) throws AlreadyInRoomException;
 
     /**
+     * Распускает текущую комнату, если текущий игрок - администратор комнаты.
+     */
+    void disbandRoom() throws NoSuchRoomException;
+
+    /**
      * Проверяет является ли заданная комната приватной
      *
      * @param room - описание комнаты, полученние из интерфейса
