@@ -96,6 +96,12 @@ public class RoomController {
         }
     }
 
+    @GetMapping("/isAdmin")
+    public Boolean isAdmin() {
+        logger.debug("Incoming request for room admin status");
+        return roomService.isCurrentUserAdmin();
+    }
+
     /**
      * Обрабатывает запрос на получение списка пользователей в текущей комнате
      *

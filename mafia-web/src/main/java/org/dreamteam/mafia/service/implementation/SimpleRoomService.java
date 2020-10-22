@@ -109,11 +109,6 @@ public class SimpleRoomService implements RoomService {
     }
 
     @Override
-    public boolean isRoomPrivate(Room room) {
-        return false;
-    }
-
-    @Override
     public void joinRoom(JoinRoomDTO dto) throws ClientErrorException {
         Optional<UserDAO> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {
@@ -259,5 +254,15 @@ public class SimpleRoomService implements RoomService {
     @Override
     public boolean isRoomReady(Room room) {
         return false;
+    }
+
+    @Override
+    public boolean isCurrentlyInRoom() {
+        final Optional<UserDAO> user = userService.getCurrentUserDAO();
+        if (!user.isPresent()) {
+            return false;
+        }
+        Optional<RoomDAO> room = repository.findRoomDAOByUserListContains(user.get());
+        return room.isPresent();
     }
 }

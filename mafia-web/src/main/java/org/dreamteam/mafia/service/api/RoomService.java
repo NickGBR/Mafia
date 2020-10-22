@@ -39,14 +39,6 @@ public interface RoomService {
     void disbandRoom() throws ClientErrorException;
 
     /**
-     * Проверяет является ли заданная комната приватной
-     *
-     * @param room - описание комнаты, полученние из интерфейса
-     * @return - true, если комната приватна, false - иначе
-     */
-    boolean isRoomPrivate(Room room);
-
-    /**
      * Пытается добавить текущего пользователя в комнату с заданным ID
      *
      * @param dto - данные, необходимые для попытки входа в комнату
@@ -115,4 +107,11 @@ public interface RoomService {
      * @return - true, если все пользователи в комнате готовы, false - иначе
      */
     boolean isRoomReady(Room room);
+
+    /**
+     * Проверяет находится ли текущий пользователь в комнате
+     *
+     * @return - true, если пользователь находится в комнате, false - в противном случае
+     */
+    boolean isCurrentlyInRoom();
 }
