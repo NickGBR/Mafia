@@ -50,6 +50,11 @@ public interface RoomService {
      * Пытается добавить текущего пользователя в комнату с заданным ID
      *
      * @param dto - данные, необходимые для попытки входа в комнату
+     * @throws ClientErrorException - если комната не существует
+     *                              или в ней уже началась игра
+     *                              или она уже заполнена
+     *                              или текущий пользователь уже в другой комнате
+     *                              или пользователь дал неподходящий к комнате пароль
      */
     void joinRoom(JoinRoomDTO dto) throws ClientErrorException;
 
@@ -57,6 +62,7 @@ public interface RoomService {
      * Покидает текущую комнату, если текущий игрок находится в комнате
      *
      * @throws ClientErrorException - если текущий пользователь не находится в комнате
+     *                              или игра уже началась
      */
     void leaveRoom() throws ClientErrorException;
 
@@ -79,7 +85,9 @@ public interface RoomService {
      * Пытается убрать пользователя из комнаты
      *
      * @param target - логин изгоняемого пользователя
-     * @throws ClientErrorException - если оба пользователя не находятся в одной и той же комнате
+     * @throws ClientErrorException - если текущий пользователь не находится в комнате
+     *                              или если игра в комнате уже начата
+     *                              или оба пользователя не находятся в одной и той же комнате
      *                              или если запросивший пользователь не является администратором своей комнаты
      */
     void kickUser(String target) throws ClientErrorException;
