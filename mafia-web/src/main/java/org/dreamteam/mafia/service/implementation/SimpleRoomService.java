@@ -6,9 +6,7 @@ import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
-import org.dreamteam.mafia.exceptions.AlreadyInRoomException;
-import org.dreamteam.mafia.exceptions.NoSuchRoomException;
-import org.dreamteam.mafia.exceptions.NotEnoughRightsException;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.Room;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.RoomRepository;
@@ -43,10 +41,6 @@ public class SimpleRoomService implements RoomService {
         this.repository = repository;
     }
 
-    @Override
-    public Room getRoomFromDTO(RoomCreationDTO roomDTO) throws NoSuchRoomException {
-        return null;
-    }
 
     @Override
     public Optional<Room> getCurrentUserRoom() {
@@ -60,12 +54,7 @@ public class SimpleRoomService implements RoomService {
     }
 
     @Override
-    public User getRoomAdmin(Room room) {
-        return null;
-    }
-
-    @Override
-    public void createRoom(RoomCreationDTO roomDTO) throws AlreadyInRoomException {
+    public void createRoom(RoomCreationDTO roomDTO) throws ClientErrorException {
         RoomDAO dao = new RoomDAO();
         dao.setName(roomDTO.getName());
         if (roomDTO.getPassword().isEmpty()) {
@@ -81,38 +70,43 @@ public class SimpleRoomService implements RoomService {
         Optional<UserDAO> admin = userService.getCurrentUserDAO();
         if (!admin.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to create rooms");
-        } else {
-            Optional<RoomDAO> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
-            if (adminCurrRoom.isPresent()) {
-                throw new AlreadyInRoomException("Can't create a room for a user, that is already in a room");
-            }
-            dao.addUser(admin.get());
-            admin.get().setRoom(dao);
-            admin.get().setIsAdmin(true);
         }
+        Optional<RoomDAO> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
+        if (adminCurrRoom.isPresent()) {
+            throw new ClientErrorException(ClientErrorCode.ALREADY_IN_ROOM,
+                                           "Can't create a room for a user, that is already in a room");
+        }
+        dao.addUser(admin.get());
+        admin.get().setRoom(dao);
+        admin.get().setIsAdmin(true);
+
         repository.save(dao);
     }
 
-    public void disbandRoom() throws NoSuchRoomException, NotEnoughRightsException {
+    public void disbandRoom() throws ClientErrorException {
         Optional<UserDAO> admin = userService.getCurrentUserDAO();
         if (!admin.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to disband rooms");
-        } else {
-            Optional<RoomDAO> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
-            if (!adminCurrRoom.isPresent()) {
-                throw new NoSuchRoomException(ClientErrorCode.NOT_IN_ROOM, "Current user is not a room admin");
-            }
-            if (!admin.get().getIsAdmin()) {
-                throw new NotEnoughRightsException("Only room administrator can disband it");
-            }
-            for (UserDAO user : adminCurrRoom.get().getUserList()) {
-                user.setRoom(null);
-            }
-            adminCurrRoom.get().getUserList().clear();
-            admin.get().setIsAdmin(false);
-            adminCurrRoom.get().setGameStatus(GameStatusEnum.DELETED);
-            repository.save(adminCurrRoom.get());
         }
+        Optional<RoomDAO> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
+        if (!adminCurrRoom.isPresent()) {
+            throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM, "Current user is not in a room");
+        }
+        if (!adminCurrRoom.get().getGameStatus().equals(GameStatusEnum.NOT_STARTED)) {
+            throw new ClientErrorException(ClientErrorCode.GAME_ALREADY_STARTED,
+                                           "Can't disband already started game");
+        }
+        if (!admin.get().getIsAdmin()) {
+            throw new ClientErrorException(ClientErrorCode.MOT_ENOUGH_RIGHTS,
+                                           "Only room administrator can disband it");
+        }
+        for (UserDAO user : adminCurrRoom.get().getUserList()) {
+            user.setRoom(null);
+        }
+        adminCurrRoom.get().getUserList().clear();
+        admin.get().setIsAdmin(false);
+        adminCurrRoom.get().setGameStatus(GameStatusEnum.DELETED);
+        repository.save(adminCurrRoom.get());
     }
 
     @Override
@@ -121,7 +115,52 @@ public class SimpleRoomService implements RoomService {
     }
 
     @Override
-    public void joinRoom(JoinRoomDTO dto) {
+    public void joinRoom(JoinRoomDTO dto) throws ClientErrorException {
+        Optional<UserDAO> user = userService.getCurrentUserDAO();
+        if (!user.isPresent()) {
+            throw new SecurityException("Non authorised user is not allowed to join rooms");
+        }
+        Optional<RoomDAO> room = repository.findById(dto.getId());
+        if (!room.isPresent() || room.get().getGameStatus().equals(GameStatusEnum.DELETED)) {
+            throw new ClientErrorException(ClientErrorCode.ROOM_NOT_EXIST, "Requested room does not exist");
+        }
+        if (!room.get().getGameStatus().equals(GameStatusEnum.NOT_STARTED)) {
+            throw new ClientErrorException(ClientErrorCode.GAME_ALREADY_STARTED,
+                                           "Can't join already started game");
+        }
+        Optional<RoomDAO> userCurrRoom = repository.findRoomDAOByUserListContains(user.get());
+        if (userCurrRoom.isPresent()) {
+            throw new ClientErrorException(ClientErrorCode.ALREADY_IN_ROOM,
+                                           "Current user is already in a room");
+        }
+        if (!room.get().getPasswordHash().isEmpty() &&
+                !encoder.matches(room.get().getPasswordHash(), dto.getPassword())) {
+            throw new ClientErrorException(ClientErrorCode.INCORRECT_PASSWORD,
+                                           "Provided wrong password for requested room");
+        }
+        room.get().addUser(user.get());
+        user.get().setRoom(room.get());
+        repository.save(room.get());
+    }
+
+    @Override
+    public void leaveRoom() throws ClientErrorException {
+        Optional<UserDAO> user = userService.getCurrentUserDAO();
+        if (!user.isPresent()) {
+            throw new SecurityException("Non authorised user is not allowed to join rooms");
+        }
+        Optional<RoomDAO> room = repository.findRoomDAOByUserListContains(user.get());
+        if (!room.isPresent()) {
+            throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM,
+                                           "User is not in room. Nothing to leave from");
+        }
+        if (room.get().getGameStatus().equals(GameStatusEnum.IN_PROGRESS)) {
+            throw new ClientErrorException(ClientErrorCode.GAME_ALREADY_STARTED,
+                                           "Can't leave while game is in progress");
+        }
+        room.get().removeUser(user.get());
+        user.get().setRoom(null);
+        repository.save(room.get());
     }
 
     @Override
@@ -147,7 +186,7 @@ public class SimpleRoomService implements RoomService {
     }
 
     @Override
-    public void kickUser(User admin, User target) throws NoSuchRoomException, NotEnoughRightsException {
+    public void kickUser(User admin, User target) throws ClientErrorException {
 
     }
 
@@ -157,7 +196,7 @@ public class SimpleRoomService implements RoomService {
     }
 
     @Override
-    public void setReady(User user, boolean ready) throws NoSuchRoomException {
+    public void setReady(boolean ready) throws ClientErrorException {
 
     }
 
@@ -166,8 +205,5 @@ public class SimpleRoomService implements RoomService {
         return false;
     }
 
-    @Override
-    public void startGame(User user) throws NoSuchRoomException, NotEnoughRightsException {
 
-    }
 }

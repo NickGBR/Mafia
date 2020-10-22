@@ -43,11 +43,6 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Room getGameInRoom(Room room) throws GameNotStartedException {
-        return null;
-    }
-
-    @Override
     public List<Character> getCharactersInGame(Room room) {
         return null;
     }
@@ -58,7 +53,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void advancePhase(Room room) throws GameIsOverException {
+    public void advancePhase(Room room) throws ClientErrorException {
 
     }
 

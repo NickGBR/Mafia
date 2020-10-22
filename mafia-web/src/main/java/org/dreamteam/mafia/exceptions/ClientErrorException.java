@@ -9,7 +9,7 @@ import org.dreamteam.mafia.util.ClientErrorCode;
 public class ClientErrorException extends Exception {
     private final ClientErrorCode code;
 
-    public ClientErrorException(String message, ClientErrorCode code) {
+    public ClientErrorException(ClientErrorCode code, String message) {
         super(message);
         this.code = code;
     }

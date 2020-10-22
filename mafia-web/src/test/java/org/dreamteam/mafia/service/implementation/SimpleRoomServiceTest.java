@@ -5,7 +5,7 @@ import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
-import org.dreamteam.mafia.exceptions.AlreadyInRoomException;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.util.ClientErrorCode;
@@ -64,7 +64,7 @@ public class SimpleRoomServiceTest {
         Mockito.when(mockRepository.findRoomDAOByUserListContains(dao)).thenReturn(Optional.empty());
         try {
             testedService.createRoom(publicDto);
-        } catch (AlreadyInRoomException e) {
+        } catch (ClientErrorException e) {
             Assert.fail("Thrown an exception, when user is authorised and not in a room");
         }
         ArgumentCaptor<RoomDAO> captor = ArgumentCaptor.forClass(RoomDAO.class);
@@ -90,7 +90,7 @@ public class SimpleRoomServiceTest {
         Mockito.when(mockRepository.findRoomDAOByUserListContains(dao)).thenReturn(Optional.empty());
         try {
             testedService.createRoom(privateDto);
-        } catch (AlreadyInRoomException e) {
+        } catch (ClientErrorException e) {
             Assert.fail("Thrown an exception, when user is authorised and not in a room");
         }
         ArgumentCaptor<RoomDAO> captor = ArgumentCaptor.forClass(RoomDAO.class);
@@ -115,7 +115,7 @@ public class SimpleRoomServiceTest {
         try {
             testedService.createRoom(publicDto);
             Assert.fail("Successfully created room, when user is anonymous");
-        } catch (AlreadyInRoomException e) {
+        } catch (ClientErrorException e) {
             Assert.fail("Thrown a wrong exception, when user is anonymous");
         } catch (SecurityException ignored) {
         }
@@ -129,7 +129,7 @@ public class SimpleRoomServiceTest {
         try {
             testedService.createRoom(publicDto);
             Assert.fail("Created a room, when current user is already in another room");
-        } catch (AlreadyInRoomException e) {
+        } catch (ClientErrorException e) {
             Assert.assertEquals(ClientErrorCode.ALREADY_IN_ROOM, e.getCode());
         }
     }

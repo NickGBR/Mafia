@@ -1,11 +1,11 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dto.CharacterDTO;
 import org.dreamteam.mafia.exceptions.*;
 import org.dreamteam.mafia.model.Character;
-import org.dreamteam.mafia.model.*;
+import org.dreamteam.mafia.model.Message;
+import org.dreamteam.mafia.model.Room;
+import org.dreamteam.mafia.model.User;
 
 import java.util.List;
 
@@ -14,14 +14,6 @@ import java.util.List;
  */
 public interface GameService {
 
-    /**
-     * Находит игру, идущую в указанной комнате
-     *
-     * @param room - комната
-     * @return - игра, идущая в комнате
-     * @throws GameNotStartedException - если игра в комнате еще не началась
-     */
-    Room getGameInRoom(Room room) throws GameNotStartedException;
 
     /**
      * Возвращает список всех персонажей в игре
@@ -43,9 +35,9 @@ public interface GameService {
      * Переводит игру в следующую фазу
      *
      * @param room - игра
-     * @throws GameIsOverException - если игра уже окончена
+     * @throws ClientErrorException - если игра уже окончена
      */
-    void advancePhase(Room room) throws GameIsOverException;
+    void advancePhase(Room room) throws ClientErrorException;
 
     /**
      * Выдвигает персонажа на голосование

@@ -2,12 +2,10 @@ package org.dreamteam.mafia.controller;
 
 import org.dreamteam.mafia.dto.LoginDTO;
 import org.dreamteam.mafia.dto.RegistrationDTO;
-import org.dreamteam.mafia.exceptions.UserAuthenticationException;
-import org.dreamteam.mafia.exceptions.UserRegistrationException;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.security.SignedJsonWebToken;
 import org.dreamteam.mafia.service.api.UserService;
-import org.dreamteam.mafia.temporary.TemporaryDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +36,12 @@ public class UserController {
      *
      * @param dto - запрос на регистрацию
      * @return - JWT вновь зарегистрированного пользователя
-     * @throws UserRegistrationException   - при ошибках регистрации
-     * @throws UserAuthenticationException - при ошибках авторизации вновь зарегестрированного пользователя
+     * @throws ClientErrorException - при ошибках регистрации
+     *                              или при ошибках авторизации вновь зарегестрированного пользователя
      */
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String register(
-            @RequestBody RegistrationDTO dto) throws UserRegistrationException, UserAuthenticationException {
+            @RequestBody RegistrationDTO dto) throws ClientErrorException {
         logger.debug("Incoming registration request. DTO: " + dto);
         userService.registerNewUser(dto);
         SignedJsonWebToken jws = userService.loginUser(dto.getLoginData());
@@ -55,10 +53,10 @@ public class UserController {
      *
      * @param dto - запрос на вход в систему
      * @return - JWT пользователя
-     * @throws UserAuthenticationException- при ошибках авторизации
+     * @throws ClientErrorException- при ошибках авторизации
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(@RequestBody LoginDTO dto) throws UserAuthenticationException {
+    public String login(@RequestBody LoginDTO dto) throws ClientErrorException {
         logger.debug("Incoming login request. DTO: " + dto);
         SignedJsonWebToken jws = userService.loginUser(dto);
         return jws.getToken();

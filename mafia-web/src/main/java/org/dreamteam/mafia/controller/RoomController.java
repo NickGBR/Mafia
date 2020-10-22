@@ -1,10 +1,9 @@
 package org.dreamteam.mafia.controller;
 
+import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
-import org.dreamteam.mafia.exceptions.AlreadyInRoomException;
-import org.dreamteam.mafia.exceptions.NoSuchRoomException;
-import org.dreamteam.mafia.exceptions.NotEnoughRightsException;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.service.api.RoomService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +31,10 @@ public class RoomController {
      * Обрабатывает запросы на создание комнаты
      *
      * @param dto - описание создаваемой комнаты
-     * @throws AlreadyInRoomException - если текущий пользователь уже находится в комнате
+     * @throws ClientErrorException - если текущий пользователь уже находится в комнате
      */
     @PostMapping("/create")
-    public void createRoom(@RequestBody RoomCreationDTO dto) throws AlreadyInRoomException {
+    public void createRoom(@RequestBody RoomCreationDTO dto) throws ClientErrorException {
         logger.debug("Incoming room creation request. DTO: " + dto);
         roomService.createRoom(dto);
     }
@@ -43,11 +42,11 @@ public class RoomController {
     /**
      * Обрабатывает запросы на расформирование комнаты
      *
-     * @throws NoSuchRoomException      - если текущий пользователь не находится в комнате
-     * @throws NotEnoughRightsException - если текущий пользователь не являяется администратором комнаты
+     * @throws ClientErrorException - если текущий пользователь не находится в комнате
+     *                              или если текущий пользователь не являяется администратором комнаты
      */
     @PostMapping("/disband")
-    public void disbandRoom() throws NoSuchRoomException, NotEnoughRightsException {
+    public void disbandRoom() throws ClientErrorException {
         logger.debug("Incoming room disbandment request.");
         roomService.disbandRoom();
     }
@@ -61,5 +60,17 @@ public class RoomController {
     public List<RoomDisplayDTO> getRooms() {
         logger.debug("Incoming request for available rooms");
         return roomService.getAvailableRooms();
+    }
+
+    @PostMapping("/join")
+    public void joinRoom(@RequestBody JoinRoomDTO dto) throws ClientErrorException {
+        logger.debug("Incoming room join request. DTO: " + dto);
+        roomService.joinRoom(dto);
+    }
+
+    @PostMapping("/leave")
+    public void leaveRoom() throws ClientErrorException {
+        logger.debug("Incoming room leave request.");
+        roomService.leaveRoom();
     }
 }
