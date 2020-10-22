@@ -75,12 +75,18 @@ public class SpringSecurityBasedUserService implements UserService {
 
     @Override
     public Optional<User> getCurrentUser() {
+        Optional<UserDAO> userDAO = getCurrentUserDAO();
+        return userDAO.map(User::new);
+    }
+
+    @Override
+    public Optional<UserDAO> getCurrentUserDAO() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
             String currentUserName = authentication.getName();
             Optional<UserDAO> userDAO = repository.findByLogin(currentUserName);
             if (userDAO.isPresent()) {
-                return Optional.of(new User(userDAO.get()));
+                return userDAO;
             } else {
                 throw new RuntimeException(
                         "User is authenticated, but is not present in repository. Internal logic failure");
