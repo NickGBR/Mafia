@@ -155,18 +155,20 @@ public class ChatController {
      */
     @GetMapping(SockConst.REQUEST_GET_ADD_USER_TO_ROOM)
     public @ResponseBody
-    Boolean addUserToRoom(@RequestParam String roomName) {
+    Integer addUserToRoom(@RequestParam String roomName) {
+
+
         String login = userService.getCurrentUser().get().getLogin();
 
         User user = TemporaryDB.users.get("web:" + login);
 
         // Получаем список пользователей находящихся в комнате.
         List<User> users = TemporaryDB.usersByRooms.get(roomName);
-        System.out.println("MY: список пользователей комнаты, " + roomName + ": " + users);
 
-        // Проверяем комнату на заполненность.
-        if(users.size()>=GameConst.USERS_AMOUNT){
-            return false;
+        if (users.size() == GameConst.USERS_AMOUNT) {
+            users.remove(user);
+            System.out.println("MY: список пользователей комнаты, " + roomName + ": " + users);
+            return GameConst.FULL_ROOM;
         }
 
         // Добавляем в список пользовотелей нашего пользователя.
@@ -187,7 +189,9 @@ public class ChatController {
                     " администатор комнаты " + admin.getName());
         }
 
-        return true;
+
+        System.out.println("MY: список пользователей комнаты, " + roomName + ": " + users);
+        return users.size();
     }
 
     @MessageMapping(SockConst.CIV_END_POINT)

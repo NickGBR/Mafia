@@ -2,6 +2,7 @@
 
 let roomName;
 let userName;
+let isLastRoomUser = false;
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -71,11 +72,14 @@ function addUserToRoom(roomName) {
         if (request.readyState === XMLHttpRequest.DONE) {
             if (request.status === 200) {
                 const data = JSON.parse(request.responseText);
-                if (data === false) {
-                    alert("Комната заполнена");
-                    console.log(roomName + ' fdfsdfdfd ');
+                console.log(data)
+                if (data === gameConst.FULL_ROOM) {
+                    alert("Комната переполнена!")
                 } else {
-                    console.log(roomName + ' fdfsdfdfd ');
+                    sessionStorage.setItem("roomName", roomName);
+                    sessionStorage.setItem("roomId", roomName);
+                    stompClient.send();
+                    window.open("roomChat.html", "_self");
                 }
             } else if (request.status === 400) {
                 console.log("ERROR 400");
@@ -206,7 +210,6 @@ function getSystemMessage(response) {
 function addNewRoomToInterface(response) {
     const data = JSON.parse(response.body);
     roomName = data.room.name;
-
     addRoomToInterface(roomName);
 }
 
@@ -219,7 +222,7 @@ function addRoomToInterface(name) {
     const dd = document.createElement("dd")           // Создаем элемент списка <dd>
     const button = document.createElement("button")     // Создаем кнопку
     button.setAttribute("id", name);                 // Устанавливаем id как название комнаты
-    button.setAttribute("onclick", "goToRoom(this.id)"); // Действие при нажатии на комнату, переходим в нее.
+    button.setAttribute("onclick", "tryToGoToRoom(this.id)"); // Действие при нажатии на комнату, попытаемся перейти в нее.
     const buttonName = document.createTextNode(name);                 // Создаем текстовый элемент
 
     button.appendChild(buttonName);
@@ -228,16 +231,11 @@ function addRoomToInterface(name) {
 }
 
 /**
- * Отвечает за переход пользователя в комнату чата, также
- * вызывает метод, для добавления пользователя в БД, со списком пользователей комнаты.
+ * Отвечает за переход пользователя в комнату чата, если комната не заполнена.
  * @param id - уникальные индификатор комнаты.
  */
-function goToRoom(id) {
-    sessionStorage.setItem("roomName", id);
-    sessionStorage.setItem("roomId", roomName);
-    window.open("roomChat.html", "_self");
-    stompClient.send()
-
+function tryToGoToRoom(id) {
+    addUserToRoom(id)
 }
 
 /**
