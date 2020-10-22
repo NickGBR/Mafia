@@ -31,44 +31,87 @@ public class GameServiceImpl implements GameService {
     private final UserService userService;
 
     @Autowired
-    public GameServiceImpl(
-            UserRepository userRepository,
-            RoomRepository roomRepository,
-            MessageRepository messageRepository,
-            UserService userService) {
+    public GameServiceImpl(UserRepository userRepository,
+                           RoomRepository roomRepository,
+                           MessageRepository messageRepository,
+                           UserService userService) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.messageRepository = messageRepository;
         this.userService = userService;
     }
 
+    /**
+     * Находит игру, идущую в указанной комнате
+     *
+     * @param room - комната
+     * @return - игра, идущая в комнате
+     * @throws GameNotStartedException - если игра в комнате еще не началась
+     */
+    @Override
+    public Room getGameInRoom(Room room) throws GameNotStartedException {
+        return null;
+    }
+
+    /**
+     * Возвращает список всех персонажей в игре
+     *
+     * @param room - игра
+     * @return - список персонажей
+     */
     @Override
     public List<Character> getCharactersInGame(Room room) {
         return null;
     }
 
+    /**
+     * Возвращает список всех сообщений в чате игры
+     *
+     * @param room - игра
+     * @return - список сообщений
+     */
     @Override
     public List<Message> getMessageLog(Room room) {
         return null;
     }
 
+    /**
+     * Переводит игру в следующую фазу
+     *
+     * @param room - игра
+     * @throws GameIsOverException - если игра уже окончена
+     */
     @Override
-    public void advancePhase(Room room) throws ClientErrorException {
+    public void advancePhase(Room room) throws GameIsOverException {
 
     }
 
+    /**
+     * Выдвигает персонажа на голосование
+     *
+     * @param user         - выдвигающий игрок
+     * @param characterDTO - выдвигаемый персонаж
+     * @throws IllegalMoveException - если выдвижение нарушает правила игры
+     */
     @Override
     public void nominateCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException {
 
     }
 
+    /**
+     * Голосует против персонажа
+     *
+     * @param user         - голосующий игрок
+     * @param characterDTO - голосуемый против персонаж
+     * @throws IllegalMoveException - если голосование нарушает правила игры
+     */
     @Override
     public void voteCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException {
 
     }
 
     public boolean isSheriff(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
-            RoomsMismatchException, NotEnoughRightsException {
+                                                    RoomsMismatchException, NotEnoughRightsException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
             throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login

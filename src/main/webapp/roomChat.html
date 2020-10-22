@@ -13,13 +13,15 @@
 
 </head>
 <body class="bodyPadding" onload="connect()">
-
-<label id="user_info_label"></label>
-<input id="left_room_button" type="button" value="Покинуть комнату" onclick="clearUsersList()">
-
+<p>
+    <label id="user_info_label"></label>
+    <input id="left_room_button" type="button" value="Покинуть комнату" onclick="clearUsersList()">
+<div id="admin_button_holder">
+</div>
+</p>
 
 <!-- окно чата -->
-<div class="room_box" id = "room_chat_box">
+<div class="room_box" id="room_chat_box">
 </div>
 <input class="message_input" id="message_input_value" placeholder="Введите сообщение..."/>
 <button class="text" disabled="disabled" id="send_message_button" onclick="sendMessage()">
@@ -37,7 +39,7 @@
 </script>
 <div>
     <div>
-        <input class="user_ready_button" id="user_ready_button" type="button" value="Готов" onclick="setReadyStatus()">
+        <input class="user_ready_button" id="user_ready_button" type="button" value="Готов" onclick="changeUserReadyStatus()">
     </div>
 
     <p id='users_list'></p>

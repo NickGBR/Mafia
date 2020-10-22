@@ -13,6 +13,8 @@ public class SockConst {
     public static final String SYS_WEB_CHAT = "/chat/system_messages/";
     public static final String SYS_WEB_ROOMS_INFO = "/chat/system_messages/rooms/";
     public static final String SYS_WEB_USERS_INFO = "/chat/system_messages/users/";
+    public static final String SYS_USERS_READY_TO_PLAY_INFO = "/chat/system_messages/users_ready_to_play_info/";
+
 
     public static final String REQUEST_GET_ADD_USER_TO_ROOM = "api/GET/addUserToRoom";
     public static final String REQUEST_GET_ROOM_ADMIN_NAME = "api/GET/get_room_admin_name";
@@ -21,6 +23,9 @@ public class SockConst {
     public static final String REQUEST_GET_USERS = "api/GET/getRoomUsers";
     public static final String REQUEST_POST_CHECK_USER = "api/POST/checkUser";
     public static final String REQUEST_POST_CHECK_ROOM = "api/POST/checkRoom";
+    public static final String REQUEST_GET_CHANGE_READY_STATUS = "api/POST/changeReadyStatus";
+    public static final String REQUEST_GET_ROOM_READY_STATUS = "api/GET/getRoomReadyStatus";
+
 
 
 }
