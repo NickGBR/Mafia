@@ -53,6 +53,8 @@ public class SpringSecurityBasedUserService implements UserService {
         UserDAO user = new UserDAO();
         user.setLogin(registrationDTO.getLogin());
         user.setPasswordHash(encoder.encode(registrationDTO.getPassword()));
+        user.setIsAdmin(false);
+        user.setIsReady(false);
 
         repository.save(user);
     }

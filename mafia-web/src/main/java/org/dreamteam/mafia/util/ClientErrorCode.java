@@ -14,7 +14,9 @@ public enum ClientErrorCode {
     INCORRECT_PASSWORD(4),
     ALREADY_IN_ROOM(5),
     WRONG_GAME_PHASE(6),
-    ROOMS_MISMATCH(7);
+    ROOMS_MISMATCH(7),
+    NOT_IN_ROOM(8),
+    MOT_ENOUGH_RIGHTS(9);
 
     private final int value;
 

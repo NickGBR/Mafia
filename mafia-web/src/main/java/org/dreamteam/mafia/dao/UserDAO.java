@@ -62,6 +62,8 @@ public class UserDAO {
     public UserDAO(String login, String passwordHash) {
         this.login = login;
         this.passwordHash = passwordHash;
+        this.isAdmin = false;
+        this.isReady = false;
     }
 
     @Override

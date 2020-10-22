@@ -105,6 +105,63 @@ function createRoom() {
     request.send(JSON.stringify(jsonData))
 }
 
+function disbandRoom() {
+    const token = readCookie("token");
+    console.log("Current token: " + token);
+    let request = new XMLHttpRequest();
+    request.open("POST", "/api/room/disband", true);
+    request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer " + token);
+    request.onreadystatechange = function () {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            if (request.status === 200) {
+                let output = document.getElementById("output_box");
+                output.textContent = ''; // Убираем все элементы потомки, заменяя их на пустую строку
+                const textNode = document.createTextNode("Комната расформирована");
+                output.appendChild(textNode)
+            } else if (request.status === 400) {
+                const data = JSON.parse(request.responseText);
+                switch (parseInt(data["result"])) {
+                    case 8: {
+                        let output = document.getElementById("output_box");
+                        output.textContent = ''; // Убираем все элементы потомки, заменяя их на пустую строку
+                        const textNode = document.createTextNode("Комната не существует. Расформирование невозможно");
+                        output.appendChild(textNode)
+                        break;
+                    }
+                    case 9: {
+                        let output = document.getElementById("output_box");
+                        output.textContent = ''; // Убираем все элементы потомки, заменяя их на пустую строку
+                        const textNode = document.createTextNode("Вы не являетесь администратором комнаты.  Расформирование невозможно");
+                        output.appendChild(textNode)
+                        break;
+                    }
+                    default: {
+                        console.log("Error: internal logic failure. Registration was successful, but login  of the same user failed.")
+                    }
+                }
+            } else if (request.status === 401) {
+                console.log("Non authorised!");
+            } else if (request.status === 500) {
+                const data = JSON.parse(request.responseText);
+                switch (parseInt(data["result"])) {
+                    case 1: {
+                        console.log("Error: Internal logic error");
+                        break;
+                    }
+                    case 2: {
+                        console.log("Error: Database error");
+                        break;
+                    }
+                }
+            } else {
+                console.log("Error: " + request.status);
+            }
+        }
+    };
+    request.send()
+}
+
 function getRooms() {
     const token = readCookie("token");
     console.log("Current token: " + token);

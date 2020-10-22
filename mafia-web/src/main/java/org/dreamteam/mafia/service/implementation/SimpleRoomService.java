@@ -84,8 +84,7 @@ public class SimpleRoomService implements RoomService {
         } else {
             Optional<RoomDAO> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
             if (adminCurrRoom.isPresent()) {
-                throw new AlreadyInRoomException(ClientErrorCode.ALREADY_IN_ROOM,
-                                                 "Can't create a room for a user, that is already in a room");
+                throw new AlreadyInRoomException("Can't create a room for a user, that is already in a room");
             }
             dao.addUser(admin.get());
             admin.get().setRoom(dao);
@@ -94,14 +93,17 @@ public class SimpleRoomService implements RoomService {
         repository.save(dao);
     }
 
-    public void disbandRoom() throws NoSuchRoomException {
+    public void disbandRoom() throws NoSuchRoomException, NotEnoughRightsException {
         Optional<UserDAO> admin = userService.getCurrentUserDAO();
         if (!admin.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to disband rooms");
         } else {
             Optional<RoomDAO> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
             if (!adminCurrRoom.isPresent()) {
-                throw new NoSuchRoomException("Current user is not a room admin");
+                throw new NoSuchRoomException(ClientErrorCode.NOT_IN_ROOM, "Current user is not a room admin");
+            }
+            if (!admin.get().getIsAdmin()) {
+                throw new NotEnoughRightsException("Only room administrator can disband it");
             }
             for (UserDAO user : adminCurrRoom.get().getUserList()) {
                 user.setRoom(null);

@@ -46,13 +46,17 @@ public interface RoomService {
      * администратором комнаты.
      *
      * @param roomDTO - описание комнаты, полученние из интерфейса
+     * @throws AlreadyInRoomException - если текущий пользователь уже в комнате и не может создать новую
      */
     void createRoom(RoomCreationDTO roomDTO) throws AlreadyInRoomException;
 
     /**
      * Распускает текущую комнату, если текущий игрок - администратор комнаты.
+     *
+     * @throws NoSuchRoomException      - если текущий пользователь не находится в комнате
+     * @throws NotEnoughRightsException - если текущий пользователь не являяется администратором комнаты
      */
-    void disbandRoom() throws NoSuchRoomException;
+    void disbandRoom() throws NoSuchRoomException, NotEnoughRightsException;
 
     /**
      * Проверяет является ли заданная комната приватной
@@ -68,7 +72,6 @@ public interface RoomService {
      * @param dto - данные, необходимые для попытки входа в комнату
      */
     void joinRoom(JoinRoomDTO dto);
-
 
     /**
      * Возвращает все незаполненные (доступные для присоединения) комнаты в приложении
