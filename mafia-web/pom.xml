@@ -76,6 +76,7 @@
             <artifactId>spring-security-messaging</artifactId>
         </dependency>
 
+
         <!-- Для Spring JPA-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -114,12 +115,18 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Зависимость для бота-->
-            <dependency>
-                <groupId>org.telegram</groupId>
-                <artifactId>telegrambots-spring-boot-starter</artifactId>
-                <version>4.9.1</version>
-            </dependency>
+        <!-- Starter  для бота -->
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots-spring-boot-starter</artifactId>
+            <version>4.9.1</version>
+        </dependency>
+        <!-- Библиотека для работы с ботом -->
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots</artifactId>
+            <version>4.9.1</version>
+        </dependency>
 
 
     </dependencies>

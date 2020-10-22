@@ -11,4 +11,5 @@ public class SystemMessage {
     User user;
     boolean isNewUser = false;
     boolean isNewRoom = false;
+    boolean addUserToRoom = false;
 }
