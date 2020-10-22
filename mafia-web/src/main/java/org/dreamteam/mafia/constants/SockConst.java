@@ -21,7 +21,7 @@ public class SockConst {
     public static final String REQUEST_GET_USERS = "api/GET/getRoomUsers";
     public static final String REQUEST_POST_CHECK_USER = "api/POST/checkUser";
     public static final String REQUEST_POST_CHECK_ROOM = "api/POST/checkRoom";
-    public static final String REQUEST_POST_CHANGE_READY_STATUS = "api/POST/changeReadyStatus";
+    public static final String REQUEST_GET_CHANGE_READY_STATUS = "api/POST/changeReadyStatus";
 
 
 }

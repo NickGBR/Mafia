@@ -139,18 +139,15 @@ function getUsersMessages() {
     request.send();
 }
 
-var checkButtonStat = false;
-
-function setReadyStatus() {
+function changeReadyButtonStatus(isReady) {
     const button = document.getElementById("user_ready_button");
-    if (checkButtonStat) {
+    if (isReady) {
         button.className = "user_ready_button";
         button.value = "Готов"
     } else {
         button.className = "user_not_ready_button";
         button.value = "Не готов";
     }
-    checkButtonStat = !checkButtonStat;
 }
 
 /**
@@ -270,4 +267,26 @@ function getRoomAdminName() {
 
 function clearUsersList() {
     document.getElementById('users_list').innerText = "";
+}
+
+function changeUserReadyStatus() {
+    const request = new XMLHttpRequest();
+    request.open("GET", sockConst.REQUEST_GET_CHANGE_USER_READY_STATUS + "?userName=" + userName, true);
+    request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
+    request.onreadystatechange = function () {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            if (request.status === 200) {
+                const data = JSON.parse(request.responseText);
+                changeReadyButtonStatus(data);
+            } else if (request.status === 400) {
+                console.log("ERROR 400");
+            } else if (request.status === 500) {
+                console.log("ERROR 500 in get room admin");
+            } else {
+                console.log("ERROR, JUST ERROR");
+            }
+        }
+    }
+    request.send();
 }

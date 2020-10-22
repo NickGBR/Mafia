@@ -51,4 +51,15 @@ public class RoomChatControllerJS {
     String getRoomAdminName(@RequestParam String roomName) {
         return TemporaryDB.rooms.get(roomName).getAdmin().getName();
     }
+
+    /**
+     * Меняем готовность пользователя, возращаем его готовность.
+     */
+    @GetMapping(SockConst.REQUEST_GET_CHANGE_READY_STATUS)
+    public @ResponseBody
+    Boolean changeUserReadyStatus(@RequestParam String userName) {
+        User user = TemporaryDB.users.get("web:" + userName);
+        user.setReady(!user.isReady());
+        return user.isReady();
+    }
 }

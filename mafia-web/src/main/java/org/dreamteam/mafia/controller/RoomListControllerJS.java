@@ -52,7 +52,6 @@ public class RoomListControllerJS {
     public @ResponseBody
     Integer addUserToRoom(@RequestParam String roomName) {
 
-
         String login = userService.getCurrentUser().get().getLogin();
 
         User user = TemporaryDB.users.get("web:" + login);
@@ -61,7 +60,7 @@ public class RoomListControllerJS {
         List<User> users = TemporaryDB.usersByRooms.get(roomName);
 
         if (users.size() == GameConst.USERS_AMOUNT) {
-            users.remove(user);
+            //users.remove(user);
             System.out.println("MY: список пользователей комнаты, " + roomName + ": " + users);
             return GameConst.FULL_ROOM;
         }
@@ -160,4 +159,6 @@ public class RoomListControllerJS {
             return true;
         }
     }
+
+
 }

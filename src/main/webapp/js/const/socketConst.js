@@ -19,6 +19,6 @@ var sockConst = {
     REQUEST_GET_MESSAGES: "api/GET/getMessages",
     REQUEST_POST_CHECK_USER: "api/POST/checkUser",
     REQUEST_POST_CHECK_ROOM: "api/POST/checkRoom",
-    REQUEST_POST_CHANGE_USER_READY_STATUS : "api/POST/changeReadyStatus",
+    REQUEST_GET_CHANGE_USER_READY_STATUS : "api/POST/changeReadyStatus",
 
 }
