@@ -91,4 +91,10 @@ public class RoomController {
         logger.debug("Incoming readiness update. New value: " + ready);
         roomService.setReady(ready);
     }
+
+    @PostMapping("/kick")
+    public void kickUser(@RequestBody String target) throws ClientErrorException {
+        logger.debug("Incoming kick request. Target user login: " + target);
+        roomService.kickUser(target);
+    }
 }

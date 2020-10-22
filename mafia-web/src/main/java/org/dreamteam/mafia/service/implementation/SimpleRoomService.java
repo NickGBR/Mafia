@@ -210,7 +210,30 @@ public class SimpleRoomService implements RoomService {
 
     @Override
     public void kickUser(String target) throws ClientErrorException {
-
+        Optional<UserDAO> admin = userService.getCurrentUserDAO();
+        if (!admin.isPresent()) {
+            throw new SecurityException("Non authorised user is not allowed to disband rooms");
+        }
+        Optional<RoomDAO> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
+        if (!adminCurrRoom.isPresent()) {
+            throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM, "Current user is not in a room");
+        }
+        if (!adminCurrRoom.get().getGameStatus().equals(GameStatusEnum.NOT_STARTED)) {
+            throw new ClientErrorException(ClientErrorCode.GAME_ALREADY_STARTED,
+                                           "Can't kick from an already started game");
+        }
+        if (!admin.get().getIsAdmin()) {
+            throw new ClientErrorException(ClientErrorCode.MOT_ENOUGH_RIGHTS,
+                                           "Only room administrator can kick users");
+        }
+        Optional<UserDAO> targetUser = adminCurrRoom.get().getUserList().stream()
+                .filter((user) -> user.getLogin().equals(target)).findFirst();
+        if (!targetUser.isPresent()) {
+            throw new ClientErrorException(ClientErrorCode.ROOMS_MISMATCH, "Target is not in the same room");
+        }
+        targetUser.get().setRoom(null);
+        adminCurrRoom.get().removeUser(targetUser.get());
+        repository.save(adminCurrRoom.get());
     }
 
     @Override

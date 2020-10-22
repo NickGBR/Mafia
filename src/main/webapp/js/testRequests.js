@@ -94,24 +94,43 @@ function leaveRoom() {
     sendRequest("POST", "/api/room/leave", "", callback, [8, 11]);
 }
 
+let userLogin = "";
+
 function getUsers() {
     let callback = function (request) {
         let output = document.getElementById("output_box");
         output.textContent = ''; // Убираем все элементы потомки, заменяя их на пустую строку
         const data = JSON.parse(request.responseText);
+        userLogin = ""
         data.forEach(function (item) {
             const textNode = document.createTextNode("Имя пользователя: " + item["name"]
                 + ", Админ: " + item["admin"] + ", Готов: " + item["ready"]);
             const node = document.createElement("LI");      // Создаем элемент списка <li>
             node.appendChild(textNode)
             output.appendChild(node)
+            if (item["admin"] === false) {
+                userLogin = item["name"];
+            }
         });
     };
 
     sendRequest("GET", "/api/room/getUsersList", "", callback, [8]);
 }
 
-function kickUsers() {
+function kickUser() {
+    if (userLogin === "") {
+        alert("Не получен список пользователей в комнате или в нем нет не-администраторов");
+        return;
+    }
+
+    let callback = function () {
+        let output = document.getElementById("output_box");
+        output.textContent = ''; // Убираем все элементы потомки, заменяя их на пустую строку
+        const textNode = document.createTextNode("Пользователь изгнан");
+        output.appendChild(textNode)
+    };
+    sendRequest("POST", "/api/room/kick", userLogin, callback, [7, 8, 9, 11]);
+
 }
 
 function setReady() {
