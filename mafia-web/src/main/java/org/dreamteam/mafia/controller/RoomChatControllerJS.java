@@ -62,4 +62,23 @@ public class RoomChatControllerJS {
         user.setReady(!user.isReady());
         return user.isReady();
     }
+
+    /**
+     * Проверяем готовность комнаты.
+     */
+    @GetMapping(SockConst.REQUEST_GET_ROOM_READY_STATUS)
+    public @ResponseBody
+    Boolean getRoomReadyStatus(@RequestParam String roomName) {
+        int readyUsersCounter = 0;
+        List<User> users = TemporaryDB.usersByRooms.get(roomName);
+
+        for (User user : users) {
+            if (user.isReady()) {
+                readyUsersCounter++;
+            }
+        }
+        messagingTemplate.convertAndSend(SockConst.SYS_USERS_READY_TO_PLAY_INFO
+                + roomName, readyUsersCounter == GameConst.USERS_AMOUNT);
+        return readyUsersCounter == GameConst.USERS_AMOUNT;
+    }
 }

@@ -51,6 +51,7 @@ function afterConnect(connection) {
 
     stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomName, getMessage);
     stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomName, updateUsersInfo)
+    stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomName, usersReadyToPlayInfo)
 }
 
 function onError(error) {
@@ -81,15 +82,11 @@ function sendMessage() {
         'text': document.getElementById("message_input_value").value,
         'from': userName
     });
-    console.log(message);
     stompClient.send(sockConst.ROOM_END_POINT, {}, message);
 }
 
 function getMessage(response) {
     const data = JSON.parse(response.body);
-    console.log("Получено сообщение: " + data.text)
-    console.log("Название чата: " + data.roomName);
-    console.log("From = " + data.from)
 
     // Отправляем сообщение в чат
     addToChat(data.from + ": " + data.text, roomChatId);
@@ -117,7 +114,6 @@ function getUsersMessages() {
         if (request.readyState === XMLHttpRequest.DONE) {
             if (request.status === 200) {
                 const data = JSON.parse(request.responseText);
-                console.log(data);
                 data.forEach((message) => {
                     addToChat(message.from + ": " + message.text, roomChatId);
                 });
@@ -141,7 +137,7 @@ function getUsersMessages() {
 
 function changeReadyButtonStatus(isReady) {
     const button = document.getElementById("user_ready_button");
-    if (isReady) {
+    if (!isReady) {
         button.className = "user_ready_button";
         button.value = "Готов"
     } else {
@@ -160,7 +156,6 @@ function updateUsersInfo(response) {
     clearUsersList();
     document.getElementById('users_list').innerText = "";
     const data = JSON.parse(response.body);
-    console.log(data);
     data.forEach((user) => {
         showUser(user.name, usersListId);
     });
@@ -193,19 +188,20 @@ function showUser(name, listId) {
  * @param isActive - устанавливает активность кнопки.
  */
 function showAdminButton(adminName, isActive) {
-        if(adminName===userName) {
-            const button = document.createElement('button');
-            button.innerText = "Начать игру";
-            const holder = document.getElementById(startButtonHolderId);
-            if (isActive === true) {
-                button.className = "active_start_game_button";
-                button.disabled = false;
-            } else {
-                button.className = "not_active_start_game_button";
-                button.disabled = false;
-            }
-            holder.appendChild(button);
+    document.getElementById("admin_button_holder").innerText = "";
+    if (adminName === userName) {
+        const button = document.createElement('button');
+        button.innerText = "Начать игру";
+        const holder = document.getElementById(startButtonHolderId);
+        if (isActive === true) {
+            button.className = "active_start_game_button";
+            button.disabled = false;
+        } else {
+            button.className = "not_active_start_game_button";
+            button.disabled = false;
         }
+        holder.appendChild(button);
+    }
 }
 
 /**
@@ -252,7 +248,6 @@ function getRoomAdminName() {
         if (request.readyState === XMLHttpRequest.DONE) {
             if (request.status === 200) {
                 roomAdminName = request.responseText;
-                console.log(roomAdminName);
             } else if (request.status === 400) {
                 console.log("ERROR 400");
             } else if (request.status === 500) {
@@ -269,6 +264,9 @@ function clearUsersList() {
     document.getElementById('users_list').innerText = "";
 }
 
+/**
+ * Меняет состояние готовности пользователя.
+ */
 function changeUserReadyStatus() {
     const request = new XMLHttpRequest();
     request.open("GET", sockConst.REQUEST_GET_CHANGE_USER_READY_STATUS + "?userName=" + userName, true);
@@ -279,14 +277,43 @@ function changeUserReadyStatus() {
             if (request.status === 200) {
                 const data = JSON.parse(request.responseText);
                 changeReadyButtonStatus(data);
+                checkRoomReadyStatus();
             } else if (request.status === 400) {
                 console.log("ERROR 400");
             } else if (request.status === 500) {
-                console.log("ERROR 500 in get room admin");
+                console.log("ERROR 500 in changeUserReadyStatus");
             } else {
                 console.log("ERROR, JUST ERROR");
             }
         }
     }
     request.send();
+}
+
+function checkRoomReadyStatus() {
+    const request = new XMLHttpRequest();
+    request.open("GET", sockConst.REQUEST_GET_ROOM_READY_STATUS + "?roomName=" + roomName, true);
+    request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
+    request.onreadystatechange = function () {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            if (request.status === 200) {
+                const data = JSON.parse(request.responseText);
+                showAdminButton(roomAdminName, data);
+            } else if (request.status === 400) {
+                console.log("ERROR 400");
+            } else if (request.status === 500) {
+                console.log("ERROR 500 in roomCheckingStatus!");
+            } else {
+                console.log("ERROR, JUST ERROR roomCheckingStatus!");
+            }
+        }
+    }
+    request.send();
+}
+
+function usersReadyToPlayInfo(response) {
+    const data = JSON.parse(response.body);
+    console.log(data + "сообщение о готовности игры!")
+    showAdminButton(roomAdminName, data);
 }
