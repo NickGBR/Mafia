@@ -1,4 +1,4 @@
-//In session storage we have "login", "roomName", isRoomAdmin
+//In session storage we have "login", "roomName"
 
 let roomName;
 let userName;
@@ -42,7 +42,7 @@ function getRooms() {
                 const data = JSON.parse(request.responseText);
                 console.log(data);
                 data.forEach((room) => {
-                addRoomToInterface(room.name);
+                    addRoomToInterface(room.name);
                 });
             } else if (request.status === 400) {
                 console.log("ERROR 400");
@@ -56,6 +56,11 @@ function getRooms() {
     request.send();
 }
 
+/**
+ * Добавляет пользователя в комнату, если комната заполненна,
+ * то выдает ошибку.
+ * @param roomName
+ */
 function addUserToRoom(roomName) {
     const request = new XMLHttpRequest();
     request.open("GET", sockConst.REQUEST_GET_ADD_USER_TO_ROOM + "?roomName=" + roomName, true)
@@ -66,10 +71,12 @@ function addUserToRoom(roomName) {
         if (request.readyState === XMLHttpRequest.DONE) {
             if (request.status === 200) {
                 const data = JSON.parse(request.responseText);
-                console.log(data);
-                data.forEach((room) => {
-                    console.log(room.name)
-                });
+                if (data === false) {
+                    alert("Комната заполнена");
+                    console.log(roomName + ' fdfsdfdfd ');
+                } else {
+                    console.log(roomName + ' fdfsdfdfd ');
+                }
             } else if (request.status === 400) {
                 console.log("ERROR 400");
             } else if (request.status === 500) {
@@ -152,7 +159,6 @@ function checkRoom() {
                     /* Если комната новая, мы добавляем системное сообщение о новой комнате
                     и выводим ее в список комнат.
                      */
-                    sessionStorage.setItem("isRoomAdmin","true"); // Так это первый пользователь вошедший в комнату, он становится ее админом.
                     sessionStorage.setItem('roomName', roomName);
                     sendMessageToServerAboutNewRoom(roomName);
                     window.open("roomChat.html", "_self");
@@ -201,7 +207,7 @@ function addNewRoomToInterface(response) {
     const data = JSON.parse(response.body);
     roomName = data.room.name;
 
-addRoomToInterface(roomName);
+    addRoomToInterface(roomName);
 }
 
 /**
@@ -226,11 +232,9 @@ function addRoomToInterface(name) {
  * вызывает метод, для добавления пользователя в БД, со списком пользователей комнаты.
  * @param id - уникальные индификатор комнаты.
  */
-function goToRoom(id){
-    addUserToRoom(id);
-    sessionStorage.setItem('isRoomAdmin',"false");
-    sessionStorage.setItem("roomName",id);
-    sessionStorage.setItem("roomId",roomName);
+function goToRoom(id) {
+    sessionStorage.setItem("roomName", id);
+    sessionStorage.setItem("roomId", roomName);
     window.open("roomChat.html", "_self");
     stompClient.send()
 

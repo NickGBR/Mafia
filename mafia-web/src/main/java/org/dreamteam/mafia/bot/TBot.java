@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-@Component
+//@Component
 public class TBot extends TelegramLongPollingBot {
 
     @Autowired

@@ -1,5 +1,6 @@
 package org.dreamteam.mafia.controller;
 
+import org.dreamteam.mafia.constants.GameConst;
 import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.model.*;
 import org.dreamteam.mafia.service.api.UserService;
@@ -149,12 +150,12 @@ public class ChatController {
     /**
      * Добавляет пользователя в комнату.
      *
-     * @param roomName
-     * @return
+     * @param roomName - имя комнаты
+     * @return Users
      */
     @GetMapping(SockConst.REQUEST_GET_ADD_USER_TO_ROOM)
     public @ResponseBody
-    List<User> addUserToRoom(@RequestParam String roomName) {
+    Boolean addUserToRoom(@RequestParam String roomName) {
         String login = userService.getCurrentUser().get().getLogin();
 
         User user = TemporaryDB.users.get("web:" + login);
@@ -162,6 +163,11 @@ public class ChatController {
         // Получаем список пользователей находящихся в комнате.
         List<User> users = TemporaryDB.usersByRooms.get(roomName);
         System.out.println("MY: список пользователей комнаты, " + roomName + ": " + users);
+
+        // Проверяем комнату на заполненность.
+        if(users.size()>=GameConst.USERS_AMOUNT){
+            return false;
+        }
 
         // Добавляем в список пользовотелей нашего пользователя.
         if (!users.contains(user)) {
@@ -181,7 +187,7 @@ public class ChatController {
                     " администатор комнаты " + admin.getName());
         }
 
-        return users;
+        return true;
     }
 
     @MessageMapping(SockConst.CIV_END_POINT)

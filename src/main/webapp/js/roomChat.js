@@ -1,9 +1,9 @@
 let userName;
 let roomName;
-let isRoomAdmin; // Используется для настройки интерфеса, чтобы не ждать ответа от сервера.
 let roomAdminName;
 const roomChatId = "room_chat_box";
 const usersListId = "users_list";
+const startButtonHolderId = "admin_button_holder";
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -24,7 +24,7 @@ function connect() {
 function afterConnect(connection) {
 
     roomName = sessionStorage.getItem('roomName');
-    isRoomAdmin = sessionStorage.getItem("isRoomAdmin");
+
     userName = sessionStorage.getItem('userName');
 
     console.log("Успешное подключение: " + connection);
@@ -44,6 +44,9 @@ function afterConnect(connection) {
 
     // Полчучем имя админа комнаты.
     getRoomAdminName();
+
+    // Добавление кнопок для администратора.
+    showAdminButton(roomAdminName, false);
 
 
     stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomName, getMessage);
@@ -185,6 +188,27 @@ function showUser(name, listId) {
     container.appendChild(textNode);
 
     document.getElementById(listId).appendChild(par);
+}
+
+/**
+ * Добавляет кнопку, начать игру, в указанный эллемент.
+ * @param adminName - имя админимтратора, кнопка создается только для администратора.
+ * @param isActive - устанавливает активность кнопки.
+ */
+function showAdminButton(adminName, isActive) {
+        if(adminName===userName) {
+            const button = document.createElement('button');
+            button.innerText = "Начать игру";
+            const holder = document.getElementById(startButtonHolderId);
+            if (isActive === true) {
+                button.className = "active_start_game_button";
+                button.disabled = false;
+            } else {
+                button.className = "not_active_start_game_button";
+                button.disabled = false;
+            }
+            holder.appendChild(button);
+        }
 }
 
 /**
