@@ -6,7 +6,6 @@ import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.temporary.TemporaryDB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -15,11 +14,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
-@Component
+//@Component
 public class TBot extends TelegramLongPollingBot {
 
     @Autowired

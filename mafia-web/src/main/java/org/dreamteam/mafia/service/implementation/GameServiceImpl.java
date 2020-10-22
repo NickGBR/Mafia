@@ -3,23 +3,27 @@ package org.dreamteam.mafia.service.implementation;
 import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dao.enums.CharacterEnum;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
-import org.dreamteam.mafia.exceptions.IllegalGamePhaseException;
-import org.dreamteam.mafia.exceptions.NotEnoughRightsException;
-import org.dreamteam.mafia.exceptions.RoomsMismatchException;
-import org.dreamteam.mafia.exceptions.UserDoesNotExistInDBException;
+import org.dreamteam.mafia.dto.CharacterDTO;
+import org.dreamteam.mafia.exceptions.*;
+import org.dreamteam.mafia.model.Character;
+import org.dreamteam.mafia.model.Message;
+import org.dreamteam.mafia.model.Room;
+import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.MessageRepository;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.repository.api.UserRepository;
+import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.util.ClientErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service("gameService")
-public class GameServiceImpl {
+public class GameServiceImpl implements GameService {
 
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
@@ -27,18 +31,49 @@ public class GameServiceImpl {
     private final UserService userService;
 
     @Autowired
-    public GameServiceImpl(UserRepository userRepository,
-                           RoomRepository roomRepository,
-                           MessageRepository messageRepository,
-                           UserService userService) {
+    public GameServiceImpl(
+            UserRepository userRepository,
+            RoomRepository roomRepository,
+            MessageRepository messageRepository,
+            UserService userService) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.messageRepository = messageRepository;
         this.userService = userService;
     }
 
+    @Override
+    public Room getGameInRoom(Room room) throws GameNotStartedException {
+        return null;
+    }
+
+    @Override
+    public List<Character> getCharactersInGame(Room room) {
+        return null;
+    }
+
+    @Override
+    public List<Message> getMessageLog(Room room) {
+        return null;
+    }
+
+    @Override
+    public void advancePhase(Room room) throws GameIsOverException {
+
+    }
+
+    @Override
+    public void nominateCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException {
+
+    }
+
+    @Override
+    public void voteCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException {
+
+    }
+
     public boolean isSheriff(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
-                                                    RoomsMismatchException, NotEnoughRightsException {
+            RoomsMismatchException, NotEnoughRightsException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
             throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
