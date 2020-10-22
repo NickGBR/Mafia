@@ -47,6 +47,7 @@ function getRooms() {
         let output = document.getElementById("output_box");
         output.textContent = ''; // Убираем все элементы потомки, заменяя их на пустую строку
         const data = JSON.parse(request.responseText);
+        roomId = -1;
         data.forEach(function (item, index) {
             const textNode = document.createTextNode("Имя комнаты: " + item.name);
             const node = document.createElement("LI");      // Создаем элемент списка <li>
@@ -54,8 +55,6 @@ function getRooms() {
             output.appendChild(node)
             if (index === 2) {
                 roomId = item.id;
-            } else {
-                roomId = -1;
             }
         });
     };
@@ -80,7 +79,7 @@ function joinRoom() {
         'id': roomId,
         'password': ''
     };
-    sendRequest("POST", "/api/room/join", JSON.stringify(jsonData), callback, [4, 5, 10, 11]);
+    sendRequest("POST", "/api/room/join", JSON.stringify(jsonData), callback, [4, 5, 10, 11, 12]);
 }
 
 function leaveRoom() {
@@ -96,4 +95,35 @@ function leaveRoom() {
 }
 
 function getUsers() {
+    let callback = function (request) {
+        let output = document.getElementById("output_box");
+        output.textContent = ''; // Убираем все элементы потомки, заменяя их на пустую строку
+        const data = JSON.parse(request.responseText);
+        data.forEach(function (item) {
+            const textNode = document.createTextNode("Имя пользователя: " + item["name"]
+                + ", Админ: " + item["admin"] + ", Готов: " + item["ready"]);
+            const node = document.createElement("LI");      // Создаем элемент списка <li>
+            node.appendChild(textNode)
+            output.appendChild(node)
+        });
+    };
+
+    sendRequest("GET", "/api/room/getUsersList", "", callback, [8]);
+}
+
+function kickUsers() {
+}
+
+function setReady() {
+    let callback = function () {
+        getUsers()
+    };
+    sendRequest("POST", "/api/room/setReady", true, callback, [8]);
+}
+
+function unsetReady() {
+    let callback = function () {
+        getUsers()
+    };
+    sendRequest("POST", "/api/room/setReady", false, callback, [8]);
 }

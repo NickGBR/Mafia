@@ -3,6 +3,7 @@ package org.dreamteam.mafia.controller;
 import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
+import org.dreamteam.mafia.dto.UserDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.service.api.RoomService;
 import org.slf4j.Logger;
@@ -71,6 +72,23 @@ public class RoomController {
     @PostMapping("/leave")
     public void leaveRoom() throws ClientErrorException {
         logger.debug("Incoming room leave request.");
-        roomService.leaveRoom();
+        if (roomService.isCurrentUserAdmin()) {
+            logger.debug("Current user is room admin. Redirecting to disbandment procedure.");
+            disbandRoom();
+        } else {
+            roomService.leaveRoom();
+        }
+    }
+
+    @GetMapping("/getUsersList")
+    public List<UserDisplayDTO> getUsersInRoom() throws ClientErrorException {
+        logger.debug("Incoming request for users in the room");
+        return roomService.getUsersInRoom();
+    }
+
+    @PostMapping("/setReady")
+    public void setReady(@RequestBody Boolean ready) throws ClientErrorException {
+        logger.debug("Incoming readiness update. New value: " + ready);
+        roomService.setReady(ready);
     }
 }

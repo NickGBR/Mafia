@@ -3,12 +3,11 @@ package org.dreamteam.mafia.service.api;
 import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
+import org.dreamteam.mafia.dto.UserDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.Room;
-import org.dreamteam.mafia.model.User;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Интерфейс с ервиса, обслуживающего систему комнат
@@ -16,11 +15,11 @@ import java.util.Optional;
 public interface RoomService {
 
     /**
-     * Возвращает комнату, в которой находится текущий пользователь
+     * Проверяет, является ли текущий пользователь администратором комнаты.
      *
-     * @return - найденная комната или пустой Optional, если пользователь не находится в комнате
+     * @return - true, если текуий пользователь - администратор комнаты, false - в остальных случаях
      */
-    Optional<Room> getCurrentUserRoom();
+    boolean isCurrentUserAdmin();
 
     /**
      * Создает новую комнату и сохраняет ее в базу, назначая текущего пользователя
@@ -69,22 +68,21 @@ public interface RoomService {
     List<RoomDisplayDTO> getAvailableRooms();
 
     /**
-     * Возвращает список пользователей внутри комнат
+     * Возвращает список пользователей внутри комнаты текущего пользователя
      *
-     * @param room - комната
      * @return - список пользователей в комнате
+     * @throws ClientErrorException - если текущий пользователь не находится в комнате
      */
-    List<User> getUsersInRoom(Room room);
+    List<UserDisplayDTO> getUsersInRoom() throws ClientErrorException;
 
     /**
      * Пытается убрать пользователя из комнаты
      *
-     * @param admin  - пользователь, запросивший изгнанине
-     * @param target - изгоняемый пользователь
+     * @param target - логин изгоняемого пользователя
      * @throws ClientErrorException - если оба пользователя не находятся в одной и той же комнате
      *                              или если запросивший пользователь не является администратором своей комнаты
      */
-    void kickUser(User admin, User target) throws ClientErrorException;
+    void kickUser(String target) throws ClientErrorException;
 
     /**
      * Проверяет заполнена ли комната
