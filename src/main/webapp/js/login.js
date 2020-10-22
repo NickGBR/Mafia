@@ -18,7 +18,7 @@ function tryToLogin() {
                 // Берем введенный логин, сервер подтвердил что логин валидный.
                 sessionStorage.setItem("login", document.getElementById("login_input").value)
                 //Переходим на страницу с чатом.
-                window.location.replace('roomList.html');
+                window.open("roomList.html", "_self");
             } else if (request.status === 400) {
                 const data = JSON.parse(request.responseText);
                 switch (parseInt(data["result"])) {

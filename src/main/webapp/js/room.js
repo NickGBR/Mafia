@@ -1,3 +1,5 @@
+//In session storage we have "login", "roomName", isRoomAdmin
+
 let roomName;
 let userName;
 
@@ -23,27 +25,84 @@ function afterConnect(connection) {
     // Включаем кнопку создания комнаты.
     document.getElementById("set_room_button").disabled = false;
     // Отправляем на сервер информацию, о пользователе вошедшем в чат.
-    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_CHAT, addRoomToInterface)
+    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO, addNewRoomToInterface)
     checkUser();
+    getRooms();
 }
 
-function checkUser() {
+function getRooms() {
     const request = new XMLHttpRequest();
-    request.open("POST", "/POST/checkUser", true)
+    request.open("GET", sockConst.REQUEST_GET_ROOMS, true)
     request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
 
     request.onreadystatechange = function () {
         if (request.readyState === XMLHttpRequest.DONE) {
             if (request.status === 200) {
-                const data = request.responseText
+                const data = JSON.parse(request.responseText);
+                console.log(data);
+                data.forEach((room) => {
+                addRoomToInterface(room.name);
+                });
+            } else if (request.status === 400) {
+                console.log("ERROR 400");
+            } else if (request.status === 500) {
+                console.log("ERROR 500");
+            } else {
+                console.log("ERROR, JUST ERROR");
+            }
+        }
+    }
+    request.send();
+}
+
+function addUserToRoom(roomName) {
+    const request = new XMLHttpRequest();
+    request.open("GET", sockConst.REQUEST_GET_ADD_USER_TO_ROOM + "?roomName=" + roomName, true)
+    request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
+
+    request.onreadystatechange = function () {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            if (request.status === 200) {
+                const data = JSON.parse(request.responseText);
+                console.log(data);
+                data.forEach((room) => {
+                    console.log(room.name)
+                });
+            } else if (request.status === 400) {
+                console.log("ERROR 400");
+            } else if (request.status === 500) {
+                console.log("ERROR 500");
+            } else {
+                console.log("ERROR, JUST ERROR");
+            }
+        }
+    }
+    request.send();
+}
+
+/**
+ * Добавление пользователя во временную БД.
+ */
+function checkUser() {
+    userName = sessionStorage.getItem('login');
+    const request = new XMLHttpRequest();
+    request.open("POST", sockConst.REQUEST_POST_CHECK_USER, true);
+    request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
+
+    request.onreadystatechange = function () {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            if (request.status === 200) {
+                const data = request.responseText;
                 if (data === true) {
-                    /* Если комната новая, мы добавляем системное сообщение о новой комнате
-                    и выводим ее в список комнат.
+                    /*
+                    Если новый пользователь, добавлен во временную БД, мы попадем в это место.
                      */
                 }
                 if (data === "false") {
                     console.log("Авторизированный пользователь, обновил страницу.")
-                    userName = null;
                 }
             } else if (request.status === 400) {
                 const data = JSON.parse(request.responseText);
@@ -58,7 +117,7 @@ function checkUser() {
                     }
                 }
             } else if (request.status === 500) {
-                console.log("ERROR 500")
+                console.log("ERROR 500");
             } else {
 
             }
@@ -76,10 +135,14 @@ function checkUser() {
 
 }
 
+/**
+ * Метод проверки наличия комнаты в БД, позволяем избежать добавления двух одинаковых комнат.
+ */
 function checkRoom() {
     const request = new XMLHttpRequest();
-    request.open("POST", "/POST/checkRoom", true)
+    request.open("POST", sockConst.REQUEST_POST_CHECK_ROOM, true)
     request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
 
     request.onreadystatechange = function () {
         if (request.readyState === XMLHttpRequest.DONE) {
@@ -89,12 +152,13 @@ function checkRoom() {
                     /* Если комната новая, мы добавляем системное сообщение о новой комнате
                     и выводим ее в список комнат.
                      */
-                    sessionStorage.setItem('roomName',roomName);
+                    sessionStorage.setItem("isRoomAdmin","true"); // Так это первый пользователь вошедший в комнату, он становится ее админом.
+                    sessionStorage.setItem('roomName', roomName);
                     sendMessageToServerAboutNewRoom(roomName);
-                    window.location.replace("/chat.html")
+                    window.open("roomChat.html", "_self");
                 }
                 if (data === "false") {
-                    alert("Комната " + roomName + " уже существует!");
+                    alert("Комната " + roomName + " уже существует, либо заполненна!");
                     roomName = null;
                 }
             } else if (request.status === 400) {
@@ -112,7 +176,6 @@ function checkRoom() {
         'name': roomName,
         'id': roomName
     });
-    console.log(str);
     request.send(str);
 }
 
@@ -127,29 +190,50 @@ function onError(error) {
  * Проверяет находится ли пользователь в БД или нет, отправляет системное сообщение с параметром
  * checkUser = true;
  */
-
-
 function getSystemMessage(response) {
 }
 
 /**
- * Метод добавляеющий комнату в список комнат.
+ * Метод добавляеющий новую комнату в список комнат.
  * @param response
  */
-function addRoomToInterface(response) {
+function addNewRoomToInterface(response) {
     const data = JSON.parse(response.body);
     roomName = data.room.name;
 
-    //Отправляем сообщение о времени суток
+addRoomToInterface(roomName);
+}
+
+/**
+ * Метод добавляеющий комнату в список комнат по имени, используется для добавление старых комнат в
+ * интерфейс пользователя.
+ * @param name
+ */
+function addRoomToInterface(name) {
     const dd = document.createElement("dd")           // Создаем элемент списка <dd>
     const button = document.createElement("button")     // Создаем кнопку
-    button.setAttribute("id", roomName);                 // Устанавливаем id как название комнаты
-    button.setAttribute("onclick", "alert(this.id)"); // Действие при нажатии кнопки
-    const buttonName = document.createTextNode(roomName);                 // Создаем текстовый элемент
+    button.setAttribute("id", name);                 // Устанавливаем id как название комнаты
+    button.setAttribute("onclick", "goToRoom(this.id)"); // Действие при нажатии на комнату, переходим в нее.
+    const buttonName = document.createTextNode(name);                 // Создаем текстовый элемент
 
     button.appendChild(buttonName);
-    dd.appendChild(button)// Вставляем текстовый внутрь элемента списка
+    dd.appendChild(button)// Вставляем кнопку внутрь элемента списка
     document.getElementById('rooms_list').appendChild(dd);
+}
+
+/**
+ * Отвечает за переход пользователя в комнату чата, также
+ * вызывает метод, для добавления пользователя в БД, со списком пользователей комнаты.
+ * @param id - уникальные индификатор комнаты.
+ */
+function goToRoom(id){
+    addUserToRoom(id);
+    sessionStorage.setItem('isRoomAdmin',"false");
+    sessionStorage.setItem("roomName",id);
+    sessionStorage.setItem("roomId",roomName);
+    window.open("roomChat.html", "_self");
+    stompClient.send()
+
 }
 
 /**
@@ -165,5 +249,5 @@ function sendMessageToServerAboutNewRoom(roomName) {
             'id': roomName
         }
     })
-    stompClient.send(sockConst.SYSTEM_END_POINT, {},data);
+    stompClient.send(sockConst.SYSTEM_END_POINT, {}, data);
 }

@@ -23,6 +23,7 @@ public class Room {
     private String name;
     private String id;
     private Message message;
+    private User admin;
 
     public Room(RoomDAO roomDAO) {
         name = roomDAO.getName();
