@@ -1,5 +1,6 @@
 package org.dreamteam.mafia.service.api;
 
+import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dto.LoginDTO;
 import org.dreamteam.mafia.dto.RegistrationDTO;
 import org.dreamteam.mafia.exceptions.UserAuthenticationException;
@@ -39,4 +40,11 @@ public interface UserService {
      * например, при вызове этого метода из контроллера, отвечающего за регистрацию пользователя
      */
     Optional<User> getCurrentUser();
+
+    /**
+     * Возвращает БД-сущность пользователя, авторизованного в данной сессии.
+     *
+     * @return - БД-сущность авторизованного в настоящий момент пользователя или null, если пользователь еще не авторизован
+     */
+    Optional<UserDAO> getCurrentUserDAO();
 }

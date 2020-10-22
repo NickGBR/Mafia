@@ -1,7 +1,6 @@
 package org.dreamteam.mafia.dao;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
@@ -9,11 +8,11 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "rooms")
 
@@ -60,19 +59,36 @@ public class RoomDAO {
     @Column(name = "don")
     private Boolean don;
 
-    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @NotFound(action = NotFoundAction.IGNORE)
     private Set<UserDAO> userList;
 
     @OneToMany(mappedBy = "messageId", fetch = FetchType.EAGER)
     private Set<MessageDAO> messageList;
 
-    public RoomDAO(String passwordHash, UserDAO admin, String roomName, Integer maxUsersAmount, GameStatusEnum gameStatus) {
+    public RoomDAO() {
+        this.dayNumber = 0;
+        this.gamePhase = GamePhaseEnum.DAY;
+        this.gameStatus = GameStatusEnum.NOT_STARTED;
+        this.messageList = new HashSet<>();
+        this.userList = new HashSet<>();
+    }
+
+    public RoomDAO(
+            String passwordHash, UserDAO admin, String roomName, Integer maxUsersAmount, GameStatusEnum gameStatus) {
         this.passwordHash = passwordHash;
         this.admin = admin;
         this.name = roomName;
         this.maxUsersAmount = maxUsersAmount;
         this.gameStatus = gameStatus;
+    }
+
+    public void addUser(UserDAO user) {
+        this.userList.add(user);
+    }
+
+    public void removeUser(UserDAO user) {
+        this.userList.remove(user);
     }
 
     @Override
@@ -90,7 +106,17 @@ public class RoomDAO {
         sb.append(", mafia=").append(mafia);
         sb.append(", sheriff=").append(sheriff);
         sb.append(", don=").append(don);
-        sb.append('}');
+        sb.append(", users={ ");
+        boolean first = true;
+        for (UserDAO user : userList) {
+            if (!first) {
+                sb.append(", ");
+            } else {
+                first = false;
+            }
+            sb.append(user.getLogin());
+        }
+        sb.append("} }");
         return sb.toString();
     }
 }

@@ -46,7 +46,17 @@ function checkUser() {
                     userName = null;
                 }
             } else if (request.status === 400) {
-
+                const data = JSON.parse(request.responseText);
+                switch (parseInt(data["result"])) {
+                    case 1: {
+                        console.log("Error: Internal logic error");
+                        break;
+                    }
+                    case 2: {
+                        console.log("Error: Database error");
+                        break;
+                    }
+                }
             } else if (request.status === 500) {
                 console.log("ERROR 500")
             } else {

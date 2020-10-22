@@ -1,8 +1,13 @@
 package org.dreamteam.mafia.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.dreamteam.mafia.dto.RoomCreationDTO;
+import org.dreamteam.mafia.dto.RoomDisplayDTO;
+import org.dreamteam.mafia.exceptions.AlreadyInRoomException;
+import org.dreamteam.mafia.service.api.RoomService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Контроллер для системы комнат
@@ -11,13 +16,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/room")
 public class RoomController {
 
+    private final RoomService roomService;
+
+    @Autowired
+    public RoomController(RoomService roomService) {
+        this.roomService = roomService;
+    }
+
     /**
-     * Заглушка для теста доступности API
+     * Обрабатывает запросы на создание комнаты
      *
-     * @return - сообщение о успешности доступа
+     * @param room - описание создаваемой комнаты
+     * @throws AlreadyInRoomException - если текущий пользователь уже находится в комнате
      */
-    @RequestMapping(value = "/getAvailable", method = RequestMethod.GET)
-    public String register() {
-        return "GET is successful";
+    @PostMapping("/create")
+    public void createRoom(@RequestBody RoomCreationDTO room) throws AlreadyInRoomException {
+        roomService.createRoom(room);
+    }
+
+    /**
+     * Обрабатывает запрос на получение списка доступных на данный момент комнат
+     *
+     * @return - список описаний доступных в данный момент комнат
+     */
+    @GetMapping("/getInitialList")
+    public List<RoomDisplayDTO> getRooms() {
+        return roomService.getAvailableRooms();
     }
 }
