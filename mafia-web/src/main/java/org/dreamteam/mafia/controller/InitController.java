@@ -1,9 +1,13 @@
 package org.dreamteam.mafia.controller;
 
 import org.dreamteam.mafia.dto.InitDTO;
+import org.dreamteam.mafia.dto.RoomDisplayDTO;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.service.api.RoomService;
 import org.dreamteam.mafia.service.api.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +19,7 @@ import java.util.Optional;
 @RequestMapping("/api/init")
 public class InitController {
 
+    private final Logger logger = LoggerFactory.getLogger(InitController.class);
     private final UserService userService;
     private final RoomService roomService;
 
@@ -25,13 +30,22 @@ public class InitController {
     }
 
     @GetMapping
-    public InitDTO getUserState() {
+    public InitDTO getUserState() throws ClientErrorException {
+
+        logger.debug("Incoming request for initialisation data");
         InitDTO dto = new InitDTO();
         final Optional<User> user = userService.getCurrentUser();
         dto.setIsLoggedIn(user.isPresent());
         if (user.isPresent()) {
             dto.setName(user.get().getName());
             dto.setIsInRoom(roomService.isCurrentlyInRoom());
+            if (dto.getIsInRoom()) {
+                final RoomDisplayDTO currentRoom = roomService.getCurrentRoom();
+                dto.setRoomID(String.valueOf(currentRoom.getId()));
+                dto.setRoomName(currentRoom.getName());
+                dto.setIsAdmin(roomService.isCurrentUserAdmin());
+                dto.setIsReady(user.get().isReady());
+            }
         }
         return dto;
     }

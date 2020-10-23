@@ -21,6 +21,8 @@ public class User {
 
     public User(UserDAO dao) {
         login = dao.getLogin();
+        name = dao.getLogin();
+        isReady = dao.getIsReady();
     }
 
     public User(){

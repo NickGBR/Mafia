@@ -101,12 +101,11 @@ public interface RoomService {
     void setReady(boolean ready) throws ClientErrorException;
 
     /**
-     * Проверяет готовы ли все пользователи  в комнате для начала игры
+     * Проверяет готовы ли все пользователи  в комнате текущего пользователя для начала игры
      *
-     * @param room - комната для проверки
      * @return - true, если все пользователи в комнате готовы, false - иначе
      */
-    boolean isRoomReady(Room room);
+    boolean isRoomReady() throws ClientErrorException;
 
     /**
      * Проверяет находится ли текущий пользователь в комнате
@@ -114,4 +113,12 @@ public interface RoomService {
      * @return - true, если пользователь находится в комнате, false - в противном случае
      */
     boolean isCurrentlyInRoom();
+
+    /**
+     * Возвращает описание текущей комнаты для клиента
+     *
+     * @return -  описание комнаты в формате пригодном для отправки клиенту
+     * @throws ClientErrorException - если пользователь не находится в комнате.
+     */
+    RoomDisplayDTO getCurrentRoom() throws ClientErrorException;
 }

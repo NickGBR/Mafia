@@ -1,6 +1,8 @@
 let userName;
 let roomName;
-let roomAdminName;
+let roomID;
+let isAdmin;
+let isReady;
 const roomChatId = "room_chat_box";
 const usersListId = "users_list";
 const startButtonHolderId = "admin_button_holder";
@@ -11,7 +13,7 @@ function connect() {
     const socket = new SockJS("http://localhost:8080/chat-messaging");
     console.log("Connected successfully");
     stompClient = Stomp.over(socket);
-    // Получаем токен достпа для конкретного пользователя.
+    // Получаем токен доступа для конкретного пользователя.
     let token = sessionStorage.getItem('token');
     // Пытаемся подключиться, передав токен в заголовке.
     // И две функции: одну для обработки успешного подключения,
@@ -23,13 +25,15 @@ function connect() {
 // Будем вызвано после установления соединения
 function afterConnect(connection) {
 
-    roomName = sessionStorage.getItem('roomName');
-
-    userName = sessionStorage.getItem('userName');
+    roomName = initialisedRoomName;
+    roomID = initialisedRoomID;
+    userName = initialisedUserName;
+    isAdmin = initialisedIsAdmin;
+    isReady = initialisedIsReady;
 
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
-    // Включаем кнопку создания комнаты.
+    // Включаем кнопку отправки сообщения
     document.getElementById("send_message_button").disabled = false;
     // Отправляем на сервер информацию, о пользователе вошедшем в чат.
 
@@ -42,11 +46,10 @@ function afterConnect(connection) {
     //Получаем список пользователей
     getRoomUsers();
 
-    // Полчучем имя админа комнаты.
-    getRoomAdminName();
-
     // Добавление кнопок для администратора.
-    showAdminButton(roomAdminName, false);
+    showAdminButton(isAdmin, false);
+
+    changeReadyButtonStatus(isReady)
 
 
     stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomName, getMessage);
@@ -56,7 +59,8 @@ function afterConnect(connection) {
 
 function onError(error) {
     console.log("Не удалось установить подключение: " + error);
-    document.getElementById("set_room_button").disabled = true;
+    document.getElementById("left_room_button").disabled = true;
+    document.getElementById("user_ready_button").disabled = true;
 }
 
 /**
@@ -163,33 +167,34 @@ function updateUsersInfo(response) {
 
 /**
  * Отображает пользователей на экране
- * @param name - имя пользователя.
+ * @param user -  пользователь.
  * @param listId - id эллимента для вывода пользователей.
  */
-function showUser(name, listId) {
+function showUser(user, listId) {
     const container = document.createElement("span"); // Атрибуд добавления свете нашуму тексту.
 
-    if (roomAdminName === name) {
+    if (user["admin"]) {
         container.className = "admin_user";
+    } else if (user["ready"]) {
+        container.className = "ready_user";
     } else {
         container.className = "not_ready_user";
     }
     const par = document.createElement("DIV");
-    const textNode = document.createTextNode(name);
+    const textNode = document.createTextNode(user["name"]);
     par.appendChild(container);
     container.appendChild(textNode);
-
     document.getElementById(listId).appendChild(par);
 }
 
 /**
  * Добавляет кнопку, начать игру, в указанный эллемент.
- * @param adminName - имя админимтратора, кнопка создается только для администратора.
+ * @param isAdmin - является ли текущий клиент администратором комнаты
  * @param isActive - устанавливает активность кнопки.
  */
-function showAdminButton(adminName, isActive) {
-    document.getElementById("admin_button_holder").innerText = "";
-    if (adminName === userName) {
+function showAdminButton(isAdmin, isActive) {
+    if (isAdmin) {
+        document.getElementById("admin_button_holder").innerText = "";
         const button = document.createElement('button');
         button.innerText = "Начать игру";
         const holder = document.getElementById(startButtonHolderId);
@@ -201,63 +206,41 @@ function showAdminButton(adminName, isActive) {
             button.disabled = false;
         }
         holder.appendChild(button);
+
+        document.getElementById("left_room_button").setAttribute("value", "Расформировать комнату");
+        document.getElementById("left_room_button").setAttribute("onClick", "disbandRoom()");
     }
+}
+
+function leaveRoom() {
+    let callback = function () {
+        window.location.href = "roomList.html";
+    };
+
+    sendRequest("POST", "/api/room/leave", "", callback, [8, 11]);
+}
+
+function disbandRoom() {
+    let callback = function () {
+        window.location.href = "roomList.html";
+    };
+    sendRequest("POST", "/api/room/disband", "", callback, [8, 9]);
 }
 
 /**
  * Отвечает за получение пользователей при заходе в комнату.
  */
 function getRoomUsers() {
-    const request = new XMLHttpRequest();
-    request.open("GET", sockConst.REQUEST_GET_USERS + "?roomName=" + roomName, true)
-    request.setRequestHeader("Content-Type", "application/json");
-    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
 
-    request.onreadystatechange = function () {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            clearUsersList(); // Отчищаем список пользователей, перед обновлением.
-            if (request.status === 200) {
-                const data = JSON.parse(request.responseText);
-                data.forEach((user) => {
-                    showUser(user.name, usersListId);
-                });
-            } else if (request.status === 400) {
-                console.log("ERROR 400");
-            } else if (request.status === 500) {
-                console.log("ERROR 500");
-            } else {
-                console.log("ERROR, JUST ERROR");
-            }
-        }
-    }
-    request.send();
-}
+    let callback = function (request) {
+        clearUsersList(); // Отчищаем список пользователей, перед обновлением.
+        const data = JSON.parse(request.responseText);
+        data.forEach((user) => {
+            showUser(user, usersListId);
+        });
+    };
 
-/**
- * Получает имя администратора, данный запрос синхронный, так как нам важно получить имя
- * администратора до вывода списка пользователей, если сдлеать запрос не синхронным,
- * могут возникать ситуации, при которых администратор не будет подсвесиваться. Данный запос
- * делает только при первом входе в комнату.
- */
-function getRoomAdminName() {
-    const request = new XMLHttpRequest();
-    request.open("GET", sockConst.REQUEST_GET_ROOM_ADMIN_NAME + "?roomName=" + roomName, false);
-    request.setRequestHeader("Content-Type", "application/json");
-    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
-    request.onreadystatechange = function () {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            if (request.status === 200) {
-                roomAdminName = request.responseText;
-            } else if (request.status === 400) {
-                console.log("ERROR 400");
-            } else if (request.status === 500) {
-                console.log("ERROR 500 in get room admin");
-            } else {
-                console.log("ERROR, JUST ERROR");
-            }
-        }
-    }
-    request.send();
+    sendRequest("GET", "/api/room/getUsersList", "", callback, [8]);
 }
 
 function clearUsersList() {
@@ -268,26 +251,14 @@ function clearUsersList() {
  * Меняет состояние готовности пользователя.
  */
 function changeUserReadyStatus() {
-    const request = new XMLHttpRequest();
-    request.open("GET", sockConst.REQUEST_GET_CHANGE_USER_READY_STATUS + "?userName=" + userName, true);
-    request.setRequestHeader("Content-Type", "application/json");
-    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
-    request.onreadystatechange = function () {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            if (request.status === 200) {
-                const data = JSON.parse(request.responseText);
-                changeReadyButtonStatus(data);
-                checkRoomReadyStatus();
-            } else if (request.status === 400) {
-                console.log("ERROR 400");
-            } else if (request.status === 500) {
-                console.log("ERROR 500 in changeUserReadyStatus");
-            } else {
-                console.log("ERROR, JUST ERROR");
-            }
-        }
-    }
-    request.send();
+
+    let callback = function () {
+        isReady = !isReady;
+        changeReadyButtonStatus(isReady);
+        checkRoomReadyStatus();
+    };
+    sendRequest("POST", "/api/room/setReady", !isReady, callback, [8]);
+
 }
 
 function checkRoomReadyStatus() {
@@ -315,5 +286,5 @@ function checkRoomReadyStatus() {
 function usersReadyToPlayInfo(response) {
     const data = JSON.parse(response.body);
     console.log(data + "сообщение о готовности игры!")
-    showAdminButton(roomAdminName, data);
+    showAdminButton(isAdmin, data);
 }

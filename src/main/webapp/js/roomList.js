@@ -16,7 +16,6 @@ function connect() {
     // И две функции: одну для обработки успешного подключения,
     // и вторую для обработки ошибки подключения
     stompClient.connect({'x-auth-token': token}, afterConnect, onError);
-
 }
 
 // Будем вызвано после установления соединения
@@ -26,35 +25,21 @@ function afterConnect(connection) {
     // Включаем кнопку создания комнаты.
     document.getElementById("set_room_button").disabled = false;
     // Отправляем на сервер информацию, о пользователе вошедшем в чат.
-    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO, addNewRoomToInterface)
-    checkUser();
+    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO, updateRoomToInterface)
+    userName = initialisedUserName;
     getRooms();
 }
 
 function getRooms() {
-    const request = new XMLHttpRequest();
-    request.open("GET", sockConst.REQUEST_GET_ROOMS, true)
-    request.setRequestHeader("Content-Type", "application/json");
-    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
 
-    request.onreadystatechange = function () {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            if (request.status === 200) {
-                const data = JSON.parse(request.responseText);
-                console.log(data);
-                data.forEach((room) => {
-                    addRoomToInterface(room.name);
-                });
-            } else if (request.status === 400) {
-                console.log("ERROR 400");
-            } else if (request.status === 500) {
-                console.log("ERROR 500");
-            } else {
-                console.log("ERROR, JUST ERROR");
-            }
-        }
-    }
-    request.send();
+    let callback = function (request) {
+        const data = JSON.parse(request.responseText);
+        console.log(data);
+        data.forEach((room) => {
+            addRoomToInterface(room);
+        });
+    };
+    sendRequest("GET", "/api/room/getInitialList", "", callback, []);
 }
 
 /**
@@ -62,136 +47,41 @@ function getRooms() {
  * то выдает ошибку.
  * @param roomName
  */
-function addUserToRoom(roomName) {
-    const request = new XMLHttpRequest();
-    request.open("GET", sockConst.REQUEST_GET_ADD_USER_TO_ROOM + "?roomName=" + roomName, true)
-    request.setRequestHeader("Content-Type", "application/json");
-    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
+function addUserToRoom(roomId) {
 
-    request.onreadystatechange = function () {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            if (request.status === 200) {
-                const data = JSON.parse(request.responseText);
-                console.log(data)
-                if (data === gameConst.FULL_ROOM) {
-                    alert("Комната переполнена!")
-                } else {
-                    sessionStorage.setItem("roomName", roomName);
-                    sessionStorage.setItem("roomId", roomName);
-                    stompClient.send();
-                    window.open("roomChat.html", "_self");
-                }
-            } else if (request.status === 400) {
-                console.log("ERROR 400");
-            } else if (request.status === 500) {
-                console.log("ERROR 500");
-            } else {
-                console.log("ERROR, JUST ERROR");
-            }
-        }
-    }
-    request.send();
+    let callback = function () {
+        window.location.href = "roomChat.html";
+    };
+    const jsonData = {
+        'id': roomId,
+        'password': ''
+    };
+    sendRequest("POST", "/api/room/join", JSON.stringify(jsonData), callback, [4, 5, 10, 11, 12]);
 }
 
-/**
- * Добавление пользователя во временную БД.
- */
-function checkUser() {
-    userName = sessionStorage.getItem('login');
-    const request = new XMLHttpRequest();
-    request.open("POST", sockConst.REQUEST_POST_CHECK_USER, true);
-    request.setRequestHeader("Content-Type", "application/json");
-    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
-
-    request.onreadystatechange = function () {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            if (request.status === 200) {
-                const data = request.responseText;
-                if (data === true) {
-                    /*
-                    Если новый пользователь, добавлен во временную БД, мы попадем в это место.
-                     */
-                }
-                if (data === "false") {
-                    console.log("Авторизированный пользователь, обновил страницу.")
-                }
-            } else if (request.status === 400) {
-                const data = JSON.parse(request.responseText);
-                switch (parseInt(data["result"])) {
-                    case 1: {
-                        console.log("Error: Internal logic error");
-                        break;
-                    }
-                    case 2: {
-                        console.log("Error: Database error");
-                        break;
-                    }
-                }
-            } else if (request.status === 500) {
-                console.log("ERROR 500");
-            } else {
-
-            }
-        }
-
-
-    }
-    const systemMessage = JSON.stringify({
-        user: {
-            login: sessionStorage.getItem("login"),
-            name: sessionStorage.getItem("login")
-        }
-    })
-    request.send(systemMessage);
-
-}
 
 /**
  * Метод проверки наличия комнаты в БД, позволяем избежать добавления двух одинаковых комнат.
  */
 function checkRoom() {
-    const request = new XMLHttpRequest();
-    request.open("POST", sockConst.REQUEST_POST_CHECK_ROOM, true)
-    request.setRequestHeader("Content-Type", "application/json");
-    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
 
-    request.onreadystatechange = function () {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            if (request.status === 200) {
-                const data = request.responseText
-                if (data === "true") {
-                    /* Если комната новая, мы добавляем системное сообщение о новой комнате
-                    и выводим ее в список комнат.
-                     */
-                    sessionStorage.setItem('roomName', roomName);
-                    sendMessageToServerAboutNewRoom(roomName);
-                    window.open("roomChat.html", "_self");
-                }
-                if (data === "false") {
-                    alert("Комната " + roomName + " уже существует, либо заполненна!");
-                    roomName = null;
-                }
-            } else if (request.status === 400) {
-
-            } else if (request.status === 500) {
-                console.log("ERROR 500")
-            } else {
-
-            }
-        }
-    }
+    let callback = function () {
+        window.location.href = "roomChat.html";
+    };
 
     roomName = document.getElementById("room_input").value;
-    const str = JSON.stringify({
+    const jsonData = {
         'name': roomName,
-        'id': roomName
-    });
-    request.send(str);
+        'description': 'New room'
+    };
+
+    sendRequest("POST", "/api/room/create", JSON.stringify(jsonData), callback, [5]);
 }
 
 // Будет вызвано при ошибке установления соединения
 function onError(error) {
     console.log("Не удалось установить подключение: " + error);
+    alert("Клиент потерял соединение с сервером");
     document.getElementById("room_input").disabled = true;
     document.getElementById("set_room_button").disabled = true;
 }
@@ -207,23 +97,39 @@ function getSystemMessage(response) {
  * Метод добавляеющий новую комнату в список комнат.
  * @param response
  */
-function addNewRoomToInterface(response) {
+function updateRoomToInterface(response) {
     const data = JSON.parse(response.body);
-    roomName = data.room.name;
-    addRoomToInterface(roomName);
+    room = data["roomDTO"];
+    if (data["remove"]) {
+        removeRoomFromInterface(room);
+    } else {
+        addRoomToInterface(room);
+    }
+}
+
+/**
+ * Метод удаляющий комнату из списка комнат по id
+ * @param room
+ */
+function removeRoomFromInterface(room) {
+    const dd = document.getElementById("dd" + room["id"]);
+    document.getElementById('rooms_list').removeChild(dd);
 }
 
 /**
  * Метод добавляеющий комнату в список комнат по имени, используется для добавление старых комнат в
  * интерфейс пользователя.
- * @param name
+ * @param room
  */
-function addRoomToInterface(name) {
+function addRoomToInterface(room) {
     const dd = document.createElement("dd")           // Создаем элемент списка <dd>
+    dd.setAttribute("id", "dd" + room["id"])
     const button = document.createElement("button")     // Создаем кнопку
-    button.setAttribute("id", name);                 // Устанавливаем id как название комнаты
+    button.setAttribute("id", room["id"]);                 // Устанавливаем id
+    button.setAttribute("description", room["description"])
     button.setAttribute("onclick", "tryToGoToRoom(this.id)"); // Действие при нажатии на комнату, попытаемся перейти в нее.
-    const buttonName = document.createTextNode(name);                 // Создаем текстовый элемент
+    const label = room["name"] + "   | " + room["currPlayers"] + " / " + room["maxPlayers"];
+    const buttonName = document.createTextNode(label);                 // Создаем текстовый элемент
 
     button.appendChild(buttonName);
     dd.appendChild(button)// Вставляем кнопку внутрь элемента списка
@@ -238,18 +144,3 @@ function tryToGoToRoom(id) {
     addUserToRoom(id)
 }
 
-/**
- * Метод отправляет всем пользователям информацию, о добавлении новой комнаты.
- * @param roomName
- */
-function sendMessageToServerAboutNewRoom(roomName) {
-
-    const data = JSON.stringify({
-        'newRoom': true,
-        'room': {
-            'name': roomName,
-            'id': roomName
-        }
-    })
-    stompClient.send(sockConst.SYSTEM_END_POINT, {}, data);
-}

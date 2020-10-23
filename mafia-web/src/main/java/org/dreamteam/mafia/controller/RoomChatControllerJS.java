@@ -3,7 +3,6 @@ package org.dreamteam.mafia.controller;
 import org.dreamteam.mafia.constants.GameConst;
 import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.model.Message;
-import org.dreamteam.mafia.model.SystemMessage;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.temporary.TemporaryDB;
@@ -12,8 +11,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -36,7 +38,7 @@ public class RoomChatControllerJS {
     public @ResponseBody
     List<Message> getMessages(@RequestParam String roomName) {
         if (TemporaryDB.messagesByRooms.get(roomName).isEmpty()) {
-            return null;
+            return new ArrayList<>();
         } else return TemporaryDB.messagesByRooms.get(roomName);
     }
 

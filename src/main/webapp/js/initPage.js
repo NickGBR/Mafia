@@ -1,5 +1,9 @@
 let spinner;
 let initialisedUserName = "";
+let initialisedRoomID = "";
+let initialisedRoomName = "";
+let initialisedIsAdmin = false;
+let initialisedIsReady = false;
 let pageName = getCurrentName();
 
 function getCurrentName() {
@@ -20,6 +24,10 @@ function doRedirect() {
         if (data["isLoggedIn"]) {
             initialisedUserName = data["name"];
             if (data["isInRoom"]) {
+                initialisedRoomID = data["roomID"];
+                initialisedRoomName = data["roomName"];
+                initialisedIsAdmin = data["isAdmin"];
+                initialisedIsReady = data["isReady"];
                 if (pageName !== "roomChat.html") {
                     window.location.href = "roomChat.html";
                 } else {
