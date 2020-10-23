@@ -52,6 +52,7 @@ function afterConnect(connection) {
     changeReadyButtonStatus(isReady)
 
 
+    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE + roomID, onDisbandment);
     stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomID, getMessage);
     stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomID, getRoomUsers)
     stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomID, usersReadyToPlayInfo)
@@ -59,9 +60,22 @@ function afterConnect(connection) {
 
 function onError(error) {
     console.log("Не удалось установить подключение: " + error);
+    alert("Клиент потерял соединение с сервером");
     document.getElementById("left_room_button").disabled = true;
     document.getElementById("user_ready_button").disabled = true;
 }
+
+/**
+ * Слушает сообщения об удаленных комнатах. Если удалилась эта, то надо перенаправить пользователя обратно на список
+ * @param response
+ */
+function onDisbandment(response) {
+    if (!isAdmin) {
+        window.location.href = "roomList.html";
+        alert("Администратор расформировал комнату. Вы будете возвращены в общее лобби.");
+    }
+}
+
 
 /**
  * Выводит информацю о пользователе в браузер.

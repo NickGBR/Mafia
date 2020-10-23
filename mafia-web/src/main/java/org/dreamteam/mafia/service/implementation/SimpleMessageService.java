@@ -5,6 +5,7 @@ import org.dreamteam.mafia.dao.MessageDAO;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dto.OutgoingChatMessageDTO;
+import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.repository.api.MessageRepository;
 import org.dreamteam.mafia.service.api.MessageService;
@@ -66,5 +67,36 @@ public class SimpleMessageService implements MessageService {
                 .map(OutgoingChatMessageDTO::new)
                 .collect(Collectors.toCollection(() -> dtos));
         return dtos;
+    }
+
+    @Override
+    public void sendAddRoom(RoomDisplayDTO addedRoom) {
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO_ADD, addedRoom);
+    }
+
+    @Override
+    public void sendRemoveRoom(RoomDisplayDTO removedRoom) {
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO_REMOVE, removedRoom);
+        // Уведолмяем игроков в комнате о том, что комната была распущена.
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO_REMOVE + removedRoom.getId(),
+                                         "");
+    }
+
+    @Override
+    public void sendUpdateRoom(RoomDisplayDTO updatedRoom) {
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO_UPDATE, updatedRoom);
+    }
+
+    @Override
+    public void sendJoinUpdate(RoomDisplayDTO room) {
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_USERS_INFO + room.getId(),
+                                         true);
+    }
+
+    @Override
+    public void sendReadinessUpdate() throws ClientErrorException {
+        messagingTemplate.convertAndSend(SockConst.SYS_USERS_READY_TO_PLAY_INFO
+                                                 + roomService.getCurrentRoom().getId(),
+                                         roomService.isRoomReady());
     }
 }

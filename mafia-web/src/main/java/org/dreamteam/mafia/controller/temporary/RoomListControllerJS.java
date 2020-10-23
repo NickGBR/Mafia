@@ -1,4 +1,4 @@
-package org.dreamteam.mafia.controller;
+package org.dreamteam.mafia.controller.temporary;
 import org.dreamteam.mafia.constants.GameConst;
 import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.model.Room;

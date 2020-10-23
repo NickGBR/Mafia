@@ -25,7 +25,9 @@ function afterConnect(connection) {
     // Включаем кнопку создания комнаты.
     document.getElementById("set_room_button").disabled = false;
     // Отправляем на сервер информацию, о пользователе вошедшем в чат.
-    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO, updateRoomToInterface)
+    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_ADD, updateRoomToInterfaceAdd)
+    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE, updateRoomToInterfaceRemove)
+    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_UPDATE, updateRoomToInterface)
     userName = initialisedUserName;
     getRooms();
 }
@@ -98,9 +100,17 @@ function getSystemMessage(response) {
  * Метод добавляеющий новую комнату в список комнат.
  * @param response
  */
-function updateRoomToInterface(response) {
-    const data = JSON.parse(response.body);
-    room = data["roomDTO"];
+function updateRoomToInterfaceAdd(response) {
+    const room = JSON.parse(response.body);
+    addRoomToInterface(room);
+}
+
+/**
+ * Метод удаляющий комнату из списка комнат.
+ * @param response
+ */
+function updateRoomToInterfaceRemove(response) {
+    const room = JSON.parse(response.body);
     if (data["remove"]) {
         removeRoomFromInterface(room);
     } else {
@@ -109,12 +119,17 @@ function updateRoomToInterface(response) {
 }
 
 /**
- * Метод удаляющий комнату из списка комнат по id
- * @param room
+ * Метод добавляеющий новую комнату в список комнат.
+ * @param response
  */
-function removeRoomFromInterface(room) {
-    const dd = document.getElementById("dd" + room["id"]);
-    document.getElementById('rooms_list').removeChild(dd);
+function updateRoomToInterface(response) {
+    const room = JSON.parse(response.body);
+    const button = document.getElementById(room["id"]);
+    button.textContent = '';
+    const label = room["name"] + "   | " + room["currPlayers"] + " / " + room["maxPlayers"];
+    const buttonName = document.createTextNode(label);                 // Создаем текстовый элемент
+
+    button.appendChild(buttonName);
 }
 
 /**

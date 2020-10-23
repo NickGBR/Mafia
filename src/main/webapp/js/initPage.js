@@ -70,6 +70,8 @@ function doInitRoom() {
 
 function setUserName() {
     let userNameNode = document.getElementById("userName");
-    const textNode = document.createTextNode(initialisedUserName);
-    userNameNode.appendChild(textNode);
+    if (userNameNode !== null) {
+        const textNode = document.createTextNode(initialisedUserName);
+        userNameNode.appendChild(textNode);
+    }
 }

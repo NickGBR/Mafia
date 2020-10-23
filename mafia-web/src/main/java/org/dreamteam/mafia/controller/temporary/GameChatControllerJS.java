@@ -1,8 +1,10 @@
-package org.dreamteam.mafia.controller;
+package org.dreamteam.mafia.controller.temporary;
 
-import org.dreamteam.mafia.constants.GameConst;
 import org.dreamteam.mafia.constants.SockConst;
-import org.dreamteam.mafia.model.*;
+import org.dreamteam.mafia.model.Message;
+import org.dreamteam.mafia.model.Room;
+import org.dreamteam.mafia.model.SystemMessage;
+import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.temporary.TemporaryDB;
 import org.slf4j.Logger;
@@ -13,7 +15,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;

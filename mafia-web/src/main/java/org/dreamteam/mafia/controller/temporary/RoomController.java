@@ -1,17 +1,15 @@
-package org.dreamteam.mafia.controller;
+package org.dreamteam.mafia.controller.temporary;
 
-import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.dto.UserDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
-import org.dreamteam.mafia.model.SystemMessage;
+import org.dreamteam.mafia.service.api.MessageService;
 import org.dreamteam.mafia.service.api.RoomService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,13 +23,13 @@ public class RoomController {
 
     private final Logger logger = LoggerFactory.getLogger(RoomController.class);
     private final RoomService roomService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final MessageService messageService;
 
     @Autowired
     public RoomController(
-            RoomService roomService, SimpMessagingTemplate messagingTemplate) {
+            RoomService roomService, MessageService messageService) {
         this.roomService = roomService;
-        this.messagingTemplate = messagingTemplate;
+        this.messageService = messageService;
     }
 
     /**
@@ -44,10 +42,7 @@ public class RoomController {
     public void createRoom(@RequestBody RoomCreationDTO dto) throws ClientErrorException {
         logger.debug("Incoming room creation request. DTO: " + dto);
         roomService.createRoom(dto);
-        SystemMessage msg = new SystemMessage();
-        msg.setNewRoom(true);
-        msg.setRoomDTO(roomService.getCurrentRoom());
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO, msg);
+        messageService.sendAddRoom(roomService.getCurrentRoom());
     }
 
     /**
@@ -59,12 +54,9 @@ public class RoomController {
     @PostMapping("/disband")
     public void disbandRoom() throws ClientErrorException {
         logger.debug("Incoming room disbandment request.");
-        SystemMessage msg = new SystemMessage();
-        msg.setNewRoom(true);
-        msg.setRoomDTO(roomService.getCurrentRoom());
-        msg.setRemove(true);
+        final RoomDisplayDTO prevRoom = roomService.getCurrentRoom();
         roomService.disbandRoom();
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO, msg);
+        messageService.sendRemoveRoom(prevRoom);
     }
 
     /**
@@ -92,8 +84,9 @@ public class RoomController {
     public void joinRoom(@RequestBody JoinRoomDTO dto) throws ClientErrorException {
         logger.debug("Incoming room join request. DTO: " + dto);
         roomService.joinRoom(dto);
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_USERS_INFO + roomService.getCurrentRoom().getId(),
-                true);
+        final RoomDisplayDTO currentRoom = roomService.getCurrentRoom();
+        messageService.sendJoinUpdate(currentRoom);
+        messageService.sendUpdateRoom(currentRoom);
     }
 
     /**
@@ -109,10 +102,11 @@ public class RoomController {
             logger.debug("Current user is room admin. Redirecting to disbandment procedure.");
             disbandRoom();
         } else {
-            Long id = roomService.getCurrentRoom().getId();
+            final RoomDisplayDTO prevRoom = roomService.getCurrentRoom();
             roomService.leaveRoom();
-            messagingTemplate.convertAndSend(SockConst.SYS_WEB_USERS_INFO + id,
-                    true);
+            prevRoom.setCurrPlayers(prevRoom.getCurrPlayers() - 1);
+            messageService.sendJoinUpdate(prevRoom);
+            messageService.sendUpdateRoom(prevRoom);
         }
     }
 
@@ -144,9 +138,7 @@ public class RoomController {
     public void setReady(@RequestBody Boolean ready) throws ClientErrorException {
         logger.debug("Incoming readiness update. New value: " + ready);
         roomService.setReady(ready);
-        messagingTemplate.convertAndSend(SockConst.SYS_USERS_READY_TO_PLAY_INFO
-                                                 + roomService.getCurrentRoom().getId(),
-                                         roomService.isRoomReady());
+        messageService.sendReadinessUpdate();
     }
 
     /**
