@@ -1,7 +1,9 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.dto.MessageDTO;
-import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.dto.OutgoingChatMessageDTO;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
+
+import java.util.List;
 
 /**
  * Интерфейс сервиса чата
@@ -9,10 +11,17 @@ import org.dreamteam.mafia.model.User;
 public interface MessageService {
 
     /**
-     * Отправляет сообщение от указанного пользователя. Адресаты определяются автоматически.
+     * Отправляет сообщение в чат от текущего пользователя. Адресаты определяются автоматически.
+     * Также сохраняет сообщение для последующего восстановления
      *
-     * @param user       - отправитель ообщения
-     * @param messageDTO - сообщение, полученное от интерфейса
+     * @param message - сообщение, полученное от интерфейса
      */
-    void sendMessage(User user, MessageDTO messageDTO);
+    void sendMessage(String message) throws ClientErrorException;
+
+    /**
+     * Возвращает историю чата для текущего игрока.
+     *
+     * @return - история чата, которую может видеть текущий игрок
+     */
+    List<OutgoingChatMessageDTO> getChatHistory() throws ClientErrorException;
 }

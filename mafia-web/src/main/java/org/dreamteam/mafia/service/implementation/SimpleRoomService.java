@@ -276,6 +276,11 @@ public class SimpleRoomService implements RoomService {
 
     @Override
     public RoomDisplayDTO getCurrentRoom() throws ClientErrorException {
+        return new RoomDisplayDTO(getCurrentRoomDAO());
+    }
+
+    @Override
+    public RoomDAO getCurrentRoomDAO() throws ClientErrorException {
         final Optional<UserDAO> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to get its room ID");
@@ -285,6 +290,6 @@ public class SimpleRoomService implements RoomService {
             throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM,
                                            "User is not in room. Can't get ID");
         }
-        return new RoomDisplayDTO(room.get());
+        return room.get();
     }
 }

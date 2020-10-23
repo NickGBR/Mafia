@@ -76,16 +76,13 @@ function showCurrentUserInfo() {
  * Отправляет сообщения пользователей в end point.
  */
 function sendMessage() {
-    const message = JSON.stringify({
-        // Это работает на JQuery
-        // 'message': $("#message_input_value").val()
-        // А это на чистом JavaScript
-        'roomName': roomName,                                    // Сервер должен знать в какую комнату переслать сообщение.
-        'roomID' : roomID,
-        'text': document.getElementById("message_input_value").value,
-        'from': userName
-    });
-    stompClient.send(sockConst.ROOM_END_POINT, {}, message);
+
+    let callback = function (request) {
+    };
+
+    sendRequest("POST", "/api/message/send",
+        document.getElementById("message_input_value").value, callback, [8]);
+
 }
 
 function getMessage(response) {
@@ -108,34 +105,15 @@ function addToChat(text, chat) {
  * Отправляем серверу название комнаты, для получения истории чата.
  */
 function getUsersMessages() {
-    const request = new XMLHttpRequest();
-    request.open("GET", sockConst.REQUEST_GET_MESSAGES + "?roomName=" + roomName, true)
-    request.setRequestHeader("Content-Type", "application/json");
-    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
 
-    request.onreadystatechange = function () {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            if (request.status === 200) {
-                const data = JSON.parse(request.responseText);
-                data.forEach((message) => {
-                    addToChat(message.from + ": " + message.text, roomChatId);
-                });
+    let callback = function (request) {
+        const data = JSON.parse(request.responseText);
+        data.forEach((message) => {
+            addToChat(message["from"] + ": " + message["text"], roomChatId);
+        });
+    };
 
-            } else if (request.status === 400) {
-
-            } else if (request.status === 500) {
-                const data = JSON.parse(request.responseText);
-                if (data.answerMessage === null) {
-                    console.log("В истории чата нет сообщений.")
-                }
-
-                console.log("ERROR 500")
-            } else {
-
-            }
-        }
-    }
-    request.send();
+    sendRequest("GET", "/api/message/restore", "", callback, [8]);
 }
 
 function changeReadyButtonStatus(isReady) {
@@ -240,32 +218,9 @@ function changeUserReadyStatus() {
     let callback = function () {
         isReady = !isReady;
         changeReadyButtonStatus(isReady);
-        checkRoomReadyStatus();
     };
     sendRequest("POST", "/api/room/setReady", !isReady, callback, [8]);
 
-}
-
-function checkRoomReadyStatus() {
-    const request = new XMLHttpRequest();
-    request.open("GET", sockConst.REQUEST_GET_ROOM_READY_STATUS + "?roomName=" + roomName, true);
-    request.setRequestHeader("Content-Type", "application/json");
-    request.setRequestHeader("Authorization", "Bearer" + sessionStorage.getItem('token'));
-    request.onreadystatechange = function () {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            if (request.status === 200) {
-                const data = JSON.parse(request.responseText);
-                showAdminButton(roomAdminName, data);
-            } else if (request.status === 400) {
-                console.log("ERROR 400");
-            } else if (request.status === 500) {
-                console.log("ERROR 500 in roomCheckingStatus!");
-            } else {
-                console.log("ERROR, JUST ERROR roomCheckingStatus!");
-            }
-        }
-    }
-    request.send();
 }
 
 function usersReadyToPlayInfo(response) {

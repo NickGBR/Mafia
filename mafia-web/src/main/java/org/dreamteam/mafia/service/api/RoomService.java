@@ -1,5 +1,6 @@
 package org.dreamteam.mafia.service.api;
 
+import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
@@ -121,4 +122,12 @@ public interface RoomService {
      * @throws ClientErrorException - если пользователь не находится в комнате.
      */
     RoomDisplayDTO getCurrentRoom() throws ClientErrorException;
+
+    /**
+     * Возвращает описание текущей комнаты для других сервисов
+     *
+     * @return -  описание комнаты, связанное с базой
+     * @throws ClientErrorException - если пользователь не находится в комнате.
+     */
+    RoomDAO getCurrentRoomDAO() throws ClientErrorException;
 }
