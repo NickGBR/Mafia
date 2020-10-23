@@ -52,9 +52,9 @@ function afterConnect(connection) {
     changeReadyButtonStatus(isReady)
 
 
-    stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomName, getMessage);
-    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomName, updateUsersInfo)
-    stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomName, usersReadyToPlayInfo)
+    stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomID, getMessage);
+    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomID, getRoomUsers)
+    stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomID, usersReadyToPlayInfo)
 }
 
 function onError(error) {
@@ -67,8 +67,6 @@ function onError(error) {
  * Выводит информацю о пользователе в браузер.
  */
 function showCurrentUserInfo() {
-    userName = sessionStorage.getItem("login");
-    roomName = sessionStorage.getItem("roomName")
 
     const userInfo = document.createTextNode("User: " + userName + ", room: " + roomName);
     document.getElementById("user_info_label").appendChild(userInfo);
@@ -83,6 +81,7 @@ function sendMessage() {
         // 'message': $("#message_input_value").val()
         // А это на чистом JavaScript
         'roomName': roomName,                                    // Сервер должен знать в какую комнату переслать сообщение.
+        'roomID' : roomID,
         'text': document.getElementById("message_input_value").value,
         'from': userName
     });
@@ -150,20 +149,6 @@ function changeReadyButtonStatus(isReady) {
     }
 }
 
-/**
- * Отвечает за обновление информации о пользователях.
- * Когда в комнату заходит новый пользователь, сервер отправляет
- * сообщение всем пользователям комнаты, со списком пользователей комнаты.
- * @param response
- */
-function updateUsersInfo(response) {
-    clearUsersList();
-    document.getElementById('users_list').innerText = "";
-    const data = JSON.parse(response.body);
-    data.forEach((user) => {
-        showUser(user.name, usersListId);
-    });
-}
 
 /**
  * Отображает пользователей на экране
@@ -285,6 +270,6 @@ function checkRoomReadyStatus() {
 
 function usersReadyToPlayInfo(response) {
     const data = JSON.parse(response.body);
-    console.log(data + "сообщение о готовности игры!")
+    getRoomUsers();
     showAdminButton(isAdmin, data);
 }

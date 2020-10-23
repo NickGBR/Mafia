@@ -47,7 +47,7 @@ public class RoomController {
         SystemMessage msg = new SystemMessage();
         msg.setNewRoom(true);
         msg.setRoomDTO(roomService.getCurrentRoom());
-        messagingTemplate.convertAndSend(SockConst.SYSTEM_END_POINT, msg);
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO, msg);
     }
 
     /**
@@ -64,7 +64,7 @@ public class RoomController {
         msg.setRoomDTO(roomService.getCurrentRoom());
         msg.setRemove(true);
         roomService.disbandRoom();
-        messagingTemplate.convertAndSend(SockConst.SYSTEM_END_POINT, msg);
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO, msg);
     }
 
     /**
@@ -92,6 +92,8 @@ public class RoomController {
     public void joinRoom(@RequestBody JoinRoomDTO dto) throws ClientErrorException {
         logger.debug("Incoming room join request. DTO: " + dto);
         roomService.joinRoom(dto);
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_USERS_INFO + roomService.getCurrentRoom().getId(),
+                true);
     }
 
     /**
@@ -107,7 +109,10 @@ public class RoomController {
             logger.debug("Current user is room admin. Redirecting to disbandment procedure.");
             disbandRoom();
         } else {
+            Long id = roomService.getCurrentRoom().getId();
             roomService.leaveRoom();
+            messagingTemplate.convertAndSend(SockConst.SYS_WEB_USERS_INFO + id,
+                    true);
         }
     }
 

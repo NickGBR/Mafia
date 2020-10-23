@@ -5,6 +5,8 @@ import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.model.*;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.temporary.TemporaryDB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -25,6 +27,9 @@ import java.util.List;
 @Controller
 //@RequestMapping
 public class GameChatControllerJS {
+
+
+    private final Logger logger = LoggerFactory.getLogger(GameChatControllerJS.class);
 
     @Autowired
     UserService userService;
@@ -57,13 +62,7 @@ public class GameChatControllerJS {
      */
     @MessageMapping(SockConst.SYSTEM_END_POINT)
     public void getSystemMessages(SystemMessage systemMessage) {
-        String login = userService.getCurrentUser().get().getLogin();
-
-        // Отправляет информацию о добавленных комнатах всем пользователям.
-        if (systemMessage.isNewRoom()) {
-            messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO, systemMessage);
-        }
-        System.out.println("");
+        logger.debug("Incoming system  message: " + systemMessage);
 
         // Добавляем сообщение для вывода.
         if (systemMessage.getMessage() != null) {
@@ -82,19 +81,19 @@ public class GameChatControllerJS {
     public void getRoomMessages(Message message) {
         System.out.println("MY: Получено сообщение " + message.getText() + ",");
         System.out.println("    От пользователя " + message.getFrom() + ", комната: " + message.getRoomName() + ".");
-        String roomName = message.getRoomName();
+        String roomId = message.getRoomID();
         List<Message> messages;
 
         if (TemporaryDB.messagesByRooms.containsKey(message.getRoomName())) {
             // Добавляем новое сообщение в лист.
-            messages = TemporaryDB.messagesByRooms.get(roomName);
+            messages = TemporaryDB.messagesByRooms.get(roomId);
         } else {
             messages = new ArrayList<>();
         }
 
         messages.add(message);
-        TemporaryDB.messagesByRooms.put(roomName, messages);
-        messagingTemplate.convertAndSend(SockConst.ROOM_WEB_CHAT + message.getRoomName(), message);
+        TemporaryDB.messagesByRooms.put(roomId, messages);
+        messagingTemplate.convertAndSend(SockConst.ROOM_WEB_CHAT + message.getRoomID(), message);
     }
 
     /**

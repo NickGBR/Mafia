@@ -45,7 +45,7 @@ function getRooms() {
 /**
  * Добавляет пользователя в комнату, если комната заполненна,
  * то выдает ошибку.
- * @param roomName
+ * @param roomId
  */
 function addUserToRoom(roomId) {
 
@@ -72,7 +72,8 @@ function checkRoom() {
     roomName = document.getElementById("room_input").value;
     const jsonData = {
         'name': roomName,
-        'description': 'New room'
+        'description': 'New room',
+        'maxPlayers': gameConst.USERS_AMOUNT,
     };
 
     sendRequest("POST", "/api/room/create", JSON.stringify(jsonData), callback, [5]);

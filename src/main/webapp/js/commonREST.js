@@ -1,22 +1,15 @@
-function readCookie(name) {
-    let nameEQ = name + '=',
-        allCookies = document.cookie.split(';'),
-        i,
-        cookie;
-    for (i = 0; i < allCookies.length; i += 1) {
-        cookie = allCookies[i];
-        while (cookie.charAt(0) === ' ') {
-            cookie = cookie.substring(1, cookie.length);
-        }
-        if (cookie.indexOf(nameEQ) === 0) {
-            return cookie.substring(nameEQ.length, cookie.length);
-        }
-    }
-    return null;
-}
-
+/**
+ * Отправляет запрос,
+ * если запрос отправлен в комнате -
+ * комната отпределяется автоматически на стороне сервера.
+ * @param method
+ * @param url
+ * @param data
+ * @param callback
+ * @param allowedErrors
+ */
 function sendRequest(method, url, data, callback, allowedErrors) {
-    const token = readCookie("token");
+    const token = sessionStorage.getItem('token');
     console.log("Current token: " + token);
     let request = new XMLHttpRequest();
     request.open(method, url, true);
