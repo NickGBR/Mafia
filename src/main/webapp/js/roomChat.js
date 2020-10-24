@@ -55,7 +55,8 @@ function afterConnect(connection) {
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE + roomID, onDisbandment);
     stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomID, getMessage);
     stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomID, getRoomUsers)
-    stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomID, usersReadyToPlayInfo)
+    stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomID, usersReadyToPlayInfo);
+    stompClient.subscribe(sockConst.SYS_GAME_STARTED_INFO + roomID, goToGameChat);
 }
 
 function onError(error) {
@@ -174,6 +175,7 @@ function showAdminButton(isAdmin, isActive) {
         document.getElementById("admin_button_holder").innerText = "";
         const button = document.createElement('button');
         button.innerText = "Начать игру";
+        button.onclick = startGame;
         const holder = document.getElementById(startButtonHolderId);
         if (isActive === true) {
             button.className = "active_start_game_button";
@@ -234,11 +236,23 @@ function changeUserReadyStatus() {
         changeReadyButtonStatus(isReady);
     };
     sendRequest("POST", "/api/room/setReady", !isReady, callback, [8]);
-
 }
 
 function usersReadyToPlayInfo(response) {
     const data = JSON.parse(response.body);
     getRoomUsers();
     showAdminButton(isAdmin, data);
+}
+
+
+function startGame(){
+    sendRequest("GET", sockConst.REQUEST_GET_START_GAME_INFO, "", null, [8]);
+}
+
+
+function goToGameChat(response){
+    console.log(response);
+    const data = JSON.parse(response.body);
+    console.log(data);
+    window.location.href = "gameChat.html";
 }

@@ -21,6 +21,8 @@ function onLoadInit() {
 function doRedirect() {
     let callback = function (request) {
         const data = JSON.parse(request.responseText);
+        console.log("do redirect = ");
+        console.log(data);
         if (data["isLoggedIn"]) {
             initialisedUserName = data["name"];
             if (data["isInRoom"]) {
@@ -28,7 +30,11 @@ function doRedirect() {
                 initialisedRoomName = data["roomName"];
                 initialisedIsAdmin = data["isAdmin"];
                 initialisedIsReady = data["isReady"];
-                if (pageName !== "roomChat.html") {
+                if (data["isGameStarted"] && pageName !== "gameChat.html") {
+                    window.location.href = "gameChat.html";
+                } else if (pageName === "gameChat.html") {
+                    doInitGameChat();
+                } else if (pageName !== "roomChat.html") {
                     window.location.href = "roomChat.html";
                 } else {
                     doInitRoom();
@@ -53,6 +59,10 @@ function doRedirect() {
 
 
 function doInitLogin() {
+    spinner.stop();
+}
+
+function doInitGameChat() {
     spinner.stop();
 }
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru-Ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Чат комнаты!</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="js/stomp.js"></script>
+    <script src="js/const/socketConst.js" type="text/javascript"></script>
+    <script src="js/roomChat.js" type="text/javascript"></script>
+    <script src="js/spin.umd.js"></script>
+    <script src="js/commonREST.js"></script>
+    <script src="js/initPage.js"></script>
+    <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
+    <script
+            crossorigin="anonymous"
+            integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+            src="https://code.jquery.com/jquery-3.3.1.js">
+    </script>
+    <script>
+        $(function () {
+            $("#header").load("header.html");
+        });
+    </script>
+    <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
+    <link href="styles/style.css" rel="stylesheet" type="text/css"/>
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" rel="stylesheet">
+
+</head>
+<body class="bodyPadding" id="body" onload="onLoadInit()">
+<div id="header"></div>
+<p>
+    <label id="user_info_label"></label>
+    <input id="left_room_button" onclick="leaveRoom()" type="button" value="Покинуть комнату">
+<div id="admin_button_holder">
+</div>
+</p>
+
+<!-- окно чата -->
+<div class="room_box" id="room_chat_box">
+</div>
+<input class="message_input" id="message_input_value" placeholder="Введите сообщение..."/>
+<button class="text" disabled="disabled" id="send_message_button" onclick="sendMessage()">
+    Отправить сообщение
+</button>
+<script>
+    document.getElementById("message_input_value")
+        .addEventListener("keyup", function (event) {
+            event.preventDefault();
+            if (event.keyCode === 13) {
+                document.getElementById("send_message_button").click();
+                document.getElementById("message_input_value").value = "";
+            }
+        });
+</script>
+<div>
+    <div>
+        <input class="user_ready_button" id="user_ready_button" onclick="changeUserReadyStatus()" type="button"
+               value="Готов">
+    </div>
+
+    <p id='users_list'></p>
+
+
+</div>
+</body>
+</html>

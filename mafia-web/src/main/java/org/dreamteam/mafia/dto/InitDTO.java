@@ -3,6 +3,7 @@ package org.dreamteam.mafia.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dreamteam.mafia.model.CharacterEnum;
 
 import java.io.Serializable;
 
@@ -18,5 +19,7 @@ public class InitDTO implements Serializable {
     String roomName = "";
     Boolean isAdmin = false;
     Boolean isReady = false;
+    CharacterEnum role = null;
+    Boolean isGameStarted = false;
 }
 

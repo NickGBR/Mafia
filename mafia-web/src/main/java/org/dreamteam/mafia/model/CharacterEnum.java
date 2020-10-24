@@ -3,7 +3,7 @@ package org.dreamteam.mafia.model;
 /**
  * Перечисление игровых ролей
  */
-public enum Role {
+public enum CharacterEnum {
 
     CITIZEN,
     SHERIFF,

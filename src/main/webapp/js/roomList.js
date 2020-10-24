@@ -25,9 +25,9 @@ function afterConnect(connection) {
     // Включаем кнопку создания комнаты.
     document.getElementById("set_room_button").disabled = false;
     // Отправляем на сервер информацию, о пользователе вошедшем в чат.
-    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_ADD, updateRoomToInterfaceAdd)
-    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE, updateRoomToInterfaceRemove)
-    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_UPDATE, updateRoomToInterface)
+    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_ADD, updateRoomToInterfaceAdd);
+    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE, updateRoomToInterfaceRemove);
+    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_UPDATE, updateRoomToInterface);
     userName = initialisedUserName;
     getRooms();
 }
@@ -111,11 +111,8 @@ function updateRoomToInterfaceAdd(response) {
  */
 function updateRoomToInterfaceRemove(response) {
     const room = JSON.parse(response.body);
-    if (data["remove"]) {
-        removeRoomFromInterface(room);
-    } else {
-        addRoomToInterface(room);
-    }
+    const dd = document.getElementById("dd" + room["id"]);
+    document.getElementById('rooms_list').removeChild(dd);
 }
 
 /**

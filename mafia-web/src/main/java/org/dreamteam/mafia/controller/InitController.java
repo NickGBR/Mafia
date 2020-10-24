@@ -1,5 +1,7 @@
 package org.dreamteam.mafia.controller;
 
+import org.dreamteam.mafia.dao.RoomDAO;
+import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.InitDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
@@ -41,6 +43,8 @@ public class InitController {
             dto.setIsInRoom(roomService.isCurrentlyInRoom());
             if (dto.getIsInRoom()) {
                 final RoomDisplayDTO currentRoom = roomService.getCurrentRoom();
+                final RoomDAO roomDAO = userService.getCurrentUserDAO().get().getRoom();
+                dto.setIsGameStarted(roomDAO.getGameStatus().equals(GameStatusEnum.IN_PROGRESS));
                 dto.setRoomID(String.valueOf(currentRoom.getId()));
                 dto.setRoomName(currentRoom.getName());
                 dto.setIsAdmin(roomService.isCurrentUserAdmin());

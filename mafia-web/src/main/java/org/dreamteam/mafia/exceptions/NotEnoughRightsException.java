@@ -8,10 +8,10 @@ import org.dreamteam.mafia.util.ClientErrorCode;
 public class NotEnoughRightsException extends ClientErrorException {
 
     public NotEnoughRightsException(String message) {
-        super(ClientErrorCode.MOT_ENOUGH_RIGHTS, message);
+        super(ClientErrorCode.NOT_ENOUGH_RIGHTS, message);
     }
 
     public NotEnoughRightsException() {
-        super(ClientErrorCode.MOT_ENOUGH_RIGHTS);
+        super(ClientErrorCode.NOT_ENOUGH_RIGHTS);
     }
 }
