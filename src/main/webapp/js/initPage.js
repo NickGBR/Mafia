@@ -1,6 +1,7 @@
 let spinner;
 let initialisedUserName = "";
 let initialisedRoomID = "";
+let initialisedUserRole = "";
 let initialisedRoomName = "";
 let initialisedIsAdmin = false;
 let initialisedIsReady = false;
@@ -32,7 +33,8 @@ function doRedirect() {
                 initialisedIsReady = data["isReady"];
                 if (data["isGameStarted"] && pageName !== "gameChat.html") {
                     window.location.href = "gameChat.html";
-                } else if (pageName === "gameChat.html") {
+                } else if (data["isGameStarted"] && pageName === "gameChat.html") {
+                    initialisedUserRole = data["role"];
                     doInitGameChat();
                 } else if (pageName !== "roomChat.html") {
                     window.location.href = "roomChat.html";
@@ -63,6 +65,7 @@ function doInitLogin() {
 }
 
 function doInitGameChat() {
+    connect();
     spinner.stop();
 }
 

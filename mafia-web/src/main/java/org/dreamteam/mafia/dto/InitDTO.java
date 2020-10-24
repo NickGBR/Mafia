@@ -3,7 +3,7 @@ package org.dreamteam.mafia.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dreamteam.mafia.model.CharacterEnum;
+import org.dreamteam.mafia.dao.enums.CharacterEnum;
 
 import java.io.Serializable;
 

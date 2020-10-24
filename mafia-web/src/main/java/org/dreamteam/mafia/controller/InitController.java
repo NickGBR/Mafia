@@ -48,6 +48,7 @@ public class InitController {
                 dto.setRoomID(String.valueOf(currentRoom.getId()));
                 dto.setRoomName(currentRoom.getName());
                 dto.setIsAdmin(roomService.isCurrentUserAdmin());
+                dto.setRole(userService.getCurrentUserDAO().get().getCharacter());
                 dto.setIsReady(user.get().isReady());
             }
         }

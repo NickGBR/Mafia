@@ -1,11 +1,9 @@
 let userName;
+let userRole;
 let roomName;
 let roomID;
 let isAdmin;
 let isReady;
-const roomChatId = "room_chat_box";
-const usersListId = "users_list";
-const startButtonHolderId = "admin_button_holder";
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -23,16 +21,18 @@ function connect() {
 
 // Будем вызвано после установления соединения
 function afterConnect(connection) {
+
+    roomName = initialisedRoomName;
+    roomID = initialisedRoomID;
+    userName = initialisedUserName;
+    isAdmin = initialisedIsAdmin;
+    isReady = initialisedIsReady;
+    userRole = initialisedUserRole;
+
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
-    // Включаем кнопку создания комнаты.
-    document.getElementById("set_room_button").disabled = false;
-    // Отправляем на сервер информацию, о пользователе вошедшем в чат.
-    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_ADD, updateRoomToInterfaceAdd)
-    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE, updateRoomToInterfaceRemove)
-    stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_UPDATE, updateRoomToInterface)
-    userName = initialisedUserName;
-    getRooms();
+    subscribeByRole();
+    showCurrentUserInfo();
 }
 
 function onError(error) {
@@ -41,3 +41,40 @@ function onError(error) {
     document.getElementById("left_room_button").disabled = true;
     document.getElementById("user_ready_button").disabled = true;
 }
+
+/**
+ * Подписывает пользователей на топики, в зависимости от роли в игре.
+ */
+function subscribeByRole() {
+    if (userRole === roleConst.MAFIA || userRole === roleConst.DONE) {
+        stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, getMessage);
+        stompClient.subscribe(sockConst.MAFIA_WEB_CHAT + roomID, getMessage)
+    } else {
+        stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, getMessage);
+    }
+}
+
+function setRoleInterface() {
+}
+
+/**
+ * Выводит информацю о пользователе в браузер.
+ */
+function showCurrentUserInfo() {
+    const userInfo = document.createTextNode("User: " + userName + " is " + userRole + "!" +
+        " Room: " + roomName + ".");
+    document.getElementById("user_info_label").appendChild(userInfo);
+}
+
+function getMessage(){
+}
+
+function disableInterface(){
+    document.getElementById('send_message_button').disabled = true;
+    document.getElementById('message_input_value').disabled = true;
+}
+
+function getLog() {
+    console.log(userRole);
+}
+

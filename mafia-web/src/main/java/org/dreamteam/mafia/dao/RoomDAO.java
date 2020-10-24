@@ -64,7 +64,7 @@ public class RoomDAO {
 
     public RoomDAO() {
         this.dayNumber = 0;
-        this.gamePhase = GamePhaseEnum.DAY;
+        this.gamePhase = GamePhaseEnum.CIVILIANS_PHASE;
         this.gameStatus = GameStatusEnum.NOT_STARTED;
         this.messageList = new HashSet<>();
         this.userList = new HashSet<>();

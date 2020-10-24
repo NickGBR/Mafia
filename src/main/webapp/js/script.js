@@ -135,19 +135,6 @@ function setName() {
 
 
 
-// Метод устанавливающий начальную конфигурацию пользовательского интерфейса в зависимости от роли игрока.
-function setRoleInterface(isMafia) {
-    console.log(isMafia)
-    if (isMafia === true) {
-        document.getElementById("mafia_chat_button").style.visibility = "visible";
-        document.getElementById("civilians_chat_button").style.visibility = "visible";
-        document.getElementById("civilians_chat_button").click();
-    } else {
-        document.getElementById("civilians_chat_button").style.visibility = "visible";
-        document.getElementById("civilians_chat_button").click();
-    }
-}
-
 //Метод выводящий сообщение в зависимости от времени в игре.
 function sendTimeMessage(isNight) {
     if (isNight === false) {
@@ -188,7 +175,6 @@ function chooseRole(id) {
     document.getElementById("start_game_button").disabled = false;
     document.getElementById("mafia_role_button").disabled = true;
     document.getElementById("civilians_role_button").disabled = true;
-    setRoleInterface(isMafia);
 }
 
 function startGame(chat) {
