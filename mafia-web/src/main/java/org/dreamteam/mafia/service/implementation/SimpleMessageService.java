@@ -4,6 +4,7 @@ import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.dao.MessageDAO;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.dao.enums.CharacterEnum;
 import org.dreamteam.mafia.dto.OutgoingChatMessageDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
@@ -51,8 +52,27 @@ public class SimpleMessageService implements MessageService {
         dao.setUser(from.get());
         dao.setRoom(room);
         dao = repository.save(dao);
-        messagingTemplate.convertAndSend(SockConst.ROOM_WEB_CHAT + room.getRoomId(),
-                                         new OutgoingChatMessageDTO(dao));
+
+            messagingTemplate.convertAndSend(SockConst.ROOM_WEB_CHAT + room.getRoomId(),
+                    new OutgoingChatMessageDTO(dao));
+
+    }
+
+    @Override
+    public void sendMessage(String message, String destination) throws ClientErrorException {
+        final Optional<UserDAO> from = userService.getCurrentUserDAO();
+        if (!from.isPresent()) {
+            throw new SecurityException("Non authorised user is not allowed to send messages");
+        }
+        RoomDAO room = roomService.getCurrentRoomDAO();
+        MessageDAO dao = new MessageDAO();
+        dao.setText(message);
+        dao.setUser(from.get());
+        dao.setRoom(room);
+        dao = repository.save(dao);
+
+        messagingTemplate.convertAndSend(destination + room.getRoomId(),
+                new OutgoingChatMessageDTO(dao));
     }
 
     @Override
