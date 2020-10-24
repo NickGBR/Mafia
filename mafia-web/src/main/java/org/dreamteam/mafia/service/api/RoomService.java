@@ -1,16 +1,14 @@
 package org.dreamteam.mafia.service.api;
 
+import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
-import org.dreamteam.mafia.exceptions.AlreadyInRoomException;
-import org.dreamteam.mafia.exceptions.NoSuchRoomException;
-import org.dreamteam.mafia.exceptions.NotEnoughRightsException;
+import org.dreamteam.mafia.dto.UserDisplayDTO;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.Room;
-import org.dreamteam.mafia.model.User;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Интерфейс с ервиса, обслуживающего систему комнат
@@ -18,52 +16,48 @@ import java.util.Optional;
 public interface RoomService {
 
     /**
-     * Находит комнату по описанию, переданному из интерфейса
+     * Проверяет, является ли текущий пользователь администратором комнаты.
      *
-     * @param roomDTO - описание комнаты, полученное из интерфейса
-     * @return - найденная комната
-     * @throws NoSuchRoomException - если описываемая комната не существует
+     * @return - true, если текуий пользователь - администратор комнаты, false - в остальных случаях
      */
-    Room getRoomFromDTO(RoomCreationDTO roomDTO) throws NoSuchRoomException;
-
-    /**
-     * Возвращает комнату, в которой находится текущий пользователь
-     *
-     * @return - найденная комната или пустой Optional, если пользователь не находится в комнате
-     */
-    Optional<Room> getCurrentUserRoom();
-
-    /**
-     * Возвращает администратора заданной комнаты
-     *
-     * @param room - комната
-     * @return - пользователь - администратор комнаты.
-     */
-    User getRoomAdmin(Room room);
+    boolean isCurrentUserAdmin();
 
     /**
      * Создает новую комнату и сохраняет ее в базу, назначая текущего пользователя
      * администратором комнаты.
      *
      * @param roomDTO - описание комнаты, полученние из интерфейса
+     * @throws ClientErrorException - если текущий пользователь уже в комнате и не может создать новую
      */
-    void createRoom(RoomCreationDTO roomDTO) throws AlreadyInRoomException;
+    void createRoom(RoomCreationDTO roomDTO) throws ClientErrorException;
 
     /**
-     * Проверяет является ли заданная комната приватной
+     * Распускает текущую комнату, если текущий игрок - администратор комнаты.
      *
-     * @param room - описание комнаты, полученние из интерфейса
-     * @return - true, если комната приватна, false - иначе
+     * @throws ClientErrorException - если текущий пользователь не находится в комнате
+     *                              или если текущий пользователь не являяется администратором комнаты
      */
-    boolean isRoomPrivate(Room room);
+    void disbandRoom() throws ClientErrorException;
 
     /**
      * Пытается добавить текущего пользователя в комнату с заданным ID
      *
      * @param dto - данные, необходимые для попытки входа в комнату
+     * @throws ClientErrorException - если комната не существует
+     *                              или в ней уже началась игра
+     *                              или она уже заполнена
+     *                              или текущий пользователь уже в другой комнате
+     *                              или пользователь дал неподходящий к комнате пароль
      */
-    void joinRoom(JoinRoomDTO dto);
+    void joinRoom(JoinRoomDTO dto) throws ClientErrorException;
 
+    /**
+     * Покидает текущую комнату, если текущий игрок находится в комнате
+     *
+     * @throws ClientErrorException - если текущий пользователь не находится в комнате
+     *                              или игра уже началась
+     */
+    void leaveRoom() throws ClientErrorException;
 
     /**
      * Возвращает все незаполненные (доступные для присоединения) комнаты в приложении
@@ -73,22 +67,23 @@ public interface RoomService {
     List<RoomDisplayDTO> getAvailableRooms();
 
     /**
-     * Возвращает список пользователей внутри комнат
+     * Возвращает список пользователей внутри комнаты текущего пользователя
      *
-     * @param room - комната
      * @return - список пользователей в комнате
+     * @throws ClientErrorException - если текущий пользователь не находится в комнате
      */
-    List<User> getUsersInRoom(Room room);
+    List<UserDisplayDTO> getUsersInRoom() throws ClientErrorException;
 
     /**
      * Пытается убрать пользователя из комнаты
      *
-     * @param admin  - пользователь, запросивший изгнанине
-     * @param target - изгоняемый пользователь
-     * @throws NoSuchRoomException      - если оба пользователя не находятся в одной и той же комнате
-     * @throws NotEnoughRightsException - если запросивший пользователь не является администратором своей комнаты
+     * @param target - логин изгоняемого пользователя
+     * @throws ClientErrorException - если текущий пользователь не находится в комнате
+     *                              или если игра в комнате уже начата
+     *                              или оба пользователя не находятся в одной и той же комнате
+     *                              или если запросивший пользователь не является администратором своей комнаты
      */
-    void kickUser(User admin, User target) throws NoSuchRoomException, NotEnoughRightsException;
+    void kickUser(String target) throws ClientErrorException;
 
     /**
      * Проверяет заполнена ли комната
@@ -101,26 +96,38 @@ public interface RoomService {
     /**
      * Подтверждает\отменяет готовность пользователя для начала игры в комнате, в которой он сейчас находится
      *
-     * @param user  - пользователь
      * @param ready - состояния, на которое нужно изменить готовность
-     * @throws NoSuchRoomException - если данный пользователь не находится сейчас в комнате
+     * @throws ClientErrorException - если данный пользователь не находится сейчас в комнате
      */
-    void setReady(User user, boolean ready) throws NoSuchRoomException;
+    void setReady(boolean ready) throws ClientErrorException;
 
     /**
-     * Проверяет готовы ли все пользователи  в комнате для начала игры
+     * Проверяет готовы ли все пользователи  в комнате текущего пользователя для начала игры
      *
-     * @param room - комната для проверки
      * @return - true, если все пользователи в комнате готовы, false - иначе
      */
-    boolean isRoomReady(Room room);
+    boolean isRoomReady() throws ClientErrorException;
 
     /**
-     * Запускает игру в комнате
+     * Проверяет находится ли текущий пользователь в комнате
      *
-     * @param user - игрок, запускающий игру (должен быть адмнистратором комнаты)
-     * @throws NoSuchRoomException      - если данный пользователь не находится сейчас в комнате
-     * @throws NotEnoughRightsException - если данный пользователь не является администратором своей комнаты
+     * @return - true, если пользователь находится в комнате, false - в противном случае
      */
-    void startGame(User user) throws NoSuchRoomException, NotEnoughRightsException;
+    boolean isCurrentlyInRoom();
+
+    /**
+     * Возвращает описание текущей комнаты для клиента
+     *
+     * @return -  описание комнаты в формате пригодном для отправки клиенту
+     * @throws ClientErrorException - если пользователь не находится в комнате.
+     */
+    RoomDisplayDTO getCurrentRoom() throws ClientErrorException;
+
+    /**
+     * Возвращает описание текущей комнаты для других сервисов
+     *
+     * @return -  описание комнаты, связанное с базой
+     * @throws ClientErrorException - если пользователь не находится в комнате.
+     */
+    RoomDAO getCurrentRoomDAO() throws ClientErrorException;
 }

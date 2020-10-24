@@ -9,6 +9,6 @@ public class UserDoesNotExistInDBException extends ClientErrorException {
     }
 
     public UserDoesNotExistInDBException(ClientErrorCode code, String message) {
-        super(message, code);
+        super(code, message);
     }
 }

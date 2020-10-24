@@ -3,8 +3,7 @@ package org.dreamteam.mafia.service.implementation;
 import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dto.LoginDTO;
 import org.dreamteam.mafia.dto.RegistrationDTO;
-import org.dreamteam.mafia.exceptions.UserAuthenticationException;
-import org.dreamteam.mafia.exceptions.UserRegistrationException;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.security.SignedJsonWebToken;
@@ -41,35 +40,37 @@ public class SpringSecurityBasedUserService implements UserService {
     }
 
     @Override
-    public void registerNewUser(RegistrationDTO registrationDTO) throws UserRegistrationException {
+    public void registerNewUser(RegistrationDTO registrationDTO) throws ClientErrorException {
         if (!registrationDTO.getPassword().equals(registrationDTO.getPasswordConfirmation())) {
-            throw new UserRegistrationException(ClientErrorCode.PASSWORD_MISMATCH, "Password mismatch!");
+            throw new ClientErrorException(ClientErrorCode.PASSWORD_MISMATCH, "Password mismatch!");
         }
         Optional<UserDAO> sameLoginDao = repository.findByLogin(registrationDTO.getLogin());
         if (sameLoginDao.isPresent()) {
-            throw new UserRegistrationException(ClientErrorCode.USER_ALREADY_EXISTS,
-                                                "Login is already in the database");
+            throw new ClientErrorException(ClientErrorCode.USER_ALREADY_EXISTS,
+                                           "Login is already in the database");
         }
         UserDAO user = new UserDAO();
         user.setLogin(registrationDTO.getLogin());
         user.setPasswordHash(encoder.encode(registrationDTO.getPassword()));
+        user.setIsAdmin(false);
+        user.setIsReady(false);
 
         repository.save(user);
     }
 
     @Override
-    public SignedJsonWebToken loginUser(LoginDTO loginDTO) throws UserAuthenticationException {
+    public SignedJsonWebToken loginUser(LoginDTO loginDTO) throws ClientErrorException {
         Optional<UserDAO> userDAO = repository.findByLogin(loginDTO.getLogin());
         if (userDAO.isPresent()) {
             if (!encoder.matches(loginDTO.getPassword(), userDAO.get().getPasswordHash())) {
-                throw new UserAuthenticationException(ClientErrorCode.INCORRECT_PASSWORD,
-                                                      "Supplied password do not match login");
+                throw new ClientErrorException(ClientErrorCode.INCORRECT_PASSWORD,
+                                               "Supplied password do not match login");
             }
 
             return tokenService.getTokenFor(new User(userDAO.get()));
         } else {
-            throw new UserAuthenticationException(ClientErrorCode.USER_NOT_EXISTS,
-                                                  "User '" + loginDTO.getLogin() + "' not found in repository");
+            throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS,
+                                           "User '" + loginDTO.getLogin() + "' not found in repository");
         }
     }
 

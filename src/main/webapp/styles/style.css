@@ -18,6 +18,17 @@
     border:3px solid #FF0000;
     overflow:auto;
 }
+
+.not_active_start_game_button{
+    background-color: red;
+    color: white;
+}
+
+.active_start_game_button{
+    background-color: green;
+    color: red;
+}
+
 .admin_user{
     color: purple;
     font-size: x-large;

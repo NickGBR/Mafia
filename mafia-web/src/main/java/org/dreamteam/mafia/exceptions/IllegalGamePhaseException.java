@@ -8,6 +8,6 @@ public class IllegalGamePhaseException extends ClientErrorException {
     }
 
     public IllegalGamePhaseException(ClientErrorCode code, String message) {
-        super(message, code);
+        super(code, message);
     }
 }

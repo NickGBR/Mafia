@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Тест доступности API по токенам</title>
+    <script src="js/testRequests.js"></script>
+    <script src="js/commonREST.js"></script>
+    <link href="styles/temp.css" rel="stylesheet" type="text/css"/>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+</head>
+<body>
+<div>
+    <div>
+        <button id="getNameButton" onclick="getUserName()">Получить имя зарегистрированного пользователя</button>
+    </div>
+    <div>
+        <button id="createRoomButton" onclick="createRoom()">Создать тестовую комнату</button>
+        <button id="disbandRoomButton" onclick="disbandRoom()">Расформировать тестовую комнату</button>
+        <button id="getRoomsButton" onclick="getRooms()">Получить список доступных комнат</button>
+    </div>
+    <div>
+        <button id="joinRoomButton" onclick="joinRoom()">Войти в тестовую комнату</button>
+        <button id="leaveRoomButton" onclick="leaveRoom()">Выйти из тестовой комнаты</button>
+        <button id="getUsersInRoomButton" onclick="getUsers()">Получить список пользователей в тестовой комнате</button>
+    </div>
+    <div>
+        <button id="kickUserButton" onclick="kickUser()">Выгнать последнего не-админа в списке</button>
+        <button id="setReadyButton" onclick="setReady()">Поставить готовность</button>
+        <button id="unsetReadyButton" onclick="unsetReady()">Снять готовность</button>
+    </div>
+    <div id="output_box"></div>
+</div>
+</body>
+</html>

@@ -15,6 +15,7 @@ public class Message {
     private String text;
     private String role;
     private String roomName;
+    private String roomID;
 
     public void setRole(Role role) {
         this.role = role.toString();

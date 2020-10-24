@@ -11,3 +11,4 @@ logging:
     root: error
     spring.framework: info
     org.dreamteam: debug
+    org.dreamteam.mafia.security: error

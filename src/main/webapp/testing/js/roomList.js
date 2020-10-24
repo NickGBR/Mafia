@@ -1,7 +1,8 @@
-//In session storage we have "login", "roomName", isRoomAdmin
+//In session storage we have "login", "roomName"
 
 let roomName;
 let userName;
+let isLastRoomUser = false;
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -42,7 +43,7 @@ function getRooms() {
                 const data = JSON.parse(request.responseText);
                 console.log(data);
                 data.forEach((room) => {
-                addRoomToInterface(room.name);
+                    addRoomToInterface(room.name);
                 });
             } else if (request.status === 400) {
                 console.log("ERROR 400");
@@ -56,6 +57,11 @@ function getRooms() {
     request.send();
 }
 
+/**
+ * Добавляет пользователя в комнату, если комната заполненна,
+ * то выдает ошибку.
+ * @param roomName
+ */
 function addUserToRoom(roomName) {
     const request = new XMLHttpRequest();
     request.open("GET", sockConst.REQUEST_GET_ADD_USER_TO_ROOM + "?roomName=" + roomName, true)
@@ -66,10 +72,15 @@ function addUserToRoom(roomName) {
         if (request.readyState === XMLHttpRequest.DONE) {
             if (request.status === 200) {
                 const data = JSON.parse(request.responseText);
-                console.log(data);
-                data.forEach((room) => {
-                    console.log(room.name)
-                });
+                console.log(data)
+                if (data === gameConst.FULL_ROOM) {
+                    alert("Комната переполнена!")
+                } else {
+                    sessionStorage.setItem("roomName", roomName);
+                    sessionStorage.setItem("roomId", roomName);
+                    stompClient.send();
+                    window.open("roomChat.html", "_self");
+                }
             } else if (request.status === 400) {
                 console.log("ERROR 400");
             } else if (request.status === 500) {
@@ -152,7 +163,6 @@ function checkRoom() {
                     /* Если комната новая, мы добавляем системное сообщение о новой комнате
                     и выводим ее в список комнат.
                      */
-                    sessionStorage.setItem("isRoomAdmin","true"); // Так это первый пользователь вошедший в комнату, он становится ее админом.
                     sessionStorage.setItem('roomName', roomName);
                     sendMessageToServerAboutNewRoom(roomName);
                     window.open("roomChat.html", "_self");
@@ -200,8 +210,7 @@ function getSystemMessage(response) {
 function addNewRoomToInterface(response) {
     const data = JSON.parse(response.body);
     roomName = data.room.name;
-
-addRoomToInterface(roomName);
+    addRoomToInterface(roomName);
 }
 
 /**
@@ -213,7 +222,7 @@ function addRoomToInterface(name) {
     const dd = document.createElement("dd")           // Создаем элемент списка <dd>
     const button = document.createElement("button")     // Создаем кнопку
     button.setAttribute("id", name);                 // Устанавливаем id как название комнаты
-    button.setAttribute("onclick", "goToRoom(this.id)"); // Действие при нажатии на комнату, переходим в нее.
+    button.setAttribute("onclick", "tryToGoToRoom(this.id)"); // Действие при нажатии на комнату, попытаемся перейти в нее.
     const buttonName = document.createTextNode(name);                 // Создаем текстовый элемент
 
     button.appendChild(buttonName);
@@ -222,18 +231,11 @@ function addRoomToInterface(name) {
 }
 
 /**
- * Отвечает за переход пользователя в комнату чата, также
- * вызывает метод, для добавления пользователя в БД, со списком пользователей комнаты.
+ * Отвечает за переход пользователя в комнату чата, если комната не заполнена.
  * @param id - уникальные индификатор комнаты.
  */
-function goToRoom(id){
-    addUserToRoom(id);
-    sessionStorage.setItem('isRoomAdmin',"false");
-    sessionStorage.setItem("roomName",id);
-    sessionStorage.setItem("roomId",roomName);
-    window.open("roomChat.html", "_self");
-    stompClient.send()
-
+function tryToGoToRoom(id) {
+    addUserToRoom(id)
 }
 
 /**

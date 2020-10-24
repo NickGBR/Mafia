@@ -13,6 +13,7 @@ public class User {
 
     private String login;
     private boolean isStartButtonPressed = false;
+    private boolean isReady = false;
     private String id;
     private String room;
     private String name; //У телеграм юзеров имя начинается с @t_UserName
@@ -20,6 +21,8 @@ public class User {
 
     public User(UserDAO dao) {
         login = dao.getLogin();
+        name = dao.getLogin();
+        isReady = dao.getIsReady();
     }
 
     public User(){

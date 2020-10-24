@@ -9,7 +9,7 @@ public class RoomsMismatchException extends ClientErrorException {
     }
 
     public RoomsMismatchException(ClientErrorCode code, String message) {
-        super(message, code);
+        super(code, message);
     }
 
 }

@@ -2,8 +2,7 @@ package org.dreamteam.mafia.service.implementation;
 
 import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dto.RegistrationDTO;
-import org.dreamteam.mafia.exceptions.UserAuthenticationException;
-import org.dreamteam.mafia.exceptions.UserRegistrationException;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.security.SecurityUserDetails;
@@ -66,7 +65,7 @@ public class SpringSecurityBasedUserServiceTest {
         Mockito.when(mockEncoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         try {
             testedService.loginUser(dtoNormal.getLoginData());
-        } catch (UserAuthenticationException e) {
+        } catch (ClientErrorException e) {
             Assert.fail("Failed to login valid user");
         }
         Mockito.verify(mockRepository, Mockito.times(1)).findByLogin(Mockito.anyString());
@@ -81,7 +80,7 @@ public class SpringSecurityBasedUserServiceTest {
         try {
             testedService.loginUser(dtoNormal.getLoginData());
             Assert.fail("Successfully logged in user, which had wrong password");
-        } catch (UserAuthenticationException e) {
+        } catch (ClientErrorException e) {
             Assert.assertEquals(ClientErrorCode.INCORRECT_PASSWORD, e.getCode());
         }
         Mockito.verify(mockRepository, Mockito.times(1)).findByLogin(Mockito.anyString());
@@ -96,7 +95,7 @@ public class SpringSecurityBasedUserServiceTest {
         try {
             testedService.loginUser(dtoNormal.getLoginData());
             Assert.fail("Successfully logged in user, which was not present in repository");
-        } catch (UserAuthenticationException e) {
+        } catch (ClientErrorException e) {
             Assert.assertEquals(ClientErrorCode.USER_NOT_EXISTS, e.getCode());
         }
         Mockito.verify(mockRepository, Mockito.times(1)).findByLogin(Mockito.anyString());
@@ -107,7 +106,7 @@ public class SpringSecurityBasedUserServiceTest {
     public void registerNewUserPositive() {
         try {
             testedService.registerNewUser(dtoNormal);
-        } catch (UserRegistrationException e) {
+        } catch (ClientErrorException e) {
             Assert.fail("Failed to register valid user");
         }
         Mockito.verify(mockRepository, Mockito.times(1)).save(Mockito.any(UserDAO.class));
@@ -118,7 +117,7 @@ public class SpringSecurityBasedUserServiceTest {
         try {
             testedService.registerNewUser(dtoPasswordMismatch);
             Assert.fail("Registered user with mismatched passwords");
-        } catch (UserRegistrationException e) {
+        } catch (ClientErrorException e) {
             Assert.assertEquals(ClientErrorCode.PASSWORD_MISMATCH, e.getCode());
         }
         Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(UserDAO.class));
@@ -131,7 +130,7 @@ public class SpringSecurityBasedUserServiceTest {
         try {
             testedService.registerNewUser(dtoNormal);
             Assert.fail("Registered user when login already exist in repository");
-        } catch (UserRegistrationException e) {
+        } catch (ClientErrorException e) {
             Assert.assertEquals(ClientErrorCode.USER_ALREADY_EXISTS, e.getCode());
         }
         Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(UserDAO.class));

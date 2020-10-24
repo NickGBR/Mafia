@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,7 +23,7 @@ public class ExceptionHandlingAdvice {
     private final Logger logger = LoggerFactory.getLogger(ExceptionHandlingAdvice.class);
 
     /**
-     * Обрабатывает исключения, вызванные некорректным запросом со стороны клиента
+     * Обрабатывает исключения, вызванные читаемым, но некорректным запросом со стороны клиента
      *
      * @param exception - обрабатываемое исключение
      * @return - JSON ответ для отправки клиенту вместе с кодом 400
@@ -34,6 +35,21 @@ public class ExceptionHandlingAdvice {
         logger.debug("User request caused exception: " + exception.getCode() + ", "
                              + exception.getLocalizedMessage());
         return new ErrorResponse(exception.getCode().getValue(), exception.getLocalizedMessage());
+    }
+
+    /**
+     * Обрабатывает исключения, вызванные нечитаемым запросом со стороны клиента
+     *
+     * @param exception - обрабатываемое исключение
+     * @return - JSON ответ для отправки клиенту вместе с кодом 400
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)  // 400
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseBody
+    public ErrorResponse handleRequestError(HttpMessageNotReadableException exception) {
+        logger.debug("User send in unreadable request: "
+                             + exception.getLocalizedMessage());
+        return new ErrorResponse(ClientErrorCode.INVALID_REQUEST.getValue(), exception.getLocalizedMessage());
     }
 
     /**

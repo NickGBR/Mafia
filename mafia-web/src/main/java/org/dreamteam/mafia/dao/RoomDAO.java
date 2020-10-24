@@ -26,10 +26,6 @@ public class RoomDAO {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @OneToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "admin_id", nullable = false)
-    private UserDAO admin;
-
     @Column(name = "room_name", nullable = false)
     private String name;
 
@@ -75,9 +71,8 @@ public class RoomDAO {
     }
 
     public RoomDAO(
-            String passwordHash, UserDAO admin, String roomName, Integer maxUsersAmount, GameStatusEnum gameStatus) {
+            String passwordHash, String roomName, Integer maxUsersAmount, GameStatusEnum gameStatus) {
         this.passwordHash = passwordHash;
-        this.admin = admin;
         this.name = roomName;
         this.maxUsersAmount = maxUsersAmount;
         this.gameStatus = gameStatus;
@@ -96,7 +91,6 @@ public class RoomDAO {
         final StringBuilder sb = new StringBuilder("RoomDAO{");
         sb.append("roomId=").append(roomId);
         sb.append(", passwordHash='").append(passwordHash).append('\'');
-        sb.append(", admin=").append(admin.getLogin());
         sb.append(", name='").append(name).append('\'');
         sb.append(", description='").append(description).append('\'');
         sb.append(", maxUsersAmount=").append(maxUsersAmount);
@@ -115,6 +109,9 @@ public class RoomDAO {
                 first = false;
             }
             sb.append(user.getLogin());
+            if (user.getIsAdmin()) {
+                sb.append("(admin)");
+            }
         }
         sb.append("} }");
         return sb.toString();
