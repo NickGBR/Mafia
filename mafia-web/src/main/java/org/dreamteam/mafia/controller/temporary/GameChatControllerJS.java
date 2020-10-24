@@ -114,7 +114,7 @@ public class GameChatControllerJS {
         message.setText("Игра была остановлена!");
         message.setRoomName(room.getName());
         message.setRole(Message.Role.HOST);
-        message.setFrom("Host");
+        message.setFrom("GameHost");
 
         // Отправляем сообщение в чат об остановке игры.
         messagingTemplate.convertAndSend(SockConst.CIV_WEB_CHAT + room.getName(), message);

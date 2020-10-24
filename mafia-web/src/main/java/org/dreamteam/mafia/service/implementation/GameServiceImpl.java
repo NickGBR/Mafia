@@ -7,11 +7,9 @@ import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.CharacterDTO;
 import org.dreamteam.mafia.exceptions.*;
-import org.dreamteam.mafia.model.Character;
+import org.dreamteam.mafia.model.*;
 import org.dreamteam.mafia.dao.enums.CharacterEnum;
-import org.dreamteam.mafia.model.Message;
-import org.dreamteam.mafia.model.Room;
-import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.model.Character;
 import org.dreamteam.mafia.repository.api.MessageRepository;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.repository.api.UserRepository;
@@ -30,7 +28,6 @@ import java.util.*;
 public class GameServiceImpl implements GameService {
 
     @Qualifier("Task")
-
     private final ThreadPoolTaskScheduler taskScheduler;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
@@ -80,7 +77,7 @@ public class GameServiceImpl implements GameService {
         setRolesToUsers(room);
         roomRepository.save(room);
         messagingTemplate.convertAndSend(SockConst.SYS_GAME_STARTED_INFO + roomId, true);
-
+        GameHost gameHost = new GameHost(messagingTemplate, userService);
     }
 
     /**
