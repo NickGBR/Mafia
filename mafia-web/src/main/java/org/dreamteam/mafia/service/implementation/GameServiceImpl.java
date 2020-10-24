@@ -19,7 +19,9 @@ import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.util.ClientErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,6 +29,9 @@ import java.util.*;
 @Service("gameService")
 public class GameServiceImpl implements GameService {
 
+    @Qualifier("Task")
+
+    private final ThreadPoolTaskScheduler taskScheduler;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
@@ -38,12 +43,14 @@ public class GameServiceImpl implements GameService {
                            RoomRepository roomRepository,
                            MessageRepository messageRepository,
                            UserService userService,
-                           SimpMessagingTemplate messagingTemplate) {
+                           SimpMessagingTemplate messagingTemplate,
+                           ThreadPoolTaskScheduler taskScheduler) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.messageRepository = messageRepository;
         this.userService = userService;
         this.messagingTemplate = messagingTemplate;
+        this.taskScheduler = taskScheduler;
     }
 
 
@@ -73,6 +80,7 @@ public class GameServiceImpl implements GameService {
         setRolesToUsers(room);
         roomRepository.save(room);
         messagingTemplate.convertAndSend(SockConst.SYS_GAME_STARTED_INFO + roomId, true);
+
     }
 
     /**
@@ -151,7 +159,7 @@ public class GameServiceImpl implements GameService {
                     + currentUserDAO.get().getLogin() + "\' are in different rooms");
         }
 
-        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.NIGHT)) {
+        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.MAFIA_PHASE)) {
             throw new IllegalGamePhaseException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
         }
 
@@ -183,7 +191,7 @@ public class GameServiceImpl implements GameService {
                     + currentUserDAO.get().getLogin() + "\' are in different rooms");
         }
 
-        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.NIGHT)) {
+        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.MAFIA_PHASE)) {
             throw new IllegalGamePhaseException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
         }
 
