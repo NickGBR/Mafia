@@ -1,6 +1,6 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.dto.OutgoingChatMessageDTO;
+import org.dreamteam.mafia.dto.ChatMessageDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 
@@ -17,14 +17,14 @@ public interface MessageService {
      *
      * @param message - сообщение, полученное от интерфейса
      */
-    void sendMessage(String message) throws ClientErrorException;
+    void sendMessage(ChatMessageDTO message) throws ClientErrorException;
 
     /**
      * Возвращает историю чата для текущего игрока.
      *
      * @return - история чата, которую может видеть текущий игрок
      */
-    List<OutgoingChatMessageDTO> getChatHistory() throws ClientErrorException;
+    List<ChatMessageDTO> getChatHistory() throws ClientErrorException;
 
     void sendAddRoom(RoomDisplayDTO addedRoom);
 

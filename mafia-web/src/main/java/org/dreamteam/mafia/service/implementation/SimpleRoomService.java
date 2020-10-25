@@ -96,7 +96,7 @@ public class SimpleRoomService implements RoomService {
                                            "Can't disband already started game");
         }
         if (!admin.get().getIsAdmin()) {
-            throw new ClientErrorException(ClientErrorCode.MOT_ENOUGH_RIGHTS,
+            throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS,
                                            "Only room administrator can disband it");
         }
         for (UserDAO user : adminCurrRoom.get().getUserList()) {
@@ -212,7 +212,7 @@ public class SimpleRoomService implements RoomService {
                                            "Can't kick from an already started game");
         }
         if (!admin.get().getIsAdmin()) {
-            throw new ClientErrorException(ClientErrorCode.MOT_ENOUGH_RIGHTS,
+            throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS,
                                            "Only room administrator can kick users");
         }
         Optional<UserDAO> targetUser = adminCurrRoom.get().getUserList().stream()

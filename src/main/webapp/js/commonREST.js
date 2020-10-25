@@ -18,7 +18,9 @@ function sendRequest(method, url, data, callback, allowedErrors) {
     request.onreadystatechange = function () {
         if (request.readyState === XMLHttpRequest.DONE) {
             if (processResponse(request, allowedErrors)) {
-                callback(request);
+                if(callback!==null) {
+                    callback(request);
+                }
             }
         }
     };

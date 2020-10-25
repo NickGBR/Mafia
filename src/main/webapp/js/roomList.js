@@ -136,11 +136,8 @@ function updateRoomToInterfaceAdd(response) {
  */
 function updateRoomToInterfaceRemove(response) {
     const room = JSON.parse(response.body);
-    if (data["remove"]) {
-        removeRoomFromInterface(room);
-    } else {
-        addRoomToInterface(room);
-    }
+    const dd = document.getElementById("dd" + room["id"]);
+    document.getElementById('rooms_list').removeChild(dd);
 }
 
 /**
