@@ -58,29 +58,65 @@
     </div>
 </div>
 <div id="overlay-chat"></div>
-<div id="overlay-modal"></div>
-<div id="modal-room-create">
-</div>
-<div id="modal-room-join-private">
-    <div class="modal-header">Подтвердите допуск к комнате: <span id="room-name"></span></div>
-    <div class="input-container centered">
-        <label for="password_input_join">Введите пароль комнаты:</label>
-        <input id="password_input_join" name="password" placeholder="Пароль" type="password">
+<div id="overlay-modal">
+    <div id="modal-room-create">
+        <div class="modal-header">Задайте параметры комнаты:</div>
+        <div class="input-container centered">
+            <label for="new_room_name">Введите имя комнаты:</label>
+            <input id="new_room_name" name="name" placeholder="Супер_Комната!">
+        </div>
+        <div class="input-container centered">
+            <label for="new_room_max_amount">Введите число игроков:</label>
+            <input id="new_room_max_amount" max="99" min="3" name="max" type="number" value="10">
+        </div>
+        <div class="input-container centered">
+            <label for="new_room_mafia_amount">Введите число игроков за мафию:</label>
+            <input id="new_room_mafia_amount" max="33" min="1" name="mafia" type="number" value="3">
+        </div>
+        <div class="input-container centered">
+            <label for="new_room_mafia_amount">Присутствует ли в игре Дон:</label>
+            <input checked id="new_room_don" name="don" type="checkbox">
+        </div>
+        <div class="input-container centered">
+            <label for="new_room_mafia_amount">Присутствует ли в игре шериф:</label>
+            <input checked id="new_room_sheriff" name="sheriff" type="checkbox">
+        </div>
+        <div class="input-button-confirmation-container centered">
+            <button class="button rectangle-button" id="create_button" onclick="createRoom()">
+                Создать комнату
+            </button>
+            <button class="button rectangle-button" onclick="hideModal()">
+                Отмена
+            </button>
+        </div>
     </div>
-    <div class="input-button-confirmation-container centered">
-        <button class="button rectangle-button" id="login_button" onclick="joinRoomPrivate()">Получить доступ</button>
+    <div id="modal-room-join-private">
+        <div class="modal-header">Подтвердите допуск к комнате: <span id="room-name"></span></div>
+        <div class="input-container centered">
+            <label for="password_input_join">Введите пароль комнаты:</label>
+            <input id="password_input_join" name="password" placeholder="******" type="password">
+        </div>
+        <div class="input-button-confirmation-container centered">
+            <button class="button rectangle-button" id="join_private_button" onclick="joinRoomPrivate()">
+                Получить доступ
+            </button>
+            <button class="button rectangle-button" onclick="hideModal()">
+                Отмена
+            </button>
+        </div>
     </div>
 </div>
+
 <div id="content">
     <!-- Кнопки управления -->
     <div class="button-group">
         <span class="button-container">
-            <button class="button rectangle-button" id="create_room_button" onclick="checkRoom()">
+            <button class="button rectangle-button" id="open_creator_button" onclick="openRoomCreator()">
             Создать комнату
             </button>
         </span>
         <span class="button-container">
-         <button class="button rectangle-button" disabled id="join_room button" onclick="joinRoomPublic()">
+         <button class="button rectangle-button" disabled id="join_room_button" onclick="joinRoomPublic()">
             Войти в комнату
          </button>
         </span>

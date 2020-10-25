@@ -50,11 +50,16 @@ function sendMessage() {
     let message = document.getElementById("message_input_value").value;
     document.getElementById("message_input_value").value = "";
     message = message.trim();
+    const data = JSON.stringify({
+        'text': message,
+        'destination': destinationConst.ROOM_USER
+    })
+
     if (message !== "") {
         let callback = function (request) {
         };
         sendRequest("POST", "/api/message/send",
-            message, callback, [8]);
+            data, callback, [8]);
     }
 }
 

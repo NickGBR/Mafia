@@ -59,48 +59,117 @@ function addUserToRoom(roomId) {
     sendRequest("POST", "/api/room/join", JSON.stringify(jsonData), callback, [4, 5, 10, 11, 12]);
 }
 
+
+function setupModal(modalID) {
+    const modal = document.getElementById(modalID);
+    const overlay = document.getElementById("overlay-modal");
+    const body = document.getElementById("body");
+    const header = document.getElementById("header");
+    modal.style.display = "block";
+    overlay.style.display = "block";
+    body.style.backgroundSize = "0";
+    body.style.backgroundColor = "wheat";
+    header.style.backgroundSize = "0";
+    header.style.backgroundColor = "wheat";
+}
+
+function hideModal() {
+    const overlay = document.getElementById("overlay-modal");
+    const body = document.getElementById("body");
+    const header = document.getElementById("header");
+    body.style.backgroundSize = "auto";
+    header.style.backgroundSize = "auto";
+    let childrenArr = Array.prototype.slice.call(overlay.children);
+    childrenArr.forEach((item) => {
+        item.style.display = "none";
+    });
+    overlay.style.display = "none";
+}
+
+function openRoomCreator() {
+    document.getElementById("new_room_name").value = "";
+    document.getElementById("new_room_max_amount").value = "10";
+    document.getElementById("new_room_mafia_amount").value = "3";
+    document.getElementById("new_room_don").checked = true;
+    document.getElementById("new_room_sheriff").checked = true;
+    setupModal("modal-room-create");
+}
+
+function cancelCreation() {
+    hideModal();
+}
+
+
 function joinRoomPublic() {
     room = selectedEntry["room"];
     if (room["privateRoom"]) {
-        const modal = document.getElementById("modal-room-join-private");
-        const overlay = document.getElementById("overlay-modal");
+        setupModal("modal-room-join-private");
         const name = document.getElementById("room-name");
+        const body = document.getElementById("body");
         name.innerText = room["name"];
-        modal.style.display = "block";
-        overlay.style.display = "block";
     } else {
-        joinRoom();
+        const jsonData = {
+            'id': roomId,
+            'password': ''
+        };
+        joinRoom(jsonData);
     }
 }
 
 function joinRoomPrivate() {
-    const modal = document.getElementById("modal-room-join-private");
-    const overlay = document.getElementById("overlay-modal");
+    hideModal();
     const password = document.getElementById("password_input_join");
-    modal.style.display = "none";
-    overlay.style.display = "none";
+    const jsonData = {
+        'id': roomId,
+        'password': password.value
+    };
     password.value = "";
+    joinRoom(jsonData);
 }
 
-function joinRoom() {
-
+function joinRoom(jsonData) {
+    let callback = function () {
+        window.location.href = "roomChat.html";
+    };
+    sendRequest("POST", "/api/room/join", JSON.stringify(jsonData), callback, [4, 5, 10, 11, 12]);
 }
 
 
 /**
- * Метод проверки наличия комнаты в БД, позволяем избежать добавления двух одинаковых комнат.
+ * Пытаемся создать новую комнату
  */
-function checkRoom() {
+function createRoom() {
+
+    let name = document.getElementById("new_room_name").value;
+    name = name.trim();
+    if (name.length > 20) {
+        return;
+    }
+    const maxAmount = document.getElementById("new_room_max_amount").value;
+    if (maxAmount < 3 || maxAmount > 99) {
+        return;
+    }
+    const mafiaAmount = document.getElementById("new_room_mafia_amount").value;
+    if (mafiaAmount < 1 || mafiaAmount > 33) {
+        return;
+    }
+    if (mafiaAmount > maxAmount / 2 - 1) {
+        return;
+    }
+
+    hideModal();
 
     let callback = function () {
         window.location.href = "roomChat.html";
     };
 
-    roomName = document.getElementById("room_input").value;
     const jsonData = {
-        'name': roomName,
-        'description': 'New room',
-        'maxPlayers': gameConst.USERS_AMOUNT,
+        'name': name,
+        'description': '',
+        'maxPlayers': maxAmount,
+        'mafia': mafiaAmount,
+        'don': document.getElementById("new_room_don").checked,
+        'sheriff': document.getElementById("new_room_sheriff").checked
     };
 
     sendRequest("POST", "/api/room/create", JSON.stringify(jsonData), callback, [5]);
@@ -112,13 +181,6 @@ function onError(error) {
     alert("Клиент потерял соединение с сервером");
     document.getElementById("room_input").disabled = true;
     document.getElementById("set_room_button").disabled = true;
-}
-
-/**
- * Проверяет находится ли пользователь в БД или нет, отправляет системное сообщение с параметром
- * checkUser = true;
- */
-function getSystemMessage(response) {
 }
 
 /**
@@ -196,7 +258,7 @@ function addRoomToInterface(room) {
 
 function selectRoom(node) {
     const foundEntry = roomEntries.find(element => element["node"].querySelector('.text') === node);
-    if (selectedEntry == undefined) {
+    if (selectedEntry === undefined) {
         selectedEntry = null;
     }
     if (selectedEntry !== null) {
@@ -214,16 +276,7 @@ function selectRoom(node) {
 }
 
 function updateButtonsOnSelect() {
-    let button = document.getElementById("join_room button");
+    let button = document.getElementById("join_room_button");
     button.disabled = selectedEntry == null;
-}
-
-
-/**
- * Отвечает за переход пользователя в комнату чата, если комната не заполнена.
- * @param id - уникальные индификатор комнаты.
- */
-function tryToGoToRoom(id) {
-    addUserToRoom(id)
 }
 
