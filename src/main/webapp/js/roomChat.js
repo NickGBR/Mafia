@@ -95,8 +95,12 @@ function sendMessage() {
     let callback = function (request) {
     };
 
-    sendRequest("POST", "/api/message/send",
-        document.getElementById("message_input_value").value, callback, [8]);
+    const data = JSON.stringify({
+        'text': document.getElementById("message_input_value").value,
+        'destination': destination.ROOM_USER,
+    })
+
+    sendRequest("POST", "/api/message/send", data, callback, [8]);
 
 }
 
@@ -124,7 +128,9 @@ function getUsersMessages() {
     let callback = function (request) {
         const data = JSON.parse(request.responseText);
         data.forEach((message) => {
-            addToChat(message["from"] + ": " + message["text"], roomChatId);
+            if(message['destination']===destination.ROOM_USER) {
+                addToChat(message["from"] + ": " + message["text"], roomChatId);
+            }
         });
     };
 
@@ -245,12 +251,12 @@ function usersReadyToPlayInfo(response) {
 }
 
 
-function startGame(){
+function startGame() {
     sendRequest("GET", sockConst.REQUEST_GET_START_GAME_INFO, "", null, [8]);
 }
 
 
-function goToGameChat(response){
+function goToGameChat(response) {
     console.log(response);
     const data = JSON.parse(response.body);
     console.log(data);

@@ -33,8 +33,15 @@ function afterConnect(connection) {
 
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
+
+    // Подписываемся на топики, в зависимости от роли.
     subscribeByRole();
+
+    // Получаем информацию о текущем пользователе.
     showCurrentUserInfo();
+
+    // Получаем историю чата.
+    getUsersMessages();
 }
 
 function onError(error) {
@@ -53,7 +60,7 @@ function subscribeByRole() {
         stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, getMessage);
         //stompClient.subscribe(sockConst.MAFIA_WEB_CHAT + roomID, getMessage)
     } else {
-        console.log("Подписался как мирный на " + sockConst.CIV_WEB_CHAT);
+        console.log("Подписался как мирный на " + sockConst.CIV_WEB_CHAT );
         stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, getMessage);
     }
 }
@@ -74,7 +81,7 @@ function showCurrentUserInfo() {
  * Вызывается при получении сообщения на сокет.
  * @param response
  */
-function getMessage(response) {
+function getMessage(response){
     const data = JSON.parse(response.body);
     // Отправляем сообщение в чат\
     addToChat(data.from + ": " + data.text, gameChatID);
@@ -93,7 +100,7 @@ function addToChat(text, chat) {
     document.getElementById(chat).appendChild(node);
 }
 
-function disableInterface() {
+function disableInterface(){
     document.getElementById('send_message_button').disabled = true;
     document.getElementById('message_input_value').disabled = true;
 }
@@ -104,8 +111,29 @@ function disableInterface() {
 function sendMessage() {
     let callback = function (request) {
     };
-    sendRequest("POST", sockConst.REQUEST_POST_CIVILIAN_MESSAGE,
-        document.getElementById("message_input_value").value, callback, [8]);
+    const data = JSON.stringify({
+        'text': document.getElementById("message_input_value").value,
+        'destination': destination.CIVILIAN,
+    })
+
+    sendRequest("POST", sockConst.REQUEST_POST_CIVILIAN_MESSAGE, data, callback, [8]);
+}
+
+/**
+ * Отправляем серверу название комнаты, для получения истории чата.
+ */
+function getUsersMessages() {
+
+    let callback = function (request) {
+        const data = JSON.parse(request.responseText);
+        data.forEach((message) => {
+            if(message['destination']===destination.CIVILIAN) {
+                addToChat(message["from"] + ": " + message["text"], gameChatID);
+            }
+        });
+    };
+
+    sendRequest("GET", "/api/message/restore", "", callback, [8]);
 }
 
 function getLog() {

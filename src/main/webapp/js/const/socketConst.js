@@ -39,7 +39,7 @@ var destination = {
 
     ROOM_USER: 'ROOM_USER',
     MAFIA: "MAFIA",
-    CITIZEN: "CITIZEN",
+    CIVILIAN: "CIVILIAN",
 }
 
 
