@@ -1,0 +1,36 @@
+label {
+    font-family: 'PT Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: bold;
+    width: 10rem;
+}
+
+input {
+    font-family: 'PT Mono', monospace;
+    font-size: 1.1rem;
+    width: 25rem;
+    background: transparent;
+    border: none;
+}
+
+.input-container {
+    width: 40rem;
+    margin: 3rem 3rem;
+    border-bottom: black 1px solid;
+}
+
+.input-button-confirmation-container {
+    width: 40rem;
+    padding: 3rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.label-text {
+    font-family: 'PT Mono', monospace;
+    font-size: 1.1rem;
+    border-bottom: black 1px solid;
+    width: 40rem;
+}
+

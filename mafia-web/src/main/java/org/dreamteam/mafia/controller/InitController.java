@@ -45,6 +45,7 @@ public class InitController {
                 dto.setRoomName(currentRoom.getName());
                 dto.setIsAdmin(roomService.isCurrentUserAdmin());
                 dto.setIsReady(user.get().isReady());
+                dto.setMaxUserAmount(currentRoom.getMaxPlayers());
             }
         }
         return dto;

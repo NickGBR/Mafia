@@ -5,35 +5,22 @@
     <script src="js/commonREST.js"></script>
     <script src="js/login.js"></script>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
-          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
+    <link href="styles/commonstyle.css" rel="stylesheet" type="text/css"/>
+    <link href="styles/authentication.css" rel="stylesheet" type="text/css"/>
 </head>
-<body>
-<br>
-<div class="container">
-    <div class="row">
-        <div class="col-md-4"></div>
-        <div class="col-md-4">
-            <div class="jumbotron text-center">
-                <div class="form-group">
-                    <h3> Введите логин.</h3>
-                    <div><input id="login_input" name="login" placeholder="login"></div>
-                </div>
-                <div class="form-group">
-                    <h3> Введите пароль.</h3>
-                    <div><input id="password_input" name="password" placeholder="password"></div>
-                </div>
-                <div>
-                    <button class="btn btn-success" id="login_button" onclick="tryToLogin()">Войти</button>
-                </div>
-                <div>Нет аккаунта? <a href="register.html"> Зарегистрируйтесь!</a></div>
-            </div>
-        </div>
-    </div>
+<body class="background">
+<div class="input-container centered">
+    <label for="login_input">Введите позывной:</label>
+    <input id="login_input" name="login" placeholder="Позывной">
 </div>
+<div class="input-container centered">
+    <label for="password_input">Введите пароль:</label>
+    <input id="password_input" name="password" placeholder="Пароль" type="password">
+</div>
+<div class="input-button-confirmation-container centered">
+    <button class="button rectangle-button" id="login_button" onclick="tryToLogin()">Подтвердить допуск к делу Мафии
+    </button>
+</div>
+<div class="centered label-text"> Еще не получили допуск? <a href="register.html">Заполните форму.</a></div>
 </body>
 </html>

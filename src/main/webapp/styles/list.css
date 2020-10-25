@@ -1,0 +1,41 @@
+.list-container {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+}
+
+
+.entry-container {
+    margin: 1.5rem 0 1.5rem 2rem;
+    height: 2rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.entry {
+    width: 31rem;
+    height: 2rem;
+    border-bottom: black solid 1px;
+}
+
+.entry:hover {
+    font-weight: bold;
+}
+
+.selected {
+    font-weight: bold;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.text {
+    font-family: 'PT Mono', monospace;
+    font-size: 1.1rem;
+    width: 25rem;
+}

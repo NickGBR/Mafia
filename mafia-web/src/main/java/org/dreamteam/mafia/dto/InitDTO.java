@@ -18,5 +18,6 @@ public class InitDTO implements Serializable {
     String roomName = "";
     Boolean isAdmin = false;
     Boolean isReady = false;
+    Integer maxUserAmount = 1;
 }
 

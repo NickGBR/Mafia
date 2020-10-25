@@ -2,7 +2,9 @@
 
 let roomName;
 let userName;
-let isLastRoomUser = false;
+let roomEntries = [];
+let selectedEntry = null;
+
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -21,10 +23,6 @@ function connect() {
 // Будем вызвано после установления соединения
 function afterConnect(connection) {
     console.log("Успешное подключение: " + connection);
-    // Теперь когда подключение установлено
-    // Включаем кнопку создания комнаты.
-    document.getElementById("set_room_button").disabled = false;
-    // Отправляем на сервер информацию, о пользователе вошедшем в чат.
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_ADD, updateRoomToInterfaceAdd)
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE, updateRoomToInterfaceRemove)
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_UPDATE, updateRoomToInterface)
@@ -59,6 +57,33 @@ function addUserToRoom(roomId) {
         'password': ''
     };
     sendRequest("POST", "/api/room/join", JSON.stringify(jsonData), callback, [4, 5, 10, 11, 12]);
+}
+
+function joinRoomPublic() {
+    room = selectedEntry["room"];
+    if (room["privateRoom"]) {
+        const modal = document.getElementById("modal-room-join-private");
+        const overlay = document.getElementById("overlay-modal");
+        const name = document.getElementById("room-name");
+        name.innerText = room["name"];
+        modal.style.display = "block";
+        overlay.style.display = "block";
+    } else {
+        joinRoom();
+    }
+}
+
+function joinRoomPrivate() {
+    const modal = document.getElementById("modal-room-join-private");
+    const overlay = document.getElementById("overlay-modal");
+    const password = document.getElementById("password_input_join");
+    modal.style.display = "none";
+    overlay.style.display = "none";
+    password.value = "";
+}
+
+function joinRoom() {
+
 }
 
 
@@ -138,19 +163,64 @@ function updateRoomToInterface(response) {
  * @param room
  */
 function addRoomToInterface(room) {
-    const dd = document.createElement("dd")           // Создаем элемент списка <dd>
-    dd.setAttribute("id", "dd" + room["id"])
-    const button = document.createElement("button")     // Создаем кнопку
-    button.setAttribute("id", room["id"]);                 // Устанавливаем id
-    button.setAttribute("description", room["description"])
-    button.setAttribute("onclick", "tryToGoToRoom(this.id)"); // Действие при нажатии на комнату, попытаемся перейти в нее.
-    const label = room["name"] + "   | " + room["currPlayers"] + " / " + room["maxPlayers"];
-    const buttonName = document.createTextNode(label);                 // Создаем текстовый элемент
-
-    button.appendChild(buttonName);
-    dd.appendChild(button)// Вставляем кнопку внутрь элемента списка
-    document.getElementById('rooms_list').appendChild(dd);
+    let roomEntry = {};
+    roomEntry["room"] = room;
+    let lastNode = document.getElementById("room_entry_last");
+    const copyNode = lastNode.cloneNode(true);
+    copyNode.id = "room_entry_" + room["id"];
+    const text = copyNode.querySelector('.text');
+    const nameTextNode = document.createTextNode(room["name"] + "   | ");
+    const currPlayersNode = document.createElement("SPAN");
+    currPlayersNode.innerText = room["currPlayers"];
+    currPlayersNode.style.fontStyle = "italic";
+    const maxPlayersNode = document.createTextNode(" / " + room["maxPlayers"]);
+    text.appendChild(nameTextNode);
+    text.appendChild(currPlayersNode);
+    text.appendChild(maxPlayersNode);
+    text.classList.add("clickable");
+    text.onclick = function (event) {
+        selectRoom(event.target);
+        updateButtonsOnSelect();
+    }
+    if (room["privateRoom"]) {
+        const stampContainer = copyNode.querySelector('.stamp-container');
+        const stampNode = document.createElement("span");
+        stampNode.classList.add("stamp");
+        stampNode.classList.add("red");
+        stampNode.innerText = "Секретно";
+        stampNode.style.transform = 'rotate(' + (Math.random() * (10) - 5) + 'deg) translateY(-0.5rem)';
+        stampContainer.appendChild(stampNode);
+    }
+    const list = document.getElementById("rooms_list");
+    list.insertBefore(copyNode, list.firstChild);
+    roomEntry["node"] = copyNode;
+    roomEntries.push(roomEntry);
 }
+
+function selectRoom(node) {
+    const foundEntry = roomEntries.find(element => element["node"].querySelector('.text') === node);
+    if (selectedEntry == undefined) {
+        selectedEntry = null;
+    }
+    if (selectedEntry !== null) {
+        const selectedText = selectedEntry["node"].querySelector('.text');
+        selectedText.classList.remove("selected");
+        if (selectedText === node) {
+            selectedEntry = null;
+            return;
+        }
+        selectedEntry = null;
+    }
+    selectedEntry = foundEntry;
+    const selectedText = selectedEntry["node"].querySelector('.text');
+    selectedText.classList.add("selected");
+}
+
+function updateButtonsOnSelect() {
+    let button = document.getElementById("join_room button");
+    button.disabled = selectedEntry == null;
+}
+
 
 /**
  * Отвечает за переход пользователя в комнату чата, если комната не заполнена.

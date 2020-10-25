@@ -1,4 +1,7 @@
 let spinner;
+let init = null;
+
+
 let initialisedUserName = "";
 let initialisedRoomID = "";
 let initialisedRoomName = "";
@@ -21,6 +24,7 @@ function onLoadInit() {
 function doRedirect() {
     let callback = function (request) {
         const data = JSON.parse(request.responseText);
+        init = data;
         if (data["isLoggedIn"]) {
             initialisedUserName = data["name"];
             if (data["isInRoom"]) {
@@ -70,8 +74,6 @@ function doInitRoom() {
 
 function setUserName() {
     let userNameNode = document.getElementById("userName");
-    if (userNameNode !== null) {
-        const textNode = document.createTextNode(initialisedUserName);
-        userNameNode.appendChild(textNode);
-    }
+    const textNode = document.createTextNode(initialisedUserName);
+    userNameNode.appendChild(textNode);
 }

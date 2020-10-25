@@ -1,0 +1,38 @@
+#header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    background-image: url("/img/tilebackground.png");
+    background-size: auto;
+    border-bottom: black 1px;
+    height: 2.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    z-index: 3;
+    font-family: 'PT Mono', monospace;
+    font-weight: bold;
+}
+
+
+#divider {
+    line-height: 1rem;
+    padding-bottom: 0.5rem;
+    border: solid #000;
+    border-width: 0 0 2px 0;
+}
+
+.header-button-container {
+    margin-right: 1rem;
+    margin-left: 2rem;
+}
+
+#content {
+    margin-top: 4rem;
+}
+
+.login-link {
+    float: right;
+    padding-top: 0.8rem;
+    padding-right: 2rem;
+}

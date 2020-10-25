@@ -10,58 +10,100 @@
     <script src="js/spin.umd.js"></script>
     <script src="js/commonREST.js"></script>
     <script src="js/initPage.js"></script>
+    <script src="js/chat.js"></script>
     <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
-    <script
-            crossorigin="anonymous"
-            integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-            src="https://code.jquery.com/jquery-3.3.1.js">
-    </script>
-    <script>
-        $(function () {
-            $("#header").load("header.html");
-        });
-    </script>
-    <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
-    <link href="styles/style.css" rel="stylesheet" type="text/css"/>
-    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" rel="stylesheet">
+    <link href="styles/commonstyle.css" rel="stylesheet" type="text/css"/>
+    <link href="styles/roomChat.css" rel="stylesheet" type="text/css"/>
 
 </head>
-<body class="bodyPadding" id="body" onload="onLoadInit()">
-<div id="header"></div>
-<p>
-    <label id="user_info_label"></label>
-    <input id="left_room_button" onclick="leaveRoom()" type="button" value="Покинуть комнату">
-<div id="admin_button_holder">
+<body class="background" id="body" onload="onLoadInit()">
+<div id="header">
+    <div id="divider">
+        <div>
+            <span class="header-button-container">
+                <button class="button round-button">?</button>
+            </span>
+            <span>
+                Личное дело: <span id="userName"></span>
+            </span>
+            <span class="header-button-container">
+                <button class="button rectangle-button" id="switch_chat_button" onclick="switchChat()">Чат</button>
+            </span>
+            <a class="login-link" href="login.html"> Зайти от другого имени</a>
+            <!-- окно чата -->
+            <div id="chat_area">
+                <div class="chat-box" id="room_chat_box">
+                </div>
+                <div class="chat-controls">
+                    <span class="chat-input">
+                        <label class="message-label" for="message_input_value">Введи сообщение: </label>
+                        <input class="message_input" id="message_input_value" placeholder="Введите сообщение..."/>
+                    </span>
+                    <button class="button rectangle-button" disabled="disabled" id="send_message_button"
+                            onclick="sendMessage()">
+                        Отправить
+                    </button>
+                </div>
+                <script>
+                    document.getElementById("message_input_value")
+                        .addEventListener("keyup", function (event) {
+                            event.preventDefault();
+                            if (event.keyCode === 13) {
+                                document.getElementById("send_message_button").click();
+                            }
+                        });
+                </script>
+            </div>
+        </div>
+    </div>
 </div>
-</p>
-
-<!-- окно чата -->
-<div class="room_box" id="room_chat_box">
-</div>
-<input class="message_input" id="message_input_value" placeholder="Введите сообщение..."/>
-<button class="text" disabled="disabled" id="send_message_button" onclick="sendMessage()">
-    Отправить сообщение
-</button>
-<script>
-    document.getElementById("message_input_value")
-        .addEventListener("keyup", function (event) {
-            event.preventDefault();
-            if (event.keyCode === 13) {
-                document.getElementById("send_message_button").click();
-                document.getElementById("message_input_value").value = "";
-            }
-        });
-</script>
-<div>
-    <div>
-        <input class="user_ready_button" id="user_ready_button" onclick="changeUserReadyStatus()" type="button"
-               value="Готов">
+<div id="overlay-chat"></div>
+<div id="content">
+    <div class="room-name-container">
+        <span class="room-name">
+            Название комнаты:  <span id="roomName"></span>
+        </span>
+        <span class="button-container user-button">
+         <button class="button rectangle-button" id="left_room_button" onclick="leaveRoom()">
+            Покинуть комнату
+         </button>
+        </span>
+        <span class="button-container admin-button">
+         <button class="button rectangle-button" id="disband_room_button" onclick="disbandRoom()">
+            Расформировать комнату
+         </button>
+        </span>
     </div>
 
-    <p id='users_list'></p>
 
+    <!-- Кнопки управления -->
+    <div class="button-group">
+        <span class="button-container user-button">
+            <button class="button rectangle-button" id="user_ready_button" onclick="changeUserReadyStatus()">
+            Я готов
+            </button>
+        </span>
+        <span class="button-container admin-button">
+         <button class="button rectangle-button" disabled id="start_game_button" onclick="">
+            Начать игру
+         </button>
+        </span>
+        <span class="button-container admin-button">
+         <button class="button rectangle-button" disabled id="kick_user_button" onclick="">
+            Выгнать игрока
+         </button>
+        </span>
+    </div>
 
+    <!-- Список игроков -->
+    <ul class="list-container" id="users_list">
+        <li class="entry-container" id="user_entry_1">
+            <div class="entry">
+                <span class="text"></span>
+                <span class="stamp-container"></span>
+            </div>
+        </li>
+    </ul>
 </div>
 </body>
 </html>
