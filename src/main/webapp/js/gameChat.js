@@ -59,7 +59,7 @@ function subscribeByRole() {
         console.log("Подписался как мафия");
         stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, getMessage);
         stompClient.subscribe(sockConst.MAFIA_WEB_CHAT + roomID, getMessage)
-        stompClient.subscribe(sockConst.SYS_WEB_CHAT+roomID, getGameStat);
+        stompClient.subscribe(sockConst.SYS_WEB_CHAT + roomID, getGameStat);
     } else {
         console.log("Подписался как мирный на " + sockConst.CIV_WEB_CHAT );
         stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, getMessage);
@@ -68,22 +68,30 @@ function subscribeByRole() {
     }
 }
 
-function setRoleInterface(role) {
-
-    const sendMessageButton = document.getElementById("send_message_button");
-    const sendMessageInput = document.getElementById("message_input_value");
+/**
+ * Меняет интерфейс игры, в зависимоти он игровой фазы.
+ * @param phase - фаза игры.
+ */
+function setGamePhaseInterface(phase) {
     disableInterface();
-    if(role===roleConst.CITIZEN){
-        sendMessageButton.disabled = false;
-        sendMessageInput.disabled = false;
-    }
-    else if(role === roleConst.MAFIA){
-    }
-    else  if(role === roleConst.DON){
-
-    }
-    else if(role === roleConst.SHERIFF){
-
+    switch (phase){
+        case gamePhaseConst.CIVILIAN:
+            destination = destinationConst.CIVILIAN;
+            activateInterface();
+        break;
+        case gamePhaseConst.MAFIA:
+            destination = destinationConst.MAFIA;
+            if(userRole === roleConst.MAFIA ||
+                userRole === roleConst.DON) activateInterface();
+            break;
+        case gamePhaseConst.DON:
+            if(userRole === roleConst.DON) activateInterface();
+            break;
+        case gamePhaseConst.SHERIFF:
+            if(userRole === roleConst.SHERIFF) activateInterface()
+            break
+        default:
+            alert("Проблемы с фазой игры, обратитесь к разработчику.")
     }
 }
 
@@ -92,9 +100,10 @@ function disableInterface(){
     document.getElementById('message_input_value').disabled = true;
 }
 
-
-
-
+function activateInterface(){
+    document.getElementById('send_message_button').disabled = false;
+    document.getElementById('message_input_value').disabled = false;
+}
 
 /**
  * Выводит информацю о пользователе в браузер.
@@ -138,7 +147,7 @@ function sendMessage() {
         'text': document.getElementById("message_input_value").value,
         'destination': destination,
     })
-    sendRequest("POST", sockConst.REQUEST_POST_CIVILIAN_MESSAGE, data, callback, [8]);
+    sendRequest("POST", sockConst.REQUEST_POST_MESSAGE, data, callback, [8]);
 }
 
 /**
@@ -149,7 +158,7 @@ function getUsersMessages() {
     let callback = function (request) {
         const data = JSON.parse(request.responseText);
         data.forEach((message) => {
-            if(message['destination']===destination.CIVILIAN) {
+            if(message['destination']===destinationConst.CIVILIAN) {
                 addToChat(message["from"] + ": " + message["text"], gameChatID);
             }
         });
@@ -159,9 +168,11 @@ function getUsersMessages() {
 }
 
 function getGameStat(response){
-
     const data = JSON.parse(response.body);
-    setRoleInterface(data['gamePhase']);
+    setGamePhaseInterface(data['gamePhase']);
+    if(data['message'] !==0) {
+        addToChat(data["message"], gameChatID)
+    }
 }
 function getLog() {
     console.log(userRole);

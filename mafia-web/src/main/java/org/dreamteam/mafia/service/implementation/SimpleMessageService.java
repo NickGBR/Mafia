@@ -46,6 +46,7 @@ public class SimpleMessageService implements MessageService {
         if (!from.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to send messages");
         }
+
         DestinationEnum destination = message.getDestination();
         RoomDAO room = roomService.getCurrentRoomDAO();
         MessageDAO dao = new MessageDAO();
@@ -54,7 +55,6 @@ public class SimpleMessageService implements MessageService {
         dao.setRoom(room);
         dao.setDestination(message.getDestination());
         dao = repository.save(dao);
-
         sendByDestination(destination, dao, room);
 
     }

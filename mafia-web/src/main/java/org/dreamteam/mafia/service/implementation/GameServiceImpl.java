@@ -79,7 +79,7 @@ public class GameServiceImpl implements GameService {
         roomRepository.save(room);
         messagingTemplate.convertAndSend(SockConst.SYS_GAME_STARTED_INFO + roomId, true);
 
-        GameHost gameHost = new GameHost(messagingTemplate, userService, room.getRoomId());
+        GameHost gameHost = new GameHost(messagingTemplate, currentUserDAO.get());
         Thread thread = new Thread(gameHost);
         thread.start();
     }

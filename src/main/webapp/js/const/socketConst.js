@@ -34,7 +34,7 @@ var sockConst = {
     REQUEST_GET_START_GAME_INFO: '/api/room/startGame'
 }
 
-var destination = {
+var destinationConst = {
 
     ROOM_USER: 'ROOM_USER',
     MAFIA: "MAFIA",

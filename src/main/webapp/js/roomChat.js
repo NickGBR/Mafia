@@ -97,7 +97,7 @@ function sendMessage() {
 
     const data = JSON.stringify({
         'text': document.getElementById("message_input_value").value,
-        'destination': destination.ROOM_USER,
+        'destination': destinationConst.ROOM_USER,
     })
 
     sendRequest("POST", sockConst.REQUEST_POST_MESSAGE, data, callback, [8]);
@@ -128,7 +128,7 @@ function getUsersMessages() {
     let callback = function (request) {
         const data = JSON.parse(request.responseText);
         data.forEach((message) => {
-            if(message['destination']===destination.ROOM_USER) {
+            if(message['destination']===destinationConst.ROOM_USER) {
                 addToChat(message["from"] + ": " + message["text"], roomChatId);
             }
         });
