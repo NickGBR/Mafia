@@ -1,5 +1,5 @@
 var gameConst = {
-    USERS_AMOUNT: 2,
+    USERS_AMOUNT: 1,
     FULL_ROOM: -1,
 }
 

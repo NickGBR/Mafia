@@ -15,6 +15,7 @@ import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.UserService;
+import org.dreamteam.mafia.service.implementation.GameEngine.GameHost;
 import org.dreamteam.mafia.util.ClientErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -78,9 +79,9 @@ public class GameServiceImpl implements GameService {
         roomRepository.save(room);
         messagingTemplate.convertAndSend(SockConst.SYS_GAME_STARTED_INFO + roomId, true);
 
-        GameHost gameHost = new GameHost(messagingTemplate, userService);
+        GameHost gameHost = new GameHost(messagingTemplate, userService, room.getRoomId());
         Thread thread = new Thread(gameHost);
-        //thread.start();
+        thread.start();
     }
 
     /**

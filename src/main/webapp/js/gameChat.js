@@ -5,7 +5,7 @@ let roomName;
 let roomID;
 let isAdmin;
 let isReady;
-
+let destination;
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -58,15 +58,43 @@ function subscribeByRole() {
     if (userRole === roleConst.MAFIA || userRole === roleConst.DON) {
         console.log("Подписался как мафия");
         stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, getMessage);
-        //stompClient.subscribe(sockConst.MAFIA_WEB_CHAT + roomID, getMessage)
+        stompClient.subscribe(sockConst.MAFIA_WEB_CHAT + roomID, getMessage)
+        stompClient.subscribe(sockConst.SYS_WEB_CHAT+roomID, getGameStat);
     } else {
         console.log("Подписался как мирный на " + sockConst.CIV_WEB_CHAT );
         stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, getMessage);
+        stompClient.subscribe(sockConst.SYS_WEB_CHAT+roomID, getGameStat);
+
     }
 }
 
-function setRoleInterface() {
+function setRoleInterface(role) {
+
+    const sendMessageButton = document.getElementById("send_message_button");
+    const sendMessageInput = document.getElementById("message_input_value");
+    disableInterface();
+    if(role===roleConst.CITIZEN){
+        sendMessageButton.disabled = false;
+        sendMessageInput.disabled = false;
+    }
+    else if(role === roleConst.MAFIA){
+    }
+    else  if(role === roleConst.DON){
+
+    }
+    else if(role === roleConst.SHERIFF){
+
+    }
 }
+
+function disableInterface(){
+    document.getElementById('send_message_button').disabled = true;
+    document.getElementById('message_input_value').disabled = true;
+}
+
+
+
+
 
 /**
  * Выводит информацю о пользователе в браузер.
@@ -79,7 +107,7 @@ function showCurrentUserInfo() {
 
 /**
  * Вызывается при получении сообщения на сокет.
- * @param response
+ * @param response.
  */
 function getMessage(response){
     const data = JSON.parse(response.body);
@@ -88,9 +116,9 @@ function getMessage(response){
 }
 
 /**
- * Добавляет сообщение в HTML
- * @param text - Текст сообщения
- * @param chat -
+ * Добавляет сообщение в HTML.
+ * @param text - Текст сообщения.
+ * @param chat - id тега для вывода сообщений.
  */
 function addToChat(text, chat) {
     const node = document.createElement("LI");      // Создаем элемент списка <li>
@@ -98,11 +126,6 @@ function addToChat(text, chat) {
     const textNode = document.createTextNode(text);         // Создаем текстовый элемент
     node.appendChild(textNode);                             // Вставляем текстовый внутрь элемента списка
     document.getElementById(chat).appendChild(node);
-}
-
-function disableInterface(){
-    document.getElementById('send_message_button').disabled = true;
-    document.getElementById('message_input_value').disabled = true;
 }
 
 /**
@@ -113,9 +136,8 @@ function sendMessage() {
     };
     const data = JSON.stringify({
         'text': document.getElementById("message_input_value").value,
-        'destination': destination.CIVILIAN,
+        'destination': destination,
     })
-
     sendRequest("POST", sockConst.REQUEST_POST_CIVILIAN_MESSAGE, data, callback, [8]);
 }
 
@@ -136,6 +158,11 @@ function getUsersMessages() {
     sendRequest("GET", "/api/message/restore", "", callback, [8]);
 }
 
+function getGameStat(response){
+
+    const data = JSON.parse(response.body);
+    setRoleInterface(data['gamePhase']);
+}
 function getLog() {
     console.log(userRole);
 }
