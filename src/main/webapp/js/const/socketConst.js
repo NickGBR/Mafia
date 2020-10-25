@@ -6,9 +6,11 @@ var sockConst = {
     ROOM_END_POINT: '/app/room_message',
 
     ROOM_WEB_CHAT: '/chat/room_messages/',
-    MAFIA_WEB_CHAT: '/chat/mafia_messages/',
-    CIV_WEB_CHAT: '/chat/civ_messages/',
+
+    MAFIA_WEB_CHAT: '/chat/message/send/mafia/',
+    CIV_WEB_CHAT: '/chat/message/send/civilians/',
     SYS_WEB_CHAT: '/chat/system_messages/',
+
     SYS_WEB_ROOMS_INFO_ADD: "/chat/system_messages/rooms/add",
     SYS_WEB_ROOMS_INFO_REMOVE: "/chat/system_messages/rooms/remove",
     SYS_WEB_ROOMS_INFO_UPDATE: "/chat/system_messages/rooms/update",
@@ -23,9 +25,21 @@ var sockConst = {
     REQUEST_GET_USERS: "api/GET/getRoomUsers",
     REQUEST_POST_CHECK_USER: "api/POST/checkUser",
     REQUEST_POST_CHECK_ROOM: "api/POST/checkRoom",
+
+    REQUEST_POST_MAFIA_MESSAGE: "/api/message/POST/mafia",
+    REQUEST_POST_CIVILIAN_MESSAGE: "/api/message/POST/civilian",
+
     REQUEST_GET_CHANGE_USER_READY_STATUS: "api/POST/changeReadyStatus",
     REQUEST_GET_ROOM_READY_STATUS: "api/GET/getRoomReadyStatus",
 
     REQUEST_GET_START_GAME_INFO: '/api/room/startGame'
 }
+
+var destination = {
+
+    ROOM_USER: 'ROOM_USER',
+    MAFIA: "MAFIA",
+    CITIZEN: "CITIZEN",
+}
+
 

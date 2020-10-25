@@ -1,9 +1,11 @@
+const gameChatID = "game_chat_box";
 let userName;
 let userRole;
 let roomName;
 let roomID;
 let isAdmin;
 let isReady;
+
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -46,10 +48,12 @@ function onError(error) {
  * Подписывает пользователей на топики, в зависимости от роли в игре.
  */
 function subscribeByRole() {
-    if (userRole === roleConst.MAFIA || userRole === roleConst.DONE) {
+    if (userRole === roleConst.MAFIA || userRole === roleConst.DON) {
+        console.log("Подписался как мафия");
         stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, getMessage);
-        stompClient.subscribe(sockConst.MAFIA_WEB_CHAT + roomID, getMessage)
+        //stompClient.subscribe(sockConst.MAFIA_WEB_CHAT + roomID, getMessage)
     } else {
+        console.log("Подписался как мирный на " + sockConst.CIV_WEB_CHAT);
         stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, getMessage);
     }
 }
@@ -66,12 +70,42 @@ function showCurrentUserInfo() {
     document.getElementById("user_info_label").appendChild(userInfo);
 }
 
-function getMessage(){
+/**
+ * Вызывается при получении сообщения на сокет.
+ * @param response
+ */
+function getMessage(response) {
+    const data = JSON.parse(response.body);
+    // Отправляем сообщение в чат\
+    addToChat(data.from + ": " + data.text, gameChatID);
 }
 
-function disableInterface(){
+/**
+ * Добавляет сообщение в HTML
+ * @param text - Текст сообщения
+ * @param chat -
+ */
+function addToChat(text, chat) {
+    const node = document.createElement("LI");      // Создаем элемент списка <li>
+    node.setAttribute("class", "message");
+    const textNode = document.createTextNode(text);         // Создаем текстовый элемент
+    node.appendChild(textNode);                             // Вставляем текстовый внутрь элемента списка
+    document.getElementById(chat).appendChild(node);
+}
+
+function disableInterface() {
     document.getElementById('send_message_button').disabled = true;
     document.getElementById('message_input_value').disabled = true;
+}
+
+/**
+ * Отправляет сообщения пользователей в end point.
+ */
+function sendMessage() {
+    let callback = function (request) {
+    };
+    sendRequest("POST", sockConst.REQUEST_POST_CIVILIAN_MESSAGE,
+        document.getElementById("message_input_value").value, callback, [8]);
 }
 
 function getLog() {

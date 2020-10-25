@@ -7,9 +7,11 @@ public class SockConst {
     public static final String ROOM_END_POINT = "/room_message";
 
     public static final String ROOM_WEB_CHAT = "/chat/room_messages/";
-    public static final String MAFIA_WEB_CHAT = "/chat/mafia_messages/";
-    public static final String CIV_WEB_CHAT = "/chat/civ_messages/";
+
+    public static final String MAFIA_WEB_CHAT = "/chat/message/send/mafia/";
+    public static final String CIV_WEB_CHAT = "/chat/message/send/civilians/";
     public static final String SYS_WEB_CHAT = "/chat/system_messages/";
+
     public static final String SYS_WEB_ROOMS_INFO_ADD = "/chat/system_messages/rooms/add";
     public static final String SYS_WEB_ROOMS_INFO_REMOVE = "/chat/system_messages/rooms/remove";
     public static final String SYS_WEB_ROOMS_INFO_UPDATE = "/chat/system_messages/rooms/update";
@@ -24,6 +26,11 @@ public class SockConst {
     public static final String REQUEST_GET_USERS = "api/GET/getRoomUsers";
     public static final String REQUEST_POST_CHECK_USER = "api/POST/checkUser";
     public static final String REQUEST_POST_CHECK_ROOM = "api/POST/checkRoom";
+
+    public static final String REQUEST_POST_MAFIA_MESSAGE = "/POST/mafia";
+    public static final String REQUEST_POST_CIVILIAN_MESSAGE = "/POST/civilian";
+
+
     public static final String REQUEST_GET_CHANGE_READY_STATUS = "api/POST/changeReadyStatus";
     public static final String REQUEST_GET_ROOM_READY_STATUS = "api/GET/getRoomReadyStatus";
 

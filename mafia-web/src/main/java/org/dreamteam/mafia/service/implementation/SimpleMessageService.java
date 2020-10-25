@@ -53,6 +53,8 @@ public class SimpleMessageService implements MessageService {
         dao.setRoom(room);
         dao = repository.save(dao);
 
+        System.out.println(messagingTemplate);
+        System.out.println( SockConst.ROOM_WEB_CHAT + room.getRoomId());
             messagingTemplate.convertAndSend(SockConst.ROOM_WEB_CHAT + room.getRoomId(),
                     new OutgoingChatMessageDTO(dao));
 
@@ -70,7 +72,8 @@ public class SimpleMessageService implements MessageService {
         dao.setUser(from.get());
         dao.setRoom(room);
         dao = repository.save(dao);
-
+        System.out.println(destination + room.getRoomId());
+        System.out.println(messagingTemplate);
         messagingTemplate.convertAndSend(destination + room.getRoomId(),
                 new OutgoingChatMessageDTO(dao));
     }

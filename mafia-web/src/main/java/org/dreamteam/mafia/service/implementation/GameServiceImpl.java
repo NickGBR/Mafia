@@ -80,7 +80,7 @@ public class GameServiceImpl implements GameService {
 
         GameHost gameHost = new GameHost(messagingTemplate, userService);
         Thread thread = new Thread(gameHost);
-        thread.start();
+        //thread.start();
     }
 
     /**

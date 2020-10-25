@@ -2,6 +2,7 @@ package org.dreamteam.mafia.dao;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.dreamteam.mafia.dao.enums.DestinationEnum;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.hibernate.annotations.NotFound;
