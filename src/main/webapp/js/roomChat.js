@@ -53,13 +53,63 @@ function afterConnect(connection) {
     loadChatMessages();
     //Получаем список пользователей
     loadRoomUsers();
+
+    stopSpinner();
 }
 
 function onError(error) {
     console.log("Не удалось установить подключение: " + error);
-    alert("Клиент потерял соединение с сервером");
+    showModalMessage("Ошибка", "Клиент потерял соединение с сервером");
     document.getElementById("left_room_button").disabled = true;
     document.getElementById("user_ready_button").disabled = true;
+}
+
+/**
+ * Выводит информацю о пользователе в браузер.
+ */
+function initCurrentRoomInfo() {
+    const roomNameText = document.createTextNode(roomName);
+    document.getElementById("roomName").appendChild(roomNameText);
+    let firstNode = document.getElementById("user_entry_1");
+    let userEntry = initUserEntry(firstNode);
+    userEntries.push(userEntry);
+    for (let i = 1; i < maxUserAmount; i++) {
+        const copyNode = firstNode.cloneNode(true);
+        copyNode.id = "user_entry_" + (i + 1);
+        document.getElementById(usersListId).appendChild(copyNode);
+        let userEntry = initUserEntry(copyNode);
+        userEntries.push(userEntry);
+    }
+    console.log(userEntries);
+}
+
+function initUserEntry(node) {
+    let userEntry = {};
+    userEntry["login"] = "";
+    userEntry["admin"] = false;
+    userEntry["used"] = false;
+    userEntry["stamp-container"] = node.querySelector('.stamp-container');
+    userEntry["text"] = node.querySelector('.text');
+    return userEntry;
+}
+
+
+/**
+ * Устанавливает соответствующий пользователю набор кнопок для отображения
+ */
+function initButtons() {
+    if (isAdmin) {
+        let elementsAdm = document.querySelectorAll('.admin-button');
+        let elementsUsr = document.querySelectorAll('.user-button');
+        elementsAdm.forEach((element) => {
+            element.style.display = "inline";
+        })
+        elementsUsr.forEach((element) => {
+            element.style.display = "none";
+        })
+    } else {
+        updateReadyButton(isReady)
+    }
 }
 
 /**
@@ -68,8 +118,11 @@ function onError(error) {
  */
 function onDisbandment(response) {
     if (!isAdmin) {
-        window.location.href = "roomList.html";
-        alert("Администратор расформировал комнату. Вы будете возвращены в общее лобби.");
+        showModalMessage("Комната расформирована",
+            "Администратор расформировал комнату. Вы будете возвращены в общее лобби.",
+            function () {
+                window.location.href = "roomList.html";
+            });
     }
 }
 
@@ -156,6 +209,41 @@ function showUser(user) {
         // Случайный поворот от -5 до 5 градусов
         stampNode.style.transform = 'rotate(' + (Math.random() * (10) - 5) + 'deg) translateY(-0.5rem)';
         currentEntry["stamp-container"].appendChild(stampNode);
+    }
+}
+
+function selectUser(node) {
+    let login = node.innerText;
+    const foundEntry = userEntries.find(element => element["login"] === login);
+    if (!foundEntry["admin"]) {
+        if (selectedEntry !== null) {
+            selectedEntry["text"].classList.remove("selected");
+            if (selectedEntry["login"] === login) {
+                selectedEntry = null;
+                return;
+            }
+            selectedEntry = null;
+        }
+        selectedEntry = foundEntry;
+        foundEntry["text"].classList.add("selected");
+    }
+}
+
+function updateButtonsOnSelect() {
+    let button = document.getElementById("kick_user_button");
+    button.disabled = selectedEntry == null;
+}
+
+function restoreSelectedUser() {
+    if (selectedEntry !== null) {
+        let login = selectedEntry["login"];
+        const foundEntry = userEntries.find(element => element["login"] === login);
+        if (foundEntry === null) {
+            selectedEntry = null;
+        } else {
+            selectedEntry = foundEntry;
+            foundEntry.classList.add("selected");
+        }
     }
 }
 

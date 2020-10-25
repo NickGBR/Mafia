@@ -133,7 +133,7 @@ public class SimpleRoomService implements RoomService {
                                            "Impossible to join a full room");
         }
         if (!room.get().getPasswordHash().isEmpty() &&
-                !encoder.matches(room.get().getPasswordHash(), dto.getPassword())) {
+                !encoder.matches(dto.getPassword(), room.get().getPasswordHash())) {
             throw new ClientErrorException(ClientErrorCode.INCORRECT_PASSWORD,
                                            "Provided wrong password for requested room");
         }

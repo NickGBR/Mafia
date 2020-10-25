@@ -1,4 +1,3 @@
-let spinner;
 let init = null;
 
 
@@ -17,8 +16,7 @@ function getCurrentName() {
 
 
 function onLoadInit() {
-    spinner = new Spin.Spinner().spin();
-    document.getElementById("body").appendChild(spinner.el);
+    startSpinner();
     doRedirect();
 }
 
@@ -55,8 +53,6 @@ function doRedirect() {
         } else {
             if (pageName !== "login.html" && name !== "registration.html") {
                 window.location.href = "login.html";
-            } else {
-                doInitLogin();
             }
         }
     };
@@ -64,25 +60,19 @@ function doRedirect() {
 }
 
 
-function doInitLogin() {
-    spinner.stop();
-}
-
 function doInitGameChat() {
     connect();
-    spinner.stop();
+    stopSpinner();
 }
 
 function doInitRoomList() {
     connect();
     setUserName();
-    spinner.stop();
 }
 
 function doInitRoom() {
     connect();
     setUserName();
-    spinner.stop();
 }
 
 function setUserName() {

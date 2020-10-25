@@ -36,7 +36,7 @@ function processResponse(request, allowedCodes) {
         return false;
     }
     const errorMessage = processErrorResponse(request, allowedCodes);
-    alert(errorMessage);
+    showModalMessage("Ошибка", errorMessage);
     return false;
 
 

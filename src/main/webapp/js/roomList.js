@@ -28,6 +28,7 @@ function afterConnect(connection) {
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_UPDATE, updateRoomToInterface)
     userName = initialisedUserName;
     getRooms();
+    stopSpinner();
 }
 
 function getRooms() {
@@ -42,49 +43,8 @@ function getRooms() {
     sendRequest("GET", "/api/room/getInitialList", "", callback, []);
 }
 
-/**
- * Добавляет пользователя в комнату, если комната заполненна,
- * то выдает ошибку.
- * @param roomId
- */
-function addUserToRoom(roomId) {
-
-    let callback = function () {
-        window.location.href = "roomChat.html";
-    };
-    const jsonData = {
-        'id': roomId,
-        'password': ''
-    };
-    sendRequest("POST", "/api/room/join", JSON.stringify(jsonData), callback, [4, 5, 10, 11, 12]);
-}
 
 
-function setupModal(modalID) {
-    const modal = document.getElementById(modalID);
-    const overlay = document.getElementById("overlay-modal");
-    const body = document.getElementById("body");
-    const header = document.getElementById("header");
-    modal.style.display = "block";
-    overlay.style.display = "block";
-    body.style.backgroundSize = "0";
-    body.style.backgroundColor = "wheat";
-    header.style.backgroundSize = "0";
-    header.style.backgroundColor = "wheat";
-}
-
-function hideModal() {
-    const overlay = document.getElementById("overlay-modal");
-    const body = document.getElementById("body");
-    const header = document.getElementById("header");
-    body.style.backgroundSize = "auto";
-    header.style.backgroundSize = "auto";
-    let childrenArr = Array.prototype.slice.call(overlay.children);
-    childrenArr.forEach((item) => {
-        item.style.display = "none";
-    });
-    overlay.style.display = "none";
-}
 
 function openRoomCreator() {
     document.getElementById("new_room_name").value = "";
@@ -95,21 +55,15 @@ function openRoomCreator() {
     setupModal("modal-room-create");
 }
 
-function cancelCreation() {
-    hideModal();
-}
-
-
 function joinRoomPublic() {
     room = selectedEntry["room"];
     if (room["privateRoom"]) {
         setupModal("modal-room-join-private");
         const name = document.getElementById("room-name");
-        const body = document.getElementById("body");
         name.innerText = room["name"];
     } else {
         const jsonData = {
-            'id': roomId,
+            'id': room["id"],
             'password': ''
         };
         joinRoom(jsonData);
@@ -118,9 +72,10 @@ function joinRoomPublic() {
 
 function joinRoomPrivate() {
     hideModal();
+    room = selectedEntry["room"];
     const password = document.getElementById("password_input_join");
     const jsonData = {
-        'id': roomId,
+        'id': room["id"],
         'password': password.value
     };
     password.value = "";
@@ -166,6 +121,7 @@ function createRoom() {
     const jsonData = {
         'name': name,
         'description': '',
+        'password': document.getElementById("new_room_password").value,
         'maxPlayers': maxAmount,
         'mafia': mafiaAmount,
         'don': document.getElementById("new_room_don").checked,
@@ -178,7 +134,7 @@ function createRoom() {
 // Будет вызвано при ошибке установления соединения
 function onError(error) {
     console.log("Не удалось установить подключение: " + error);
-    alert("Клиент потерял соединение с сервером");
+    showModalMessage("Ошибка", "Клиент потерял соединение с сервером");
     document.getElementById("room_input").disabled = true;
     document.getElementById("set_room_button").disabled = true;
 }
@@ -198,8 +154,8 @@ function updateRoomToInterfaceAdd(response) {
  */
 function updateRoomToInterfaceRemove(response) {
     const room = JSON.parse(response.body);
-    const dd = document.getElementById("dd" + room["id"]);
-    document.getElementById('rooms_list').removeChild(dd);
+    const foundEntry = roomEntries.find(element => element["room"]["id"] === room["id"]);
+    document.getElementById('rooms_list').removeChild(foundEntry["node"]);
 }
 
 /**
@@ -208,12 +164,23 @@ function updateRoomToInterfaceRemove(response) {
  */
 function updateRoomToInterface(response) {
     const room = JSON.parse(response.body);
-    const button = document.getElementById(room["id"]);
-    button.textContent = '';
-    const label = room["name"] + "   | " + room["currPlayers"] + " / " + room["maxPlayers"];
-    const buttonName = document.createTextNode(label);                 // Создаем текстовый элемент
+    const foundEntry = roomEntries.find(element => element["room"]["id"] === room["id"]);
+    foundEntry["room"] = room;
+    const text = foundEntry["node"].querySelector('.text');
+    text.textContent = "";
+    addRoomText(text, room);
 
-    button.appendChild(buttonName);
+}
+
+function addRoomText(text, room) {
+    const nameTextNode = document.createTextNode(room["name"] + "   | ");
+    const currPlayersNode = document.createElement("SPAN");
+    currPlayersNode.innerText = room["currPlayers"];
+    currPlayersNode.style.fontStyle = "italic";
+    const maxPlayersNode = document.createTextNode(" / " + room["maxPlayers"]);
+    text.appendChild(nameTextNode);
+    text.appendChild(currPlayersNode);
+    text.appendChild(maxPlayersNode);
 }
 
 /**
@@ -228,14 +195,7 @@ function addRoomToInterface(room) {
     const copyNode = lastNode.cloneNode(true);
     copyNode.id = "room_entry_" + room["id"];
     const text = copyNode.querySelector('.text');
-    const nameTextNode = document.createTextNode(room["name"] + "   | ");
-    const currPlayersNode = document.createElement("SPAN");
-    currPlayersNode.innerText = room["currPlayers"];
-    currPlayersNode.style.fontStyle = "italic";
-    const maxPlayersNode = document.createTextNode(" / " + room["maxPlayers"]);
-    text.appendChild(nameTextNode);
-    text.appendChild(currPlayersNode);
-    text.appendChild(maxPlayersNode);
+    addRoomText(text, room)
     text.classList.add("clickable");
     text.onclick = function (event) {
         selectRoom(event.target);

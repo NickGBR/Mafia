@@ -11,6 +11,7 @@
     <script src="js/commonREST.js"></script>
     <script src="js/initPage.js"></script>
     <script src="js/chat.js"></script>
+    <script src="js/modal.js"></script>
     <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
     <link href="styles/commonstyle.css" rel="stylesheet" type="text/css"/>
     <link href="styles/roomChat.css" rel="stylesheet" type="text/css"/>
@@ -58,6 +59,19 @@
     </div>
 </div>
 <div id="overlay-chat"></div>
+<div id="overlay-modal">
+    <div id="modal-spinner">
+    </div>
+    <div id="modal-message">
+        <div class="modal-header" id="modal-message-title"></div>
+        <div id="modal-message-text"></div>
+        <div class="input-button-confirmation-container centered">
+            <button class="button rectangle-button" id="confirm-message-button" onclick="confirmModalMessage()">
+                ОК
+            </button>
+        </div>
+    </div>
+</div>
 <div id="content">
     <div class="room-name-container">
         <span class="room-name">

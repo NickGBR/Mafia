@@ -1,11 +1,11 @@
 #modal-room-create {
     position: relative;
-    top: 10%;
+    top: 5%;
     margin: auto;
     width: 60%;
     min-width: 48rem;
     height: auto;
-    padding: 2rem 2rem;
+    padding: 1.5rem 1rem;
     z-index: 5;
     display: none;
     background-image: url("/img/tilebackground.png");
@@ -28,11 +28,3 @@
     border-radius: 1rem;
 }
 
-.modal-header {
-    width: 40rem;
-    margin: auto;
-    font-family: 'PT Mono', monospace;
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-align: center;
-}
