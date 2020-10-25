@@ -4,6 +4,7 @@ import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.dao.MessageDAO;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.dao.enums.DestinationEnum;
 import org.dreamteam.mafia.dto.ChatMessageDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
@@ -45,6 +46,7 @@ public class SimpleMessageService implements MessageService {
         if (!from.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to send messages");
         }
+        DestinationEnum destination = message.getDestination();
         RoomDAO room = roomService.getCurrentRoomDAO();
         MessageDAO dao = new MessageDAO();
         dao.setText(message.getText());
@@ -53,31 +55,10 @@ public class SimpleMessageService implements MessageService {
         dao.setDestination(message.getDestination());
         dao = repository.save(dao);
 
-        System.out.println(messagingTemplate);
-        System.out.println( SockConst.ROOM_WEB_CHAT + room.getRoomId());
-            messagingTemplate.convertAndSend(SockConst.ROOM_WEB_CHAT + room.getRoomId(),
-                    new ChatMessageDTO(dao));
+        sendByDestination(destination, dao, room);
 
     }
 
-    @Override
-    public void sendMessage(ChatMessageDTO message, String destination) throws ClientErrorException {
-        final Optional<UserDAO> from = userService.getCurrentUserDAO();
-        if (!from.isPresent()) {
-            throw new SecurityException("Non authorised user is not allowed to send messages");
-        }
-        RoomDAO room = roomService.getCurrentRoomDAO();
-        MessageDAO dao = new MessageDAO();
-        dao.setText(message.getText());
-        dao.setUser(from.get());
-        dao.setDestination(message.getDestination());
-        dao.setRoom(room);
-        dao = repository.save(dao);
-        System.out.println(destination + room.getRoomId());
-        System.out.println(messagingTemplate);
-        messagingTemplate.convertAndSend(destination + room.getRoomId(),
-                new ChatMessageDTO(dao));
-    }
 
     @Override
     public List<ChatMessageDTO> getChatHistory() throws ClientErrorException {
@@ -103,7 +84,7 @@ public class SimpleMessageService implements MessageService {
         messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO_REMOVE, removedRoom);
         // Уведолмяем игроков в комнате о том, что комната была распущена.
         messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO_REMOVE + removedRoom.getId(),
-                                         "");
+                "");
     }
 
     @Override
@@ -114,13 +95,37 @@ public class SimpleMessageService implements MessageService {
     @Override
     public void sendJoinUpdate(RoomDisplayDTO room) {
         messagingTemplate.convertAndSend(SockConst.SYS_WEB_USERS_INFO + room.getId(),
-                                         true);
+                true);
     }
 
     @Override
     public void sendReadinessUpdate() throws ClientErrorException {
         messagingTemplate.convertAndSend(SockConst.SYS_USERS_READY_TO_PLAY_INFO
-                                                 + roomService.getCurrentRoom().getId(),
-                                         roomService.isRoomReady());
+                        + roomService.getCurrentRoom().getId(),
+                roomService.isRoomReady());
+    }
+
+    /**
+     * Отправляет сообщения подписчикам, в зависимости от роли.
+     *
+     * @param destination - роль подписчика.
+     * @param message     - сообщение для передачи.
+     * @param room        - комната для передачи.
+     */
+    private void sendByDestination(DestinationEnum destination, MessageDAO message, RoomDAO room) {
+        switch (destination) {
+            case MAFIA:
+                messagingTemplate.convertAndSend(SockConst.MAFIA_WEB_CHAT + room.getRoomId(),
+                        new ChatMessageDTO(message));
+                break;
+            case CIVILIAN:
+                messagingTemplate.convertAndSend(SockConst.CIV_WEB_CHAT + room.getRoomId(),
+                        new ChatMessageDTO(message));
+                break;
+            case ROOM_USER:
+                messagingTemplate.convertAndSend(SockConst.ROOM_WEB_CHAT + room.getRoomId(),
+                        new ChatMessageDTO(message));
+                break;
+        }
     }
 }

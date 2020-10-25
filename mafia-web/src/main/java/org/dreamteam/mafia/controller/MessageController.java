@@ -20,21 +20,11 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @PostMapping("/send")
+    @PostMapping(SockConst.REQUEST_POST_MESSAGE)
     public void sendMessage(@RequestBody ChatMessageDTO message) throws ClientErrorException {
         messageService.sendMessage(message);
     }
 
-    @PostMapping(SockConst.REQUEST_POST_MAFIA_MESSAGE)
-    public void sendMessageToMafia(@RequestBody ChatMessageDTO message) throws ClientErrorException {
-        messageService.sendMessage(message, SockConst.MAFIA_WEB_CHAT);
-    }
-
-    @PostMapping(SockConst.REQUEST_POST_CIVILIAN_MESSAGE)
-    public void sendMessageToCivilians(@RequestBody ChatMessageDTO message) throws ClientErrorException {
-        System.out.println(message);
-        messageService.sendMessage(message, SockConst.CIV_WEB_CHAT);
-    }
 
     @GetMapping("/restore")
     public List<ChatMessageDTO> sendMessage() throws ClientErrorException {

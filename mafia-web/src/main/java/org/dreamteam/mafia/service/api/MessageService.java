@@ -19,8 +19,6 @@ public interface MessageService {
      */
     void sendMessage(ChatMessageDTO message) throws ClientErrorException;
 
-    void sendMessage(ChatMessageDTO message, String destination) throws ClientErrorException;
-
     /**
      * Возвращает историю чата для текущего игрока.
      *

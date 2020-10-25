@@ -26,8 +26,7 @@ var sockConst = {
     REQUEST_POST_CHECK_USER: "api/POST/checkUser",
     REQUEST_POST_CHECK_ROOM: "api/POST/checkRoom",
 
-    REQUEST_POST_MAFIA_MESSAGE: "/api/message/POST/mafia",
-    REQUEST_POST_CIVILIAN_MESSAGE: "/api/message/POST/civilian",
+    REQUEST_POST_MESSAGE: "/api/message/send",
 
     REQUEST_GET_CHANGE_USER_READY_STATUS: "api/POST/changeReadyStatus",
     REQUEST_GET_ROOM_READY_STATUS: "api/GET/getRoomReadyStatus",

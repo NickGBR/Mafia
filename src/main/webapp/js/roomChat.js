@@ -100,7 +100,7 @@ function sendMessage() {
         'destination': destination.ROOM_USER,
     })
 
-    sendRequest("POST", "/api/message/send", data, callback, [8]);
+    sendRequest("POST", sockConst.REQUEST_POST_MESSAGE, data, callback, [8]);
 
 }
 
