@@ -1,4 +1,8 @@
 function setupModal(modalID) {
+    if ((typeof openChat !== 'undefined') && openChat) {
+        switchChat();
+    }
+
     const modal = document.getElementById(modalID);
     const overlay = document.getElementById("overlay-modal");
     const body = document.getElementById("body");
