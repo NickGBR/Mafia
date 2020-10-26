@@ -11,35 +11,144 @@
     <script src="js/spin.umd.js"></script>
     <script src="js/commonREST.js"></script>
     <script src="js/initPage.js"></script>
-    <script
-            crossorigin="anonymous"
-            integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-            src="https://code.jquery.com/jquery-3.3.1.js">
-    </script>
-    <script>
-        $(function () {
-            $("#header").load("header.html");
-        });
-    </script>
+    <script src="js/chat.js"></script>
+    <script src="js/modal.js"></script>
     <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
-    <link href="styles/style.css" rel="stylesheet" type="text/css"/>
-    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" rel="stylesheet">
-
+    <link href="styles/roomList.css" rel="stylesheet" type="text/css"/>
+    <link href="styles/commonstyle.css" rel="stylesheet" type="text/css"/>
 </head>
-<body class="bodyPadding" id="body" onload="onLoadInit()">
-<div id="header"></div>
-<p>
-    <input class="message_input" id="room_input" placeholder="Создать комнату"/>
-    <button class="text" disabled="disabled" id="set_room_button" onclick="checkRoom()">Создать комнату
-    </button>
-</p>
-<p>
-<div class="room_box" id="rooms_box">
-    <dl id="rooms_list">
-    </dl>
+<body class="background" id="body" onload="onLoadInit()">
+<div id="header">
+    <div id="divider">
+        <div>
+            <span class="header-button-container">
+                <button class="button round-button">?</button>
+            </span>
+            <span>
+                Личное дело: <span id="userName"></span>
+            </span>
+            <span class="header-button-container">
+                <button class="button rectangle-button" id="switch_chat_button" onclick="switchChat()">Чат</button>
+            </span>
+            <a class="login-link" href="login.html"> Зайти от другого имени</a>
+            <!-- окно чата -->
+            <div id="chat_area">
+                <div class="chat-box" id="room_chat_box">
+                </div>
+                <div class="chat-controls">
+                    <span class="chat-input">
+                        <label class="message-label" for="message_input_value">Введи сообщение: </label>
+                        <input class="message_input" id="message_input_value" placeholder="Введите сообщение..."/>
+                    </span>
+                    <button class="button rectangle-button" disabled="disabled" id="send_message_button"
+                            onclick="sendMessage()">
+                        Отправить
+                    </button>
+                </div>
+                <script>
+                    document.getElementById("message_input_value")
+                        .addEventListener("keyup", function (event) {
+                            event.preventDefault();
+                            if (event.keyCode === 13) {
+                                document.getElementById("send_message_button").click();
+                            }
+                        });
+                </script>
+            </div>
+        </div>
+    </div>
 </div>
-</p>
+<div id="overlay-chat"></div>
+<div id="overlay-modal">
+    <div id="modal-spinner">
+    </div>
+    <div id="modal-message">
+        <div class="modal-header" id="modal-message-title"></div>
+        <div id="modal-message-text"></div>
+        <div class="input-button-confirmation-container centered">
+            <button class="button rectangle-button" id="confirm-message-button" onclick="confirmModalMessage()">
+                ОК
+            </button>
+        </div>
+    </div>
+    <div id="modal-room-create">
+        <div class="modal-header">Задайте параметры комнаты:</div>
+        <div id="input-error-message">
+        </div>
+        <div class="input-container centered">
+            <label for="new_room_name">Введите имя комнаты:</label>
+            <input id="new_room_name" name="name" placeholder="Супер_Комната!">
+        </div>
+        <div class="input-container centered">
+            <label for="new_room_max_amount">Введите число игроков:</label>
+            <input id="new_room_max_amount" max="99" min="3" name="max" type="number" value="10">
+        </div>
+        <div class="input-container centered">
+            <label for="new_room_mafia_amount">Введите число игроков за мафию:</label>
+            <input id="new_room_mafia_amount" max="49" min="1" name="mafia" type="number" value="3">
+        </div>
+        <div class="input-container centered">
+            <label for="new_room_don">Присутствует ли в игре Дон:</label>
+            <input checked id="new_room_don" name="don" type="checkbox">
+        </div>
+        <div class="input-container centered">
+            <label for="new_room_sheriff">Присутствует ли в игре шериф:</label>
+            <input checked id="new_room_sheriff" name="sheriff" type="checkbox">
+        </div>
+        <div class="input-container centered">
+            <label for="new_room_password">Введите пароль комнаты:</label>
+            <input id="new_room_password" name="password" placeholder="Или оставьте пустым" type="password">
+        </div>
+        <div class="input-button-confirmation-container centered">
+            <button class="button rectangle-button" id="create_button" onclick="createRoom()">
+                Создать комнату
+            </button>
+            <button class="button rectangle-button" onclick="hideModal()">
+                Отмена
+            </button>
+        </div>
+    </div>
+    <div id="modal-room-join-private">
+        <div class="modal-header">Подтвердите допуск к комнате: <span id="room-name"></span></div>
+        <div class="input-container centered">
+            <label for="password_input_join">Введите пароль комнаты:</label>
+            <input id="password_input_join" name="password" placeholder="******" type="password">
+        </div>
+        <div class="input-button-confirmation-container centered">
+            <button class="button rectangle-button" id="join_private_button" onclick="joinRoomPrivate()">
+                Получить доступ
+            </button>
+            <button class="button rectangle-button" onclick="hideModal()">
+                Отмена
+            </button>
+        </div>
+    </div>
+</div>
 
+<div id="content">
+    <!-- Кнопки управления -->
+    <div class="button-group">
+        <span class="button-container">
+            <button class="button rectangle-button" id="open_creator_button" onclick="openRoomCreator()">
+            Создать комнату
+            </button>
+        </span>
+        <span class="button-container">
+         <button class="button rectangle-button" disabled id="join_room_button" onclick="joinRoomPublic()">
+            Войти в комнату
+         </button>
+        </span>
+
+    </div>
+    <!-- Список игроков -->
+    <ul class="list-container" id="rooms_list">
+        <li class="entry-container" id="room_entry_last">
+            <div class="entry">
+                <span class="text"></span>
+                <span class="stamp-container"></span>
+            </div>
+        </li>
+    </ul>
+</div>
 </body>
 </html>

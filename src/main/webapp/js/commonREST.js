@@ -18,7 +18,9 @@ function sendRequest(method, url, data, callback, allowedErrors) {
     request.onreadystatechange = function () {
         if (request.readyState === XMLHttpRequest.DONE) {
             if (processResponse(request, allowedErrors)) {
-                callback(request);
+                if(callback!==null) {
+                    callback(request);
+                }
             }
         }
     };
@@ -34,7 +36,7 @@ function processResponse(request, allowedCodes) {
         return false;
     }
     const errorMessage = processErrorResponse(request, allowedCodes);
-    alert(errorMessage);
+    showModalMessage("Ошибка", errorMessage);
     return false;
 
 
@@ -110,6 +112,12 @@ function processErrorCode(code) {
         }
         case 12: {
             return "В комнате нет свободных мест"
+        }
+        case 13: {
+            return "Задано недопустимое имя: пустое, либо же превышающее максимальную длину"
+        }
+        case 14: {
+            return "Переданы недопустимые параметры комнаты"
         }
         default: {
             return "Ошибка внутренней логики. Сервер вернул код ошибки, неизвестный клиенту. Обратитесь к разработчику.";

@@ -1,6 +1,7 @@
 package org.dreamteam.mafia.controller;
 
-import org.dreamteam.mafia.dto.OutgoingChatMessageDTO;
+import org.dreamteam.mafia.constants.SockConst;
+import org.dreamteam.mafia.dto.ChatMessageDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.service.api.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,15 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @PostMapping("/send")
-    public void sendMessage(@RequestBody String message) throws ClientErrorException {
+    @PostMapping(SockConst.REQUEST_POST_MESSAGE)
+    public void sendMessage(@RequestBody ChatMessageDTO message) throws ClientErrorException {
         messageService.sendMessage(message);
     }
 
+
     @GetMapping("/restore")
-    public List<OutgoingChatMessageDTO> sendMessage() throws ClientErrorException {
+    public List<ChatMessageDTO> sendMessage() throws ClientErrorException {
         return messageService.getChatHistory();
     }
+
 }

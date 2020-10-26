@@ -1,6 +1,8 @@
 package org.dreamteam.mafia.dao.enums;
 
 public enum GamePhaseEnum {
-    DAY,
-    NIGHT
+    MAFIA_PHASE,
+    CIVILIANS_PHASE,
+    DON_PHASE,
+    SHERIFF_PHASE
 }

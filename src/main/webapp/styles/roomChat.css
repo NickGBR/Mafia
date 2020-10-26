@@ -1,0 +1,33 @@
+.admin-button {
+    display: none;
+}
+
+.user-button {
+}
+
+.room-name {
+    font-family: 'PT Mono', monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-right: 2rem;
+}
+
+
+.room-name-container {
+    height: 3rem;
+    margin: 2rem 2rem;
+}
+
+.room-param {
+    font-family: 'PT Mono', monospace;
+    font-size: 1.2rem;
+    margin-right: 2rem;
+}
+
+.room-param-container {
+    display: block;
+    margin: 2rem 2rem;
+}
+
+
+

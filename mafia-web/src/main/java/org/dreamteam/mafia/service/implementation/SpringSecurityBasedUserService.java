@@ -41,16 +41,21 @@ public class SpringSecurityBasedUserService implements UserService {
 
     @Override
     public void registerNewUser(RegistrationDTO registrationDTO) throws ClientErrorException {
+        String login = registrationDTO.getLogin().trim();
+        ;
+        if (login.length() == 0 || login.length() > 34) {
+            throw new ClientErrorException(ClientErrorCode.INVALID_NAME, "Provided login is invalid");
+        }
         if (!registrationDTO.getPassword().equals(registrationDTO.getPasswordConfirmation())) {
             throw new ClientErrorException(ClientErrorCode.PASSWORD_MISMATCH, "Password mismatch!");
         }
-        Optional<UserDAO> sameLoginDao = repository.findByLogin(registrationDTO.getLogin());
+        Optional<UserDAO> sameLoginDao = repository.findByLogin(login);
         if (sameLoginDao.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.USER_ALREADY_EXISTS,
                                            "Login is already in the database");
         }
         UserDAO user = new UserDAO();
-        user.setLogin(registrationDTO.getLogin());
+        user.setLogin(login);
         user.setPasswordHash(encoder.encode(registrationDTO.getPassword()));
         user.setIsAdmin(false);
         user.setIsReady(false);

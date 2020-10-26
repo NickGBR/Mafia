@@ -17,10 +17,12 @@ public enum ClientErrorCode {
     WRONG_GAME_PHASE(6),
     ROOMS_MISMATCH(7),
     NOT_IN_ROOM(8),
-    MOT_ENOUGH_RIGHTS(9),
+    NOT_ENOUGH_RIGHTS(9),
     ROOM_NOT_EXIST(10),
     GAME_ALREADY_STARTED(11),
-    ROOM_IS_FULL(12);
+    ROOM_IS_FULL(12),
+    INVALID_NAME(13),
+    INVALID_ROOM_PARAMETERS(14);
 
     private final int value;
 

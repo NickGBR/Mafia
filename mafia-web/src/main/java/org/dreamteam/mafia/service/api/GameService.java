@@ -14,6 +14,11 @@ import java.util.List;
  */
 public interface GameService {
 
+    /**
+     * Запускает игру.
+     */
+    void startGame() throws ClientErrorException;
+
 
     /**
      * Возвращает список всех персонажей в игре
@@ -59,25 +64,27 @@ public interface GameService {
 
     /**
      * Проверка является ли игрок шерифом.
+     *
      * @param login - логин игрока
      * @return - true, если игрок явлеятся шерифом, нет в противном случае
-     * @throws IllegalGamePhaseException - если не соответствует фаза дня (ночью шериф ищет мафию/дона, мафия ищет шерифа)
+     * @throws IllegalGamePhaseException     - если не соответствует фаза дня (ночью шериф ищет мафию/дона, мафия ищет шерифа)
      * @throws UserDoesNotExistInDBException - если игрока нет в базе
-     * @throws RoomsMismatchException - если игроки находятся в разных комнатах
-     * @throws NotEnoughRightsException - если у игрока нет прав голосовать в данную фазу
+     * @throws RoomsMismatchException        - если игроки находятся в разных комнатах
+     * @throws NotEnoughRightsException      - если у игрока нет прав голосовать в данную фазу
      */
     boolean isSheriff(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
-                                            RoomsMismatchException, NotEnoughRightsException;
+            RoomsMismatchException, NotEnoughRightsException;
 
     /**
      * Проверка является ли игрок мафией/доном.
+     *
      * @param login - логин игрока
      * @return - true, если игрок явлеятся мафией/доном, нет в противном случае
-     * @throws IllegalGamePhaseException - если не соответствует фаза дня (ночью шериф ищет мафию/дона, мафия ищет шерифа)
+     * @throws IllegalGamePhaseException     - если не соответствует фаза дня (ночью шериф ищет мафию/дона, мафия ищет шерифа)
      * @throws UserDoesNotExistInDBException - если игрока нет в базе
-     * @throws RoomsMismatchException - если игроки находятся в разных комнатах
-     * @throws NotEnoughRightsException - если у игрока нет прав голосовать в данную фазу
+     * @throws RoomsMismatchException        - если игроки находятся в разных комнатах
+     * @throws NotEnoughRightsException      - если у игрока нет прав голосовать в данную фазу
      */
     boolean isMafia(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
-                                                RoomsMismatchException, NotEnoughRightsException;
+            RoomsMismatchException, NotEnoughRightsException;
 }

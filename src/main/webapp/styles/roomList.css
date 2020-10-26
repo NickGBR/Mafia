@@ -1,0 +1,30 @@
+#modal-room-create {
+    position: relative;
+    top: 5%;
+    margin: auto;
+    width: 60%;
+    min-width: 48rem;
+    height: auto;
+    padding: 1.5rem 1rem;
+    z-index: 5;
+    display: none;
+    background-image: url("/img/tilebackground.png");
+    background-size: auto;
+    border-radius: 1rem;
+}
+
+#modal-room-join-private {
+    position: relative;
+    top: 30%;
+    margin: auto;
+    width: 60%;
+    min-width: 48rem;
+    height: auto;
+    padding: 2rem 2rem;
+    z-index: 5;
+    display: none;
+    background-image: url("/img/tilebackground.png");
+    background-size: auto;
+    border-radius: 1rem;
+}
+

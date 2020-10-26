@@ -30,6 +30,6 @@ public class Room {
         id = roomDAO.getRoomId().toString();
         isStarted = !roomDAO.getGameStatus().equals(GameStatusEnum.NOT_STARTED);
         isExisting = !roomDAO.getGameStatus().equals(GameStatusEnum.DELETED);
-        isNight = roomDAO.getGamePhase().equals(GamePhaseEnum.NIGHT);
+        isNight = roomDAO.getGamePhase().equals(GamePhaseEnum.CIVILIANS_PHASE);
     }
 }

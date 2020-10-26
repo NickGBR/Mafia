@@ -1,0 +1,56 @@
+@import "button.css";
+@import "header.css";
+@import "list.css";
+@import "stamp.css";
+@import "input.css";
+@import "chat.css";
+@import "modal.css";
+
+@font-face {
+    font-family: 'PT Mono';
+    src: url('/fonts/PTMono-Regular.eot');
+    src: url('/fonts/PTMono-Regular.eot?#iefix') format('embedded-opentype'),
+    url('/fonts/PTMono-Regular.woff2') format('woff2'),
+    url('/fonts/PTMono-Regular.woff') format('woff'),
+    url('/fonts/PTMono-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.background {
+    background-image: url("/img/tilebackground.png");
+    background-size: auto;
+}
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #141462;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #a00f0f;
+}
+
+a:visited {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.centered {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.button-group {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    margin-right: 2rem;
+}
+
+
+
+

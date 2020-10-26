@@ -3,9 +3,14 @@ let roomName;
 let roomID;
 let isAdmin;
 let isReady;
-const roomChatId = "room_chat_box";
+let maxUserAmount;
+let mafiaAmount;
+let hasDon;
+let hasSheriff;
+let selectedEntry = null;
 const usersListId = "users_list";
-const startButtonHolderId = "admin_button_holder";
+
+let userEntries = [];
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -17,52 +22,112 @@ function connect() {
     let token = sessionStorage.getItem('token');
     // Пытаемся подключиться, передав токен в заголовке.
     // И две функции: одну для обработки успешного подключения,
-    // и вторую для обработки ошибки подключения
-
+    // и вторую для обработки ошибки подключени
     stompClient.connect({'x-auth-token': token}, afterConnect, onError);
 }
 
 // Будем вызвано после установления соединения
 function afterConnect(connection) {
 
-    roomName = initialisedRoomName;
-    roomID = initialisedRoomID;
-    userName = initialisedUserName;
-    isAdmin = initialisedIsAdmin;
-    isReady = initialisedIsReady;
+    userName = init["name"];
+    roomID = init["roomID"];
+    roomName = init["roomName"];
+    isAdmin = init["isAdmin"];
+    isReady = init["isReady"];
+    maxUserAmount = init["maxUserAmount"];
+    mafiaAmount = init["mafiaAmount"];
+    hasDon = init["hasDon"];
+    hasSheriff = init["hasSheriff"];
 
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
     // Включаем кнопку отправки сообщения
     document.getElementById("send_message_button").disabled = false;
-    // Отправляем на сервер информацию, о пользователе вошедшем в чат.
 
-    // Добавляем информацию о пользователе в чат.
-    showCurrentUserInfo();
-
-    // Получаем историю чата.
-    getUsersMessages();
-
-    //Получаем список пользователей
-    getRoomUsers();
-
-    // Добавление кнопок для администратора.
-    showAdminButton(isAdmin, false);
-
-    changeReadyButtonStatus(isReady)
-
+    // Выводим назание комнаты и заполняем список игроков
+    initCurrentRoomInfo();
+    // Выбираем какой набор кнопок отображать: для админа или для пользователя
+    // и для пользователя инициализируем кнопку готовности.
+    initButtons();
 
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE + roomID, onDisbandment);
-    stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomID, getMessage);
-    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomID, getRoomUsers)
-    stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomID, usersReadyToPlayInfo)
+    stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomID, receiveMessage);
+    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomID, onUserUpdate);
+    stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomID, updateUsersReadiness);
+    stompClient.subscribe(sockConst.SYS_GAME_STARTED_INFO + roomID, goToGameChat);
+
+    // Получаем историю чата.
+    loadChatMessages();
+    //Получаем список пользователей
+    loadRoomUsers();
+
+    stopSpinner();
 }
 
 function onError(error) {
     console.log("Не удалось установить подключение: " + error);
-    alert("Клиент потерял соединение с сервером");
+    showModalMessage("Ошибка", "Клиент потерял соединение с сервером");
     document.getElementById("left_room_button").disabled = true;
     document.getElementById("user_ready_button").disabled = true;
+}
+
+/**
+ * Выводит информацю о пользователе в браузер.
+ */
+function initCurrentRoomInfo() {
+    document.getElementById("roomName").innerText = roomName;
+    document.getElementById("max-amount").innerText = maxUserAmount;
+    document.getElementById("mafia-amount").innerText = mafiaAmount;
+    if (hasSheriff) {
+        document.getElementById("sheriff-present").innerText = "в игре";
+    } else {
+        document.getElementById("sheriff-present").innerText = "нет";
+    }
+    if (hasDon) {
+        document.getElementById("don-present").innerText = "в игре";
+    } else {
+        document.getElementById("don-present").innerText = "нет";
+    }
+    let firstNode = document.getElementById("user_entry_1");
+    let userEntry = initUserEntry(firstNode);
+    userEntries.push(userEntry);
+    for (let i = 1; i < maxUserAmount; i++) {
+        const copyNode = firstNode.cloneNode(true);
+        copyNode.id = "user_entry_" + (i + 1);
+        document.getElementById(usersListId).appendChild(copyNode);
+        let userEntry = initUserEntry(copyNode);
+        userEntries.push(userEntry);
+    }
+    console.log(userEntries);
+}
+
+function initUserEntry(node) {
+    let userEntry = {};
+    userEntry["login"] = "";
+    userEntry["admin"] = false;
+    userEntry["used"] = false;
+    userEntry["stamp-container"] = node.querySelector('.stamp-container');
+    userEntry["text"] = node.querySelector('.text');
+    return userEntry;
+}
+
+
+/**
+ * Устанавливает соответствующий пользователю набор кнопок для отображения
+ */
+function initButtons() {
+    if (isAdmin) {
+        let elementsAdm = document.querySelectorAll('.admin-button');
+        let elementsUsr = document.querySelectorAll('.user-button');
+        elementsAdm.forEach((element) => {
+            element.style.display = "inline";
+        })
+        elementsUsr.forEach((element) => {
+            element.style.display = "none";
+        })
+    } else {
+        updateReadyButton(isReady)
+    }
 }
 
 /**
@@ -71,123 +136,15 @@ function onError(error) {
  */
 function onDisbandment(response) {
     if (!isAdmin) {
-        window.location.href = "roomList.html";
-        alert("Администратор расформировал комнату. Вы будете возвращены в общее лобби.");
+        showModalMessage("Комната расформирована",
+            "Администратор расформировал комнату. Вы будете возвращены в общее лобби.",
+            function () {
+                window.location.href = "roomList.html";
+            });
     }
 }
 
 
-/**
- * Выводит информацю о пользователе в браузер.
- */
-function showCurrentUserInfo() {
-
-    const userInfo = document.createTextNode("User: " + userName + ", room: " + roomName);
-    document.getElementById("user_info_label").appendChild(userInfo);
-}
-
-/**
- * Отправляет сообщения пользователей в end point.
- */
-function sendMessage() {
-
-    let callback = function (request) {
-    };
-
-    sendRequest("POST", "/api/message/send",
-        document.getElementById("message_input_value").value, callback, [8]);
-
-}
-
-function getMessage(response) {
-    const data = JSON.parse(response.body);
-
-    // Отправляем сообщение в чат
-    addToChat(data.from + ": " + data.text, roomChatId);
-}
-
-// Добавление сообщения в HTML
-function addToChat(text, chat) {
-    const node = document.createElement("LI");      // Создаем элемент списка <li>
-    node.setAttribute("class", "message");
-    const textNode = document.createTextNode(text);         // Создаем текстовый элемент
-    node.appendChild(textNode);                             // Вставляем текстовый внутрь элемента списка
-    document.getElementById(chat).appendChild(node);
-}
-
-/**
- * Отправляем серверу название комнаты, для получения истории чата.
- */
-function getUsersMessages() {
-
-    let callback = function (request) {
-        const data = JSON.parse(request.responseText);
-        data.forEach((message) => {
-            addToChat(message["from"] + ": " + message["text"], roomChatId);
-        });
-    };
-
-    sendRequest("GET", "/api/message/restore", "", callback, [8]);
-}
-
-function changeReadyButtonStatus(isReady) {
-    const button = document.getElementById("user_ready_button");
-    if (!isReady) {
-        button.className = "user_ready_button";
-        button.value = "Готов"
-    } else {
-        button.className = "user_not_ready_button";
-        button.value = "Не готов";
-    }
-}
-
-
-/**
- * Отображает пользователей на экране
- * @param user -  пользователь.
- * @param listId - id эллимента для вывода пользователей.
- */
-function showUser(user, listId) {
-    const container = document.createElement("span"); // Атрибуд добавления свете нашуму тексту.
-
-    if (user["admin"]) {
-        container.className = "admin_user";
-    } else if (user["ready"]) {
-        container.className = "ready_user";
-    } else {
-        container.className = "not_ready_user";
-    }
-    const par = document.createElement("DIV");
-    const textNode = document.createTextNode(user["name"]);
-    par.appendChild(container);
-    container.appendChild(textNode);
-    document.getElementById(listId).appendChild(par);
-}
-
-/**
- * Добавляет кнопку, начать игру, в указанный эллемент.
- * @param isAdmin - является ли текущий клиент администратором комнаты
- * @param isActive - устанавливает активность кнопки.
- */
-function showAdminButton(isAdmin, isActive) {
-    if (isAdmin) {
-        document.getElementById("admin_button_holder").innerText = "";
-        const button = document.createElement('button');
-        button.innerText = "Начать игру";
-        const holder = document.getElementById(startButtonHolderId);
-        if (isActive === true) {
-            button.className = "active_start_game_button";
-            button.disabled = false;
-        } else {
-            button.className = "not_active_start_game_button";
-            button.disabled = false;
-        }
-        holder.appendChild(button);
-
-        document.getElementById("left_room_button").setAttribute("value", "Расформировать комнату");
-        document.getElementById("left_room_button").setAttribute("onClick", "disbandRoom()");
-    }
-}
 
 function leaveRoom() {
     let callback = function () {
@@ -204,24 +161,122 @@ function disbandRoom() {
     sendRequest("POST", "/api/room/disband", "", callback, [8, 9]);
 }
 
+
+function onUserUpdate(response) {
+    const data = response.body;
+    if (data === userName) {
+        showModalMessage("Вас исключили", "Администратор исключил вас из комнаты.", function () {
+            window.location.href = "roomList.html";
+        });
+    } else {
+        loadRoomUsers();
+    }
+
+}
+
+
 /**
  * Отвечает за получение пользователей при заходе в комнату.
  */
-function getRoomUsers() {
-
+function loadRoomUsers() {
     let callback = function (request) {
         clearUsersList(); // Отчищаем список пользователей, перед обновлением.
         const data = JSON.parse(request.responseText);
         data.forEach((user) => {
-            showUser(user, usersListId);
+            showUser(user);
         });
+        restoreSelectedUser();
     };
-
     sendRequest("GET", "/api/room/getUsersList", "", callback, [8]);
 }
 
 function clearUsersList() {
-    document.getElementById('users_list').innerText = "";
+    userEntries.forEach((userEntry) => {
+        userEntry["text"].innerText = "";
+        userEntry["stamp-container"].innerText = "";
+        userEntry["used"] = false;
+        userEntry["login"] = "";
+        userEntry["admin"] = false;
+        userEntry["text"].classList.remove("clickable", "selected");
+        userEntry["text"].onclick = "";
+    });
+}
+
+/**
+ * Добавляет пользователя в отображаемый на экране список
+ * @param user -  пользователь.
+ */
+function showUser(user) {
+    let currentEntry = null;
+    for (let i = 0; i < userEntries.length; i++) {
+        if (!userEntries[i]["used"]) {
+            currentEntry = userEntries[i];
+            break;
+        }
+    }
+    currentEntry["used"] = true;
+    currentEntry["login"] = user["name"];
+    const textNodeName = document.createTextNode(user["name"]);
+    currentEntry["text"].appendChild(textNodeName);
+    if (!user["admin"]) {
+        currentEntry["text"].classList.add("clickable");
+        currentEntry["text"].onclick = function (event) {
+            selectUser(event.target);
+            updateButtonsOnSelect();
+        }
+    }
+    if (user["admin"] || user["ready"]) {
+        const stampNode = document.createElement("span");
+        stampNode.classList.add("stamp");
+        let textNodeStamp;
+        if (user["admin"]) {
+            currentEntry["admin"] = true;
+            stampNode.classList.add("red");
+            textNodeStamp = document.createTextNode("Админ");
+        } else {
+            stampNode.classList.add("blue");
+            textNodeStamp = document.createTextNode("Готов");
+        }
+        stampNode.appendChild(textNodeStamp);
+        // Случайный поворот от -5 до 5 градусов
+        stampNode.style.transform = 'rotate(' + (Math.random() * (10) - 5) + 'deg) translateY(-0.5rem)';
+        currentEntry["stamp-container"].appendChild(stampNode);
+    }
+}
+
+function selectUser(node) {
+    let login = node.innerText;
+    const foundEntry = userEntries.find(element => element["login"] === login);
+    if (!foundEntry["admin"]) {
+        if (selectedEntry !== null) {
+            selectedEntry["text"].classList.remove("selected");
+            if (selectedEntry["login"] === login) {
+                selectedEntry = null;
+                return;
+            }
+            selectedEntry = null;
+        }
+        selectedEntry = foundEntry;
+        foundEntry["text"].classList.add("selected");
+    }
+}
+
+function updateButtonsOnSelect() {
+    let button = document.getElementById("kick_user_button");
+    button.disabled = selectedEntry == null;
+}
+
+function restoreSelectedUser() {
+    if (selectedEntry !== null) {
+        let login = selectedEntry["login"];
+        const foundEntry = userEntries.find(element => element["login"] === login);
+        if (foundEntry === null) {
+            selectedEntry = null;
+        } else {
+            selectedEntry = foundEntry;
+            foundEntry.classList.add("selected");
+        }
+    }
 }
 
 /**
@@ -231,14 +286,45 @@ function changeUserReadyStatus() {
 
     let callback = function () {
         isReady = !isReady;
-        changeReadyButtonStatus(isReady);
+        updateReadyButton(isReady);
     };
     sendRequest("POST", "/api/room/setReady", !isReady, callback, [8]);
 
 }
 
-function usersReadyToPlayInfo(response) {
+
+function updateReadyButton(isReady) {
+    const button = document.getElementById("user_ready_button");
+    if (!isReady) {
+        button.innerText = "Я готов"
+    } else {
+        button.innerText = "Я не готов";
+    }
+}
+
+function updateUsersReadiness(response) {
+    loadRoomUsers();
     const data = JSON.parse(response.body);
-    getRoomUsers();
-    showAdminButton(isAdmin, data);
+    console.log(data);
+    let button = document.getElementById("start_game_button");
+    button.disabled = !data;
+}
+
+
+function kickUser() {
+    let callback = function () {
+    };
+    sendRequest("POST", "/api/room/kick", selectedEntry["login"], callback, [7, 8, 9, 11]);
+}
+
+function startGame() {
+    sendRequest("GET", sockConst.REQUEST_GET_START_GAME_INFO, "", null, [8]);
+}
+
+
+function goToGameChat(response) {
+    console.log(response);
+    const data = JSON.parse(response.body);
+    console.log(data);
+    window.location.href = "gameChat.html";
 }

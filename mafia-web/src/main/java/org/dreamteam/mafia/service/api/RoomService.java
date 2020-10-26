@@ -6,7 +6,6 @@ import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.dto.UserDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
-import org.dreamteam.mafia.model.Room;
 
 import java.util.List;
 
@@ -84,14 +83,6 @@ public interface RoomService {
      *                              или если запросивший пользователь не является администратором своей комнаты
      */
     void kickUser(String target) throws ClientErrorException;
-
-    /**
-     * Проверяет заполнена ли комната
-     *
-     * @param room - комната для проверки
-     * @return - true, если комната заполнена, false - иначе
-     */
-    boolean isRoomFull(Room room);
 
     /**
      * Подтверждает\отменяет готовность пользователя для начала игры в комнате, в которой он сейчас находится

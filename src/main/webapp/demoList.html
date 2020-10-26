@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Демо поведения интерфейса списка игроков</title>
+    <link href="styles/nameList.css" rel="stylesheet" type="text/css"/>
+</head>
+<body class="background">
+<div class="header">
+    <div class="divider">
+    <span class="header-button-container">
+        <button class="button round-button">?</button>
+    </span>
+        <span class="header-right">
+        Личное дело: <span id="userName" onload="setUserName()">t@ASDFGHJKLQWERTYUIZXCVBNM_MAX_NAME</span>
+        <a class="login-link" href="login.html"> Зайти от другого имени</a>
+    </span>
+    </div>
+</div>
+<div class="content">
+    <ul class="list-container">
+        <li class="entry-container">
+            <div class="entry">
+                <span class="text"> Игрок1 </span>
+                <span class="stamp-container"><a class="stamp red">Админ</a></span>
+            </div>
+        </li>
+        <li class="entry-container">
+            <div class="entry">
+                <span class="text"> Игрок2 </span>
+                <span class="stamp-container"></span>
+            </div>
+        </li>
+        <li class="entry-container">
+            <div class="entry selected">
+                <span class="text">Имя в тридцать два символа, да?!</span>
+                <span class="stamp-container"><a class="stamp blue">Готов</a></span>
+            </div>
+        </li>
+        <li class="entry-container">
+            <div class="entry">
+                <span class="text"> Игрок5 </span>
+                <span class="stamp-container"></span>
+            </div>
+        </li>
+        <li class="entry-container">
+            <div class="entry">
+                <span class="text">t@ASDFGHJKLQWERTYUIZXCVBNM_MAX_NAME</span>
+                <span class="stamp-container"><a class="stamp blue">Готов</a></span>
+            </div>
+        </li>
+        <li class="entry-container">
+            <div class="entry">
+                <span class="text"> Игрок c ником с пробелами </span>
+                <span class="stamp-container"><a class="stamp blue">Готов</a></span>
+            </div>
+        </li>
+        <li class="entry-container">
+            <div class="entry">
+                <span class="text"> ххХ!НАГИБАТОР_НУБОВ!Ххх</span>
+                <span class="stamp-container"></span>
+            </div>
+        </li>
+        <li class="entry-container">
+            <div class="entry">
+                <span class="text"> Игрок9 </span>
+                <span class="stamp-container"></span>
+            </div>
+        </li>
+        <li class="entry-container">
+            <div class="entry">
+                <span class="text"> Игрок10 </span>
+                <span class="stamp-container"><a class="stamp blue">Готов</a></span>
+            </div>
+        </li>
+        <li class="entry-container">
+            <div class="entry">
+                <span class="text"></span>
+                <span class="stamp-container"></span>
+            </div>
+        </li>
+        <li class="entry-container">
+            <div class="entry">
+                <span class="text"></span>
+                <span class="stamp-container"></span>
+            </div>
+        </li>
+    </ul>
+    <span class="button-container">
+    <button class="button rectangle-button">Начать игру</button>
+</span>
+    <span class="button-container">
+    <button class="button rectangle-button">Выгнать игрока</button>
+</span>
+    <span class="button-container">
+    <button class="button rectangle-button">Просто кнопка</button>
+</span>
+</div>
+</body>
+</html>
