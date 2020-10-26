@@ -6,6 +6,7 @@ let roomID;
 let isAdmin;
 let isReady;
 let destination;
+let gamePhase;
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -30,6 +31,7 @@ function afterConnect(connection) {
     isAdmin = initialisedIsAdmin;
     isReady = initialisedIsReady;
     userRole = initialisedUserRole;
+    gamePhase = init["gamePhase"];
 
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
@@ -42,6 +44,8 @@ function afterConnect(connection) {
 
     // Получаем историю чата.
     getUsersMessages();
+
+    setGamePhaseInterface(gamePhase);
 }
 
 function onError(error) {
@@ -69,7 +73,7 @@ function subscribeByRole() {
 }
 
 /**
- * Меняет интерфейс игры, в зависимоти он игровой фазы.
+ * Меняет интерфейс игры, в зависимоти от игровой фазы.
  * @param phase - фаза игры.
  */
 function setGamePhaseInterface(phase) {
@@ -168,11 +172,26 @@ function getUsersMessages() {
 }
 
 function getGameStat(response){
+
     const data = JSON.parse(response.body);
+    if(data["gamePhase"] === gamePhaseConst.END){
+        showEndGameScreen(data['message']);
+        return;
+    }
+
+
     setGamePhaseInterface(data['gamePhase']);
     if(data['message'] !==0) {
         addToChat(data["message"], gameChatID)
     }
+}
+
+function showEndGameScreen(message){
+    showModalMessage("Игра окончена",
+        message,
+        function () {
+            window.location.href = "roomList.html";
+        });
 }
 function getLog() {
     console.log(userRole);

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dreamteam.mafia.dao.enums.CharacterEnum;
+import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 
 import java.io.Serializable;
 
@@ -25,5 +26,8 @@ public class InitDTO implements Serializable {
     Boolean hasSheriff = false;
     CharacterEnum role = null;
     Boolean isGameStarted = false;
+
+    GamePhaseEnum  gamePhase = GamePhaseEnum.CIVILIANS_PHASE;
+    Boolean isRoomReady = false;
 }
 

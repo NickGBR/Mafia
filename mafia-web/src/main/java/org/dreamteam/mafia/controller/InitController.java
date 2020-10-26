@@ -54,6 +54,10 @@ public class InitController {
                 dto.setMafiaAmount(roomDAO.getMafia());
                 dto.setHasSheriff(roomDAO.getSheriff());
                 dto.setHasDon(roomDAO.getDon());
+                dto.setIsRoomReady(roomService.isRoomReady());
+                if (dto.getIsGameStarted()) {
+                    dto.setGamePhase(roomDAO.getGamePhase());
+                }
             }
         }
         return dto;

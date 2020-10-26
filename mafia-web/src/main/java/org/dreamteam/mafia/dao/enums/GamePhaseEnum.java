@@ -4,5 +4,6 @@ public enum GamePhaseEnum {
     MAFIA_PHASE,
     CIVILIANS_PHASE,
     DON_PHASE,
-    SHERIFF_PHASE
+    SHERIFF_PHASE,
+    END_GAME_PHASE
 }

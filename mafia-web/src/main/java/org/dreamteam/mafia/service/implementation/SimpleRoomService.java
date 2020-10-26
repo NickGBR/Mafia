@@ -108,6 +108,7 @@ public class SimpleRoomService implements RoomService {
         }
         for (UserDAO user : adminCurrRoom.get().getUserList()) {
             user.setRoom(null);
+            user.setIsReady(false);
         }
         adminCurrRoom.get().getUserList().clear();
         admin.get().setIsAdmin(false);

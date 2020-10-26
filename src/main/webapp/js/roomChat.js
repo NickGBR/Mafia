@@ -3,6 +3,7 @@ let roomName;
 let roomID;
 let isAdmin;
 let isReady;
+let isRoomReady;
 let maxUserAmount;
 let mafiaAmount;
 let hasDon;
@@ -38,6 +39,7 @@ function afterConnect(connection) {
     mafiaAmount = init["mafiaAmount"];
     hasDon = init["hasDon"];
     hasSheriff = init["hasSheriff"];
+    isRoomReady = init["isRoomReady"];
 
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
@@ -125,6 +127,8 @@ function initButtons() {
         elementsUsr.forEach((element) => {
             element.style.display = "none";
         })
+        let button = document.getElementById("start_game_button");
+        button.disabled = !isRoomReady;
     } else {
         updateReadyButton(isReady)
     }
