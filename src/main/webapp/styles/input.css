@@ -38,6 +38,18 @@ input[type="text"] {
     width: 40rem;
 }
 
+#input-error-message {
+    display: none;
+    font-family: 'PT Mono', monospace;
+    font-size: 1.1rem;
+    color: #540b0b;
+    border-bottom: #540b0b 1px solid;
+    width: 40rem;
+    padding-top: 3rem;
+    margin: auto;
+    text-align: center;
+}
+
 input[type=checkbox] {
     position: relative;
     cursor: pointer;

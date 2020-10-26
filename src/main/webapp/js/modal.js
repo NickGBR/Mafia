@@ -7,8 +7,10 @@ function setupModal(modalID) {
     overlay.style.display = "block";
     body.style.backgroundSize = "0";
     body.style.backgroundColor = "wheat";
-    header.style.backgroundSize = "0";
-    header.style.backgroundColor = "wheat";
+    if (header !== null) {
+        header.style.backgroundSize = "0";
+        header.style.backgroundColor = "wheat";
+    }
 }
 
 function hideModal() {
@@ -16,7 +18,9 @@ function hideModal() {
     const body = document.getElementById("body");
     const header = document.getElementById("header");
     body.style.backgroundSize = "auto";
-    header.style.backgroundSize = "auto";
+    if (header !== null) {
+        header.style.backgroundSize = "auto";
+    }
     let childrenArr = Array.prototype.slice.call(overlay.children);
     childrenArr.forEach((item) => {
         item.style.display = "none";

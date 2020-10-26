@@ -51,6 +51,9 @@ public class InitController {
                 dto.setRole(userService.getCurrentUserDAO().get().getCharacter());
                 dto.setIsReady(user.get().isReady());
                 dto.setMaxUserAmount(currentRoom.getMaxPlayers());
+                dto.setMafiaAmount(roomDAO.getMafia());
+                dto.setHasSheriff(roomDAO.getSheriff());
+                dto.setHasDon(roomDAO.getDon());
             }
         }
         return dto;

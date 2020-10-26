@@ -30,6 +30,7 @@
     z-index: 5;
     display: none;
     background-image: url("/img/tilebackground.png");
+    background-coloer: wheat;
     background-size: auto;
     border-radius: 1rem;
 }

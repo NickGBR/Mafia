@@ -1,12 +1,14 @@
-package org.dreamteam.mafia.controller.temporary;
+package org.dreamteam.mafia.controller;
 
 import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.dto.UserDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.service.api.MessageService;
 import org.dreamteam.mafia.service.api.RoomService;
+import org.dreamteam.mafia.service.api.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +25,15 @@ public class RoomController {
 
     private final Logger logger = LoggerFactory.getLogger(RoomController.class);
     private final RoomService roomService;
+    private final UserService userService;
     private final MessageService messageService;
 
     @Autowired
     public RoomController(
-            RoomService roomService, MessageService messageService) {
+            RoomService roomService, UserService userService,
+            MessageService messageService) {
         this.roomService = roomService;
+        this.userService = userService;
         this.messageService = messageService;
     }
 
@@ -85,7 +90,9 @@ public class RoomController {
         logger.debug("Incoming room join request. DTO: " + dto);
         roomService.joinRoom(dto);
         final RoomDisplayDTO currentRoom = roomService.getCurrentRoom();
-        messageService.sendJoinUpdate(currentRoom);
+        final User user = userService.getCurrentUser().orElseThrow(
+                () -> new SecurityException("Non authorised user is not allowed to leave rooms"));
+        messageService.sendJoinUpdate(currentRoom, user.getLogin());
         messageService.sendUpdateRoom(currentRoom);
     }
 
@@ -104,8 +111,10 @@ public class RoomController {
         } else {
             final RoomDisplayDTO prevRoom = roomService.getCurrentRoom();
             roomService.leaveRoom();
+            final User user = userService.getCurrentUser().orElseThrow(
+                    () -> new SecurityException("Non authorised user is not allowed to leave rooms"));
             prevRoom.setCurrPlayers(prevRoom.getCurrPlayers() - 1);
-            messageService.sendJoinUpdate(prevRoom);
+            messageService.sendJoinUpdate(prevRoom, user.getLogin());
             messageService.sendUpdateRoom(prevRoom);
         }
     }
@@ -154,6 +163,9 @@ public class RoomController {
     public void kickUser(@RequestBody String target) throws ClientErrorException {
         logger.debug("Incoming kick request. Target user login: " + target);
         roomService.kickUser(target);
+        final RoomDisplayDTO currentRoom = roomService.getCurrentRoom();
+        messageService.sendJoinUpdate(currentRoom, target);
+        messageService.sendUpdateRoom(currentRoom);
     }
 
     /**

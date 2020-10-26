@@ -32,7 +32,7 @@ public interface MessageService {
 
     void sendUpdateRoom(RoomDisplayDTO updatedRoom);
 
-    void sendJoinUpdate(RoomDisplayDTO room);
+    void sendJoinUpdate(RoomDisplayDTO room, String login);
 
     void sendReadinessUpdate() throws ClientErrorException;
 }

@@ -4,6 +4,9 @@ let roomID;
 let isAdmin;
 let isReady;
 let maxUserAmount;
+let mafiaAmount;
+let hasDon;
+let hasSheriff;
 let selectedEntry = null;
 const usersListId = "users_list";
 
@@ -32,6 +35,9 @@ function afterConnect(connection) {
     isAdmin = init["isAdmin"];
     isReady = init["isReady"];
     maxUserAmount = init["maxUserAmount"];
+    mafiaAmount = init["mafiaAmount"];
+    hasDon = init["hasDon"];
+    hasSheriff = init["hasSheriff"];
 
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
@@ -46,8 +52,9 @@ function afterConnect(connection) {
 
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE + roomID, onDisbandment);
     stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomID, receiveMessage);
-    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomID, loadRoomUsers)
-    stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomID, updateUsersReadiness)
+    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomID, onUserUpdate);
+    stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomID, updateUsersReadiness);
+    stompClient.subscribe(sockConst.SYS_GAME_STARTED_INFO + roomID, goToGameChat);
 
     // Получаем историю чата.
     loadChatMessages();
@@ -68,8 +75,19 @@ function onError(error) {
  * Выводит информацю о пользователе в браузер.
  */
 function initCurrentRoomInfo() {
-    const roomNameText = document.createTextNode(roomName);
-    document.getElementById("roomName").appendChild(roomNameText);
+    document.getElementById("roomName").innerText = roomName;
+    document.getElementById("max-amount").innerText = maxUserAmount;
+    document.getElementById("mafia-amount").innerText = mafiaAmount;
+    if (hasSheriff) {
+        document.getElementById("sheriff-present").innerText = "в игре";
+    } else {
+        document.getElementById("sheriff-present").innerText = "нет";
+    }
+    if (hasDon) {
+        document.getElementById("don-present").innerText = "в игре";
+    } else {
+        document.getElementById("don-present").innerText = "нет";
+    }
     let firstNode = document.getElementById("user_entry_1");
     let userEntry = initUserEntry(firstNode);
     userEntries.push(userEntry);
@@ -142,6 +160,20 @@ function disbandRoom() {
     };
     sendRequest("POST", "/api/room/disband", "", callback, [8, 9]);
 }
+
+
+function onUserUpdate(response) {
+    const data = response.body;
+    if (data === userName) {
+        showModalMessage("Вас исключили", "Администратор исключил вас из комнаты.", function () {
+            window.location.href = "roomList.html";
+        });
+    } else {
+        loadRoomUsers();
+    }
+
+}
+
 
 /**
  * Отвечает за получение пользователей при заходе в комнату.
@@ -273,10 +305,17 @@ function updateReadyButton(isReady) {
 function updateUsersReadiness(response) {
     loadRoomUsers();
     const data = JSON.parse(response.body);
+    console.log(data);
     let button = document.getElementById("start_game_button");
-    button.disabled = data;
+    button.disabled = !data;
 }
 
+
+function kickUser() {
+    let callback = function () {
+    };
+    sendRequest("POST", "/api/room/kick", selectedEntry["login"], callback, [7, 8, 9, 11]);
+}
 
 function startGame() {
     sendRequest("GET", sockConst.REQUEST_GET_START_GAME_INFO, "", null, [8]);

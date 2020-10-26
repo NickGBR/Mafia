@@ -74,50 +74,66 @@
 </div>
 <div id="content">
     <div class="room-name-container">
-        <span class="room-name">
-            Название комнаты:  <span id="roomName"></span>
-        </span>
+            <span class="room-name">
+                Название комнаты:  <span id="roomName"></span>
+            </span>
         <span class="button-container user-button">
-         <button class="button rectangle-button" id="left_room_button" onclick="leaveRoom()">
-            Покинуть комнату
-         </button>
-        </span>
+                <button class="button rectangle-button" id="left_room_button" onclick="leaveRoom()">
+                    Покинуть комнату
+                </button>
+            </span>
         <span class="button-container admin-button">
-         <button class="button rectangle-button" id="disband_room_button" onclick="disbandRoom()">
-            Расформировать комнату
-         </button>
-        </span>
+                <button class="button rectangle-button" id="disband_room_button" onclick="disbandRoom()">
+                    Расформировать комнату
+                </button>
+            </span>
     </div>
-
-
-    <!-- Кнопки управления -->
-    <div class="button-group">
+    <div class="room-param-container">
+            <span class="room-param">
+                Число игроков всего:  <span id="max-amount"></span>
+            </span>
+        <span class="room-param">
+                 Число игроков за мафию:  <span id="mafia-amount"></span>
+            </span>
+    </div>
+    <div class="room-param-container">
+        <span class="room-param">
+                Шериф:  <span id="sheriff-present"></span>
+            </span>
+        <span class="room-param">
+                 Дон:  <span id="don-present"></span>
+            </span>
+    </div>
+    <div>
+        <!-- Кнопки управления -->
+        <div class="button-group">
         <span class="button-container user-button">
             <button class="button rectangle-button" id="user_ready_button" onclick="changeUserReadyStatus()">
             Я готов
             </button>
         </span>
-        <span class="button-container admin-button">
-         <button class="button rectangle-button" disabled id="start_game_button" onclick="">
+            <span class="button-container admin-button">
+         <button class="button rectangle-button" disabled id="start_game_button" onclick="startGame()">
             Начать игру
          </button>
         </span>
-        <span class="button-container admin-button">
-         <button class="button rectangle-button" disabled id="kick_user_button" onclick="">
+            <span class="button-container admin-button">
+         <button class="button rectangle-button" disabled id="kick_user_button" onclick="kickUser()">
             Выгнать игрока
          </button>
         </span>
-    </div>
+        </div>
 
-    <!-- Список игроков -->
-    <ul class="list-container" id="users_list">
-        <li class="entry-container" id="user_entry_1">
-            <div class="entry">
-                <span class="text"></span>
-                <span class="stamp-container"></span>
-            </div>
-        </li>
-    </ul>
+        <!-- Список игроков -->
+        <ul class="list-container" id="users_list">
+            <li class="entry-container" id="user_entry_1">
+                <div class="entry">
+                    <span class="text"></span>
+                    <span class="stamp-container"></span>
+                </div>
+            </li>
+        </ul>
+    </div>
 </div>
 </body>
 </html>

@@ -52,6 +52,7 @@ function openRoomCreator() {
     document.getElementById("new_room_mafia_amount").value = "3";
     document.getElementById("new_room_don").checked = true;
     document.getElementById("new_room_sheriff").checked = true;
+    document.getElementById("input-error-message").style.display = "none";
     setupModal("modal-room-create");
 }
 
@@ -97,18 +98,26 @@ function createRoom() {
 
     let name = document.getElementById("new_room_name").value;
     name = name.trim();
+    if (name.length === 0) {
+        showInputError("Ошибка: пустое имя комнаты");
+        return;
+    }
     if (name.length > 20) {
+        showInputError("Ошибка: слишком длинное имя комнаты");
         return;
     }
     const maxAmount = document.getElementById("new_room_max_amount").value;
     if (maxAmount < 3 || maxAmount > 99) {
+        showInputError("Ошибка: недопустимое число игроков");
         return;
     }
     const mafiaAmount = document.getElementById("new_room_mafia_amount").value;
     if (mafiaAmount < 1 || mafiaAmount > 33) {
+        showInputError("Ошибка: недопустимое число игроков за Мафию");
         return;
     }
-    if (mafiaAmount > maxAmount / 2 - 1) {
+    if (mafiaAmount > (maxAmount / 2 + maxAmount % 2 - 1)) {
+        showInputError("Ошибка: слишком много игроков за Мафию от общего числа");
         return;
     }
 
@@ -128,7 +137,7 @@ function createRoom() {
         'sheriff': document.getElementById("new_room_sheriff").checked
     };
 
-    sendRequest("POST", "/api/room/create", JSON.stringify(jsonData), callback, [5]);
+    sendRequest("POST", "/api/room/create", JSON.stringify(jsonData), callback, [5, 13, 14]);
 }
 
 // Будет вызвано при ошибке установления соединения
@@ -137,6 +146,13 @@ function onError(error) {
     showModalMessage("Ошибка", "Клиент потерял соединение с сервером");
     document.getElementById("room_input").disabled = true;
     document.getElementById("set_room_button").disabled = true;
+}
+
+
+function showInputError(text) {
+    const error = document.getElementById("input-error-message")
+    error.innerText = text;
+    error.style.display = "block";
 }
 
 /**

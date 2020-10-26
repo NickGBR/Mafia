@@ -8,7 +8,6 @@ import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.dto.UserDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
-import org.dreamteam.mafia.model.Room;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.service.api.RoomService;
 import org.dreamteam.mafia.service.api.UserService;
@@ -54,8 +53,16 @@ public class SimpleRoomService implements RoomService {
 
     @Override
     public void createRoom(RoomCreationDTO roomDTO) throws ClientErrorException {
+        String name = roomDTO.getName().trim();
+        if (name.length() == 0 || name.length() > 20) {
+            throw new ClientErrorException(ClientErrorCode.INVALID_NAME, "Provided name is invalid");
+        }
+        if (roomDTO.getMafia() > (roomDTO.getMaxPlayers() / 2 + (roomDTO.getMaxPlayers() % 2 - 1))) {
+            throw new ClientErrorException(ClientErrorCode.INVALID_ROOM_PARAMETERS,
+                                           "Too many mafia - game would end immediately");
+        }
         RoomDAO dao = new RoomDAO();
-        dao.setName(roomDTO.getName());
+        dao.setName(name);
         if (roomDTO.getPassword().isEmpty()) {
             dao.setPasswordHash("");
         } else {
@@ -226,10 +233,6 @@ public class SimpleRoomService implements RoomService {
         repository.save(adminCurrRoom.get());
     }
 
-    @Override
-    public boolean isRoomFull(Room room) {
-        return false;
-    }
 
     @Override
     public void setReady(boolean ready) throws ClientErrorException {
@@ -261,7 +264,7 @@ public class SimpleRoomService implements RoomService {
                 .map(UserDAO::getIsReady)
                 .filter((ready) -> ready)
                 .count();
-        return count == room.get().getMaxUsersAmount();
+        return count == (room.get().getMaxUsersAmount() - 1);
     }
 
     @Override

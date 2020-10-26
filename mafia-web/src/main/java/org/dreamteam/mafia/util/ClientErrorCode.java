@@ -20,7 +20,9 @@ public enum ClientErrorCode {
     NOT_ENOUGH_RIGHTS(9),
     ROOM_NOT_EXIST(10),
     GAME_ALREADY_STARTED(11),
-    ROOM_IS_FULL(12);
+    ROOM_IS_FULL(12),
+    INVALID_NAME(13),
+    INVALID_ROOM_PARAMETERS(14);
 
     private final int value;
 

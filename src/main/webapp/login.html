@@ -4,11 +4,25 @@
     <title>Вход</title>
     <script src="js/commonREST.js"></script>
     <script src="js/login.js"></script>
+    <script src="js/modal.js"></script>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
     <link href="styles/commonstyle.css" rel="stylesheet" type="text/css"/>
     <link href="styles/authentication.css" rel="stylesheet" type="text/css"/>
 </head>
-<body class="background">
+<body class="background" id="body">
+<div id="overlay-modal">
+    <div id="modal-spinner">
+    </div>
+    <div id="modal-message">
+        <div class="modal-header" id="modal-message-title"></div>
+        <div id="modal-message-text"></div>
+        <div class="input-button-confirmation-container centered">
+            <button class="button rectangle-button" id="confirm-message-button" onclick="confirmModalMessage()">
+                ОК
+            </button>
+        </div>
+    </div>
+</div>
 <div class="input-container centered">
     <label for="login_input">Введите позывной:</label>
     <input id="login_input" name="login" placeholder="хХ_Гроза_Мафии_Хх">

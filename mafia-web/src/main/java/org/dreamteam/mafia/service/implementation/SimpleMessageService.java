@@ -93,9 +93,9 @@ public class SimpleMessageService implements MessageService {
     }
 
     @Override
-    public void sendJoinUpdate(RoomDisplayDTO room) {
+    public void sendJoinUpdate(RoomDisplayDTO room, String login) {
         messagingTemplate.convertAndSend(SockConst.SYS_WEB_USERS_INFO + room.getId(),
-                true);
+                                         login);
     }
 
     @Override
