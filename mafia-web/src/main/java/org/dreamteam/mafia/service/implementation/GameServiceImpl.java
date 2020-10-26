@@ -3,6 +3,7 @@ package org.dreamteam.mafia.service.implementation;
 import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.CharacterDTO;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Service("gameService")
+@Service("GameService")
 public class GameServiceImpl implements GameService {
 
     @Qualifier("Task")
@@ -141,6 +142,7 @@ public class GameServiceImpl implements GameService {
 
     }
 
+    @Override
     public boolean isSheriff(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
             RoomsMismatchException, NotEnoughRightsException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
@@ -172,7 +174,7 @@ public class GameServiceImpl implements GameService {
 
     }
 
-
+    @Override
     public boolean isMafia(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
             RoomsMismatchException, NotEnoughRightsException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
@@ -202,6 +204,39 @@ public class GameServiceImpl implements GameService {
 
         return userDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.DON) ||
                 userDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.MAFIA);
+    }
+
+    // @Override
+    public int countVotesAgainst(String login) throws RoomsMismatchException, UserDoesNotExistInDBException, IllegalGamePhaseException, CharacterAlreadyDeadException {
+        Optional<UserDAO> userDAO = userRepository.findByLogin(login);
+        if (!userDAO.isPresent()) {
+            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
+                    + "\' doesn't exist in a database");
+        }
+
+        Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
+        if (!currentUserDAO.isPresent()) {
+            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
+        }
+
+        if (!Objects.equals(userDAO.get().getRoom().getRoomId(), currentUserDAO.get().getRoom().getRoomId())) {
+            throw new RoomsMismatchException(ClientErrorCode.ROOMS_MISMATCH, "\'"
+                    + userDAO.get().getLogin() + "\' and \'"
+                    + currentUserDAO.get().getLogin() + "\' are in different rooms");
+        }
+
+        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.CIVILIANS_PHASE)) {
+            throw new IllegalGamePhaseException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
+        }
+
+        if (userDAO.get().getCharacterStatus().equals(CharacterStatusEnum.DEAD) ||
+            currentUserDAO.get().getCharacterStatus().equals(CharacterStatusEnum.DEAD)) {
+            throw new CharacterAlreadyDeadException(ClientErrorCode.CHARACTER_IS_DEAD, "Character is out of game!");
+        }
+
+        // userDAO.get().getVotesAgainst()++;
+
+        return 0;
     }
 
     private void setRolesToUsers(RoomDAO room) {
