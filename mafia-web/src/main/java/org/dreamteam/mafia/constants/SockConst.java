@@ -40,7 +40,6 @@ public class SockConst {
      */
     public static final String REQUEST_GET_ROLE_INFO = "/GET/checkRole";
 
-
     public static final String REQUEST_GET_START_GAME_INFO = "/startGame";
 
 
