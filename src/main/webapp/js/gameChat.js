@@ -204,6 +204,7 @@ function getGameStat(response) {
  * доном или шерифом. Проверка на дона или шерифа, происходит на сервере
  * автоматически, так как мы знаем роли игрока, сделавшего запрос.
  */
+
 function checkUserRole(){
     let callback = function (request) {
 
