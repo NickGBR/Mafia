@@ -53,7 +53,10 @@
 </div>
 <input class="message_input" disabled="disabled" id="message_input_value" placeholder="Введите сообщение..."/>
 <button class="text" disabled="disabled" id="send_message_button" onclick="sendMessage()">Отправить сообщение</button>
-<button class="text" id="" onclick="getLog()">getLog</button>
+<button class="text"  onclick="getLog()">getLog</button>
+<button class="text" id="don_checker" onclick="checkUserRole()">Проверить шерифа</button>
+<button class="text" id="sheriff_checker" onclick="checkUserRole()">Проверить дона</button>
+
 <script>
     document.getElementById("message_input_value")
         .addEventListener("keyup", function (event) {

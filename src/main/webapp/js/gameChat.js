@@ -65,9 +65,9 @@ function subscribeByRole() {
         stompClient.subscribe(sockConst.MAFIA_WEB_CHAT + roomID, getMessage)
         stompClient.subscribe(sockConst.SYS_WEB_CHAT + roomID, getGameStat);
     } else {
-        console.log("Подписался как мирный на " + sockConst.CIV_WEB_CHAT );
+        console.log("Подписался как мирный на " + sockConst.CIV_WEB_CHAT);
         stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, getMessage);
-        stompClient.subscribe(sockConst.SYS_WEB_CHAT+roomID, getGameStat);
+        stompClient.subscribe(sockConst.SYS_WEB_CHAT + roomID, getGameStat);
 
     }
 }
@@ -78,33 +78,46 @@ function subscribeByRole() {
  */
 function setGamePhaseInterface(phase) {
     disableInterface();
-    switch (phase){
+    switch (phase) {
         case gamePhaseConst.CIVILIAN:
             destination = destinationConst.CIVILIAN;
             activateInterface();
-        break;
+            break;
         case gamePhaseConst.MAFIA:
             destination = destinationConst.MAFIA;
-            if(userRole === roleConst.MAFIA ||
+            if (userRole === roleConst.MAFIA ||
                 userRole === roleConst.DON) activateInterface();
             break;
         case gamePhaseConst.DON:
-            if(userRole === roleConst.DON) activateInterface();
+            if (userRole === roleConst.DON) activateDonInterface();
             break;
         case gamePhaseConst.SHERIFF:
-            if(userRole === roleConst.SHERIFF) activateInterface()
-            break
+            if (userRole === roleConst.SHERIFF) activateSheriffInterface();
+            break;
         default:
             alert("Проблемы с фазой игры, обратитесь к разработчику.")
     }
 }
 
-function disableInterface(){
+function disableInterface() {
     document.getElementById('send_message_button').disabled = true;
     document.getElementById('message_input_value').disabled = true;
+    document.getElementById('don_checker').style.display = 'none';
+    document.getElementById('sheriff_checker').style.display = 'none';
 }
 
-function activateInterface(){
+function activateDonInterface() {
+    activateInterface();
+    document.getElementById('don_checker').style.display = "block";
+}
+
+function activateSheriffInterface() {
+    activateInterface();
+    document.getElementById('sheriff_checker').style.display = "block";
+
+}
+
+function activateInterface() {
     document.getElementById('send_message_button').disabled = false;
     document.getElementById('message_input_value').disabled = false;
 }
@@ -122,7 +135,7 @@ function showCurrentUserInfo() {
  * Вызывается при получении сообщения на сокет.
  * @param response.
  */
-function getMessage(response){
+function getMessage(response) {
     const data = JSON.parse(response.body);
     // Отправляем сообщение в чат\
     addToChat(data.from + ": " + data.text, gameChatID);
@@ -162,7 +175,7 @@ function getUsersMessages() {
     let callback = function (request) {
         const data = JSON.parse(request.responseText);
         data.forEach((message) => {
-            if(message['destination']===destinationConst.CIVILIAN) {
+            if (message['destination'] === destinationConst.CIVILIAN) {
                 addToChat(message["from"] + ": " + message["text"], gameChatID);
             }
         });
@@ -171,28 +184,43 @@ function getUsersMessages() {
     sendRequest("GET", "/api/message/restore", "", callback, [8]);
 }
 
-function getGameStat(response){
+function getGameStat(response) {
 
     const data = JSON.parse(response.body);
-    if(data["gamePhase"] === gamePhaseConst.END){
+    if (data["gamePhase"] === gamePhaseConst.END) {
         showEndGameScreen(data['message']);
         return;
     }
 
 
     setGamePhaseInterface(data['gamePhase']);
-    if(data['message'] !==0) {
+    if (data['message'] !== 0) {
         addToChat(data["message"], gameChatID)
     }
 }
 
-function showEndGameScreen(message){
+/**
+ * Функция для шерифа и дона, проверяющая является ли тот или иной игрок
+ * доном или шерифом. Проверка на дона или шерифа, происходит на сервере
+ * автоматически, так как мы знаем роли игрока, сделавшего запрос.
+ */
+function checkUserRole(){
+    let callback = function (request) {
+
+        console.log(request.responseText);
+    };
+    let login = document.getElementById("message_input_value").value;
+    sendRequest("GET", sockConst.REQUEST_GET_ROLE_INFO +"?login=" + login, "", callback, [8]);
+}
+
+function showEndGameScreen(message) {
     showModalMessage("Игра окончена",
         message,
         function () {
             window.location.href = "roomList.html";
         });
 }
+
 function getLog() {
     console.log(userRole);
 }
