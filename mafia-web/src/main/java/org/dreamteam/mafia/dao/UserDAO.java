@@ -9,6 +9,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -16,11 +17,18 @@ import java.util.Objects;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "users")
 
 public class UserDAO {
+
+    public UserDAO() {
+        this.isAdmin = false;
+        this.isReady = false;
+        this.votesAgainst = 0;
+        this.characterStatus = CharacterStatusEnum.ALIVE;
+    }
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,15 +64,9 @@ public class UserDAO {
     @Enumerated(EnumType.STRING)
     private CharacterStatusEnum characterStatus;
 
+
     @Column(name = "votes_against")
     private Integer votesAgainst;
-
-    public UserDAO(String login, String passwordHash) {
-        this.login = login;
-        this.passwordHash = passwordHash;
-        this.isAdmin = false;
-        this.isReady = false;
-    }
 
     @Override
     public int hashCode() {

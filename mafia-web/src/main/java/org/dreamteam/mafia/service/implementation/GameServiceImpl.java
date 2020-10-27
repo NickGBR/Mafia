@@ -143,6 +143,8 @@ public class GameServiceImpl implements GameService {
     @Override
     public void countVotesAgainst(String login) throws ClientErrorException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
+
+
         if (!userDAO.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
                     + "\' doesn't exist in a database");
@@ -159,10 +161,6 @@ public class GameServiceImpl implements GameService {
                     + currentUserDAO.get().getLogin() + "\' are in different rooms");
         }
 
-        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.CIVILIANS_PHASE)) {
-            throw new ClientErrorException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
-        }
-
         if (userDAO.get().getCharacterStatus().equals(CharacterStatusEnum.DEAD) ||
                 currentUserDAO.get().getCharacterStatus().equals(CharacterStatusEnum.DEAD)) {
             throw new ClientErrorException(ClientErrorCode.CHARACTER_IS_DEAD, "Character is out of game!");
@@ -170,8 +168,8 @@ public class GameServiceImpl implements GameService {
 
         Integer votesAgainst = userDAO.get().getVotesAgainst();
         userDAO.get().setVotesAgainst(votesAgainst + 1);
+        System.out.println(userDAO.get().getVotesAgainst());
         userRepository.save(userDAO.get());
-
     }
 
     @Override
