@@ -51,12 +51,15 @@
 <!-- окно чата -->
 <div class="room_box" id="game_chat_box">
 </div>
+
 <input class="message_input" disabled="disabled" id="message_input_value" placeholder="Введите сообщение..."/>
-<input class="message_input" disabled="disabled" id="user_login_value" placeholder="Введите за кого голосуете"/>
+
 <button class="text" disabled="disabled" id="send_message_button" onclick="sendMessage()">Отправить сообщение</button>
-<button class="text" id="vote_for_user_button" onclick="voteForUser()">Проголосовать</button>
-<button class="text" id="don_checker" onclick="checkUserRole()">Проверить шерифа</button>
-<button class="text" id="sheriff_checker" onclick="checkUserRole()">Проверить дона</button>
+
+<button class="text" disabled="disabled" id="vote_for_user_button" onclick="voteForUser()">Проголосовать</button>
+
+<button class="text" disabled="disabled" id="don_checker" onclick="checkUserRole()">Проверить шерифа</button>
+<button class="text" disabled="disabled" id="sheriff_checker" onclick="checkUserRole()">Проверить дона</button>
 
 <script>
     document.getElementById("message_input_value")
