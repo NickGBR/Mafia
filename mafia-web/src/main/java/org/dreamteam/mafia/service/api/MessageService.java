@@ -34,5 +34,7 @@ public interface MessageService {
 
     void sendJoinUpdate(RoomDisplayDTO room, String login);
 
+    void sendKickUpdate(RoomDisplayDTO room, String login);
+
     void sendReadinessUpdate() throws ClientErrorException;
 }

@@ -99,10 +99,16 @@ public class SimpleMessageService implements MessageService {
     }
 
     @Override
+    public void sendKickUpdate(RoomDisplayDTO room, String login) {
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_USERS_INFO_KICKED + room.getId(),
+                                         login);
+    }
+
+    @Override
     public void sendReadinessUpdate() throws ClientErrorException {
         messagingTemplate.convertAndSend(SockConst.SYS_USERS_READY_TO_PLAY_INFO
-                        + roomService.getCurrentRoom().getId(),
-                roomService.isRoomReady());
+                                                 + roomService.getCurrentRoom().getId(),
+                                         roomService.isRoomReady());
     }
 
     /**

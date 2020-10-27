@@ -16,6 +16,7 @@ public class SockConst {
     public static final String SYS_WEB_ROOMS_INFO_REMOVE = "/chat/system_messages/rooms/remove";
     public static final String SYS_WEB_ROOMS_INFO_UPDATE = "/chat/system_messages/rooms/update";
     public static final String SYS_WEB_USERS_INFO = "/chat/system_messages/users/";
+    public static final String SYS_WEB_USERS_INFO_KICKED = "/chat/system_messages/users/kicked";
     public static final String SYS_USERS_READY_TO_PLAY_INFO = "/chat/system_messages/users_ready_to_play_info/";
     public static final String SYS_GAME_STARTED_INFO = "/chat/system_message/game_started_message/";
 

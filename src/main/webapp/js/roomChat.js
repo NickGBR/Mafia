@@ -8,6 +8,7 @@ let maxUserAmount;
 let mafiaAmount;
 let hasDon;
 let hasSheriff;
+let isKicked = false;
 let selectedEntry = null;
 const usersListId = "users_list";
 
@@ -54,7 +55,8 @@ function afterConnect(connection) {
 
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE + roomID, onDisbandment);
     stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomID, receiveMessage);
-    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomID, onUserUpdate);
+    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomID, loadRoomUsers);
+    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO_KICKED + roomID, onUserKick);
     stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomID, updateUsersReadiness);
     stompClient.subscribe(sockConst.SYS_GAME_STARTED_INFO + roomID, goToGameChat);
 
@@ -155,16 +157,14 @@ function disbandRoom() {
 }
 
 
-function onUserUpdate(response) {
+function onUserKick(response) {
     const data = response.body;
     if (data === userName) {
+        isKicked = true;
         showModalMessage("Вас исключили", "Администратор исключил вас из комнаты.", function () {
             window.location.href = "roomList.html";
         });
-    } else {
-        loadRoomUsers();
     }
-
 }
 
 
@@ -172,6 +172,9 @@ function onUserUpdate(response) {
  * Отвечает за получение пользователей при заходе в комнату.
  */
 function loadRoomUsers() {
+    if (isKicked) {
+        return;
+    }
     let callback = function (request) {
         clearUsersList(); // Отчищаем список пользователей, перед обновлением.
         const data = JSON.parse(request.responseText);

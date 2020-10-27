@@ -11,10 +11,12 @@ var sockConst = {
     CIV_WEB_CHAT: '/chat/message/send/civilians/',
     SYS_WEB_CHAT: '/chat/system_messages/',
 
-    SYS_WEB_ROOMS_INFO_ADD: "/chat/system_messages/rooms/add",
-    SYS_WEB_ROOMS_INFO_REMOVE: "/chat/system_messages/rooms/remove",
-    SYS_WEB_ROOMS_INFO_UPDATE: "/chat/system_messages/rooms/update",
+    SYS_WEB_ROOMS_INFO_ADD: '/chat/system_messages/rooms/add',
+    SYS_WEB_ROOMS_INFO_REMOVE: '/chat/system_messages/rooms/remove',
+    SYS_WEB_ROOMS_INFO_UPDATE: '/chat/system_messages/rooms/update',
     SYS_WEB_USERS_INFO: '/chat/system_messages/users/',
+    SYS_WEB_USERS_INFO_KICKED: '/chat/system_messages/users/kicked',
+
     SYS_USERS_READY_TO_PLAY_INFO: '/chat/system_messages/users_ready_to_play_info/',
     SYS_GAME_STARTED_INFO: '/chat/system_message/game_started_message/',
 
