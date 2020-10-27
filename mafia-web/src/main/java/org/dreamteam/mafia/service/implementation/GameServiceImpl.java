@@ -207,7 +207,7 @@ public class GameServiceImpl implements GameService {
     }
 
     // @Override
-    public int countVotesAgainst(String login) throws RoomsMismatchException, UserDoesNotExistInDBException, IllegalGamePhaseException, CharacterAlreadyDeadException {
+    public void countVotesAgainst(String login) throws RoomsMismatchException, UserDoesNotExistInDBException, IllegalGamePhaseException, CharacterAlreadyDeadException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
             throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
@@ -234,9 +234,10 @@ public class GameServiceImpl implements GameService {
             throw new CharacterAlreadyDeadException(ClientErrorCode.CHARACTER_IS_DEAD, "Character is out of game!");
         }
 
-        // userDAO.get().getVotesAgainst()++;
+        Integer votesAgainst = userDAO.get().getVotesAgainst();
+        userDAO.get().setVotesAgainst(votesAgainst + 1);
+        userRepository.save(userDAO.get());
 
-        return 0;
     }
 
     private void setRolesToUsers(RoomDAO room) {
