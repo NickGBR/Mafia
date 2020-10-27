@@ -275,7 +275,7 @@ function voteForUser(){
         console.log(request.responseText);
     };
     let login = document.getElementById("user_login_value").value;
-    sendRequest("GET", sockConst.REQUEST_GET_ROLE_INFO +"?login=" + login, "", callback, [8]);
+    sendRequest("GET", sockConst.REQUEST_GET_VOTE_FOR_USER +"?login=" + login, "", null, [8]);
 }
 
 function showEndGameScreen(message) {
