@@ -87,4 +87,17 @@ public interface GameService {
      */
     boolean isMafia(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
             RoomsMismatchException, NotEnoughRightsException;
+
+    /**
+     * Подсчет голосов против игрока.
+     *
+     * @param login - логин игрока, против которого голосуют
+     * @throws RoomsMismatchException        - если игроки находятся в разных комнатах
+     * @throws UserDoesNotExistInDBException - если игрока нет в базе
+     * @throws IllegalGamePhaseException     - если не соответствует фаза голосования (мирные голосуют днем)
+     * @throws CharacterAlreadyDeadException - если пользователь уже выбыл из игры
+     */
+    void countVotesAgainst(String login) throws RoomsMismatchException, UserDoesNotExistInDBException,
+            IllegalGamePhaseException, CharacterAlreadyDeadException;
+
 }

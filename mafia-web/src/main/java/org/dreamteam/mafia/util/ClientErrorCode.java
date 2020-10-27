@@ -22,7 +22,8 @@ public enum ClientErrorCode {
     GAME_ALREADY_STARTED(11),
     ROOM_IS_FULL(12),
     INVALID_NAME(13),
-    INVALID_ROOM_PARAMETERS(14);
+    INVALID_ROOM_PARAMETERS(14),
+    CHARACTER_IS_DEAD(15);
 
     private final int value;
 
