@@ -31,6 +31,14 @@ var sockConst = {
     REQUEST_GET_CHANGE_USER_READY_STATUS: "api/POST/changeReadyStatus",
     REQUEST_GET_ROOM_READY_STATUS: "api/GET/getRoomReadyStatus",
 
+    /**
+     * Использоуется для проверки роли персонажа,
+     * шериф првоеряет, явлеяется ли персонаж доном,
+     * дон проверяет явлеся ли указанный персонаж шерифом.
+     */
+    REQUEST_GET_ROLE_INFO: "api/room/GET/checkRole",
+
+
     REQUEST_GET_START_GAME_INFO: '/api/room/startGame'
 }
 

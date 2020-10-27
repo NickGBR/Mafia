@@ -162,7 +162,7 @@ public class GameServiceImpl implements GameService {
                     + currentUserDAO.get().getLogin() + "\' are in different rooms");
         }
 
-        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.MAFIA_PHASE)) {
+        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.DON_PHASE)) {
             throw new IllegalGamePhaseException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
         }
 
@@ -194,7 +194,7 @@ public class GameServiceImpl implements GameService {
                     + currentUserDAO.get().getLogin() + "\' are in different rooms");
         }
 
-        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.MAFIA_PHASE)) {
+        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.SHERIFF_PHASE)) {
             throw new IllegalGamePhaseException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
         }
 

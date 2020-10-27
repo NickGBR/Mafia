@@ -33,6 +33,14 @@ public class SockConst {
     public static final String REQUEST_GET_CHANGE_READY_STATUS = "api/POST/changeReadyStatus";
     public static final String REQUEST_GET_ROOM_READY_STATUS = "api/GET/getRoomReadyStatus";
 
+    /**
+     * Использоуется для проверки роли персонажа,
+     * шериф првоеряет, явлеяется ли персонаж доном,
+     * дон проверяет явлеся ли указанный персонаж шерифом.
+     */
+    public static final String REQUEST_GET_ROLE_INFO = "/GET/checkRole";
+
+
     public static final String REQUEST_GET_START_GAME_INFO = "/startGame";
 
 
