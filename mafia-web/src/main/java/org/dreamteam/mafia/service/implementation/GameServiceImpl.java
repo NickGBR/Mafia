@@ -206,7 +206,7 @@ public class GameServiceImpl implements GameService {
                 userDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.MAFIA);
     }
 
-    // @Override
+    @Override
     public void countVotesAgainst(String login) throws RoomsMismatchException, UserDoesNotExistInDBException, IllegalGamePhaseException, CharacterAlreadyDeadException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
