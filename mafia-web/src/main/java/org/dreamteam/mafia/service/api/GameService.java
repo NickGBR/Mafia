@@ -1,7 +1,7 @@
 package org.dreamteam.mafia.service.api;
 
 import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.exceptions.*;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 
 /**
  * Интерфейс сервиса, обеспечивающего ведение самой игры.
@@ -13,6 +13,8 @@ public interface GameService {
      * проверят существует ли пользоватеь в базе данных,
      * проверяет достаточно ли у пльзователя прав для запуска комнаты,
      * отправляет всем пользователям информацию об успешном старте игры.
+     *
+     * @throws ClientErrorException - при возникновении ошибок на стороне клиента
      */
     void startGame() throws ClientErrorException;
 
@@ -21,38 +23,26 @@ public interface GameService {
      *
      * @param login - логин игрока
      * @return - true, если игрок явлеятся шерифом, нет в противном случае
-     * @throws IllegalGamePhaseException     - если не соответствует фаза дня (ночью шериф ищет мафию/дона, мафия ищет шерифа)
-     * @throws UserDoesNotExistInDBException - если игрока нет в базе
-     * @throws RoomsMismatchException        - если игроки находятся в разных комнатах
-     * @throws NotEnoughRightsException      - если у игрока нет прав голосовать в данную фазу
+     * @throws ClientErrorException - при возникновении ошибок на стороне клиента
      */
-    boolean isSheriff(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
-            RoomsMismatchException, NotEnoughRightsException;
+    boolean isSheriff(String login) throws ClientErrorException;
 
     /**
      * Проверка является ли игрок мафией/доном.
      *
      * @param login - логин игрока
      * @return - true, если игрок явлеятся мафией/доном, нет в противном случае
-     * @throws IllegalGamePhaseException     - если не соответствует фаза дня (ночью шериф ищет мафию/дона, мафия ищет шерифа)
-     * @throws UserDoesNotExistInDBException - если игрока нет в базе
-     * @throws RoomsMismatchException        - если игроки находятся в разных комнатах
-     * @throws NotEnoughRightsException      - если у игрока нет прав голосовать в данную фазу
+     * @throws ClientErrorException - при возникновении ошибок на стороне клиента
      */
-    boolean isMafia(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
-            RoomsMismatchException, NotEnoughRightsException;
+    boolean isMafia(String login) throws ClientErrorException;
 
     /**
      * Подсчет голосов против игрока.
      *
      * @param login - логин игрока, против которого голосуют
-     * @throws RoomsMismatchException        - если игроки находятся в разных комнатах
-     * @throws UserDoesNotExistInDBException - если игрока нет в базе
-     * @throws IllegalGamePhaseException     - если не соответствует фаза голосования (мирные голосуют днем)
-     * @throws CharacterAlreadyDeadException - если пользователь уже выбыл из игры
+     * @throws ClientErrorException - при возникновении ошибок на стороне клиента
      */
-    void countVotesAgainst(String login) throws RoomsMismatchException, UserDoesNotExistInDBException,
-            IllegalGamePhaseException, CharacterAlreadyDeadException;
+    void countVotesAgainst(String login) throws ClientErrorException;
 
     /**
      * Распределение ролей игрокам.

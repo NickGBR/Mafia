@@ -79,31 +79,30 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public boolean isSheriff(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
-            RoomsMismatchException, NotEnoughRightsException {
+    public boolean isSheriff(String login) throws ClientErrorException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
-            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
-                    + "\' doesn't exist in a database");
+            throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
+                    + "\' doesn't exist in a database" );
         }
 
         Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
         if (!currentUserDAO.isPresent()) {
-            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
+            throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
         }
 
         if (!Objects.equals(userDAO.get().getRoom().getRoomId(), currentUserDAO.get().getRoom().getRoomId())) {
-            throw new RoomsMismatchException(ClientErrorCode.ROOMS_MISMATCH, "\'"
+            throw new ClientErrorException(ClientErrorCode.ROOMS_MISMATCH, "\'"
                     + userDAO.get().getLogin() + "\' and \'"
                     + currentUserDAO.get().getLogin() + "\' are in different rooms");
         }
 
         if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.DON_PHASE)) {
-            throw new IllegalGamePhaseException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
+            throw new ClientErrorException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
         }
 
         if (!currentUserDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.DON)) {
-            throw new NotEnoughRightsException("Permission denied");
+            throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS, "Permission denied");
         }
 
         return userDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.SHERIFF);
@@ -111,31 +110,30 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public boolean isMafia(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
-            RoomsMismatchException, NotEnoughRightsException {
+    public boolean isMafia(String login) throws ClientErrorException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
-            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
+            throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
                     + "\' doesn't exist in a database");
         }
 
         Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
         if (!currentUserDAO.isPresent()) {
-            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
+            throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
         }
 
         if (!Objects.equals(userDAO.get().getRoom().getRoomId(), currentUserDAO.get().getRoom().getRoomId())) {
-            throw new RoomsMismatchException(ClientErrorCode.ROOMS_MISMATCH, "\'"
+            throw new ClientErrorException(ClientErrorCode.ROOMS_MISMATCH, "\'"
                     + userDAO.get().getLogin() + "\' and \'"
                     + currentUserDAO.get().getLogin() + "\' are in different rooms");
         }
 
         if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.SHERIFF_PHASE)) {
-            throw new IllegalGamePhaseException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
+            throw new ClientErrorException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
         }
 
         if (!currentUserDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.SHERIFF)) {
-            throw new NotEnoughRightsException("Permission denied");
+            throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS, "Permission denied");
         }
 
         return userDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.DON) ||
@@ -143,31 +141,31 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void countVotesAgainst(String login) throws RoomsMismatchException, UserDoesNotExistInDBException, IllegalGamePhaseException, CharacterAlreadyDeadException {
+    public void countVotesAgainst(String login) throws ClientErrorException {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
-            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
+            throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
                     + "\' doesn't exist in a database");
         }
 
         Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
         if (!currentUserDAO.isPresent()) {
-            throw new UserDoesNotExistInDBException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
+            throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
         }
 
         if (!Objects.equals(userDAO.get().getRoom().getRoomId(), currentUserDAO.get().getRoom().getRoomId())) {
-            throw new RoomsMismatchException(ClientErrorCode.ROOMS_MISMATCH, "\'"
+            throw new ClientErrorException(ClientErrorCode.ROOMS_MISMATCH, "\'"
                     + userDAO.get().getLogin() + "\' and \'"
                     + currentUserDAO.get().getLogin() + "\' are in different rooms");
         }
 
         if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.CIVILIANS_PHASE)) {
-            throw new IllegalGamePhaseException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
+            throw new ClientErrorException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
         }
 
         if (userDAO.get().getCharacterStatus().equals(CharacterStatusEnum.DEAD) ||
                 currentUserDAO.get().getCharacterStatus().equals(CharacterStatusEnum.DEAD)) {
-            throw new CharacterAlreadyDeadException(ClientErrorCode.CHARACTER_IS_DEAD, "Character is out of game!");
+            throw new ClientErrorException(ClientErrorCode.CHARACTER_IS_DEAD, "Character is out of game!");
         }
 
         Integer votesAgainst = userDAO.get().getVotesAgainst();
