@@ -79,21 +79,31 @@ function subscribeByRole() {
 function setGamePhaseInterface(phase) {
     disableInterface();
     switch (phase) {
-        case gamePhaseConst.CIVILIAN:
+        case gamePhaseConst.CIVILIANS_DISCUSS_PHASE:
             destination = destinationConst.CIVILIAN;
             activateInterface();
             break;
-        case gamePhaseConst.MAFIA:
+
+        case gamePhaseConst.CIVILIANS_VOTE_PHASE:
+            break;
+
+        case gamePhaseConst.MAFIA_DISCUSS_PHASE:
             destination = destinationConst.MAFIA;
             if (userRole === roleConst.MAFIA ||
                 userRole === roleConst.DON) activateInterface();
             break;
-        case gamePhaseConst.DON:
+
+        case  gamePhaseConst.MAFIA_VOTE_PHASE:
+            break;
+
+        case gamePhaseConst.DON_PHASE:
             if (userRole === roleConst.DON) activateDonInterface();
             break;
-        case gamePhaseConst.SHERIFF:
+
+        case gamePhaseConst.SHERIFF_PHASE:
             if (userRole === roleConst.SHERIFF) activateSheriffInterface();
-            break;
+            break
+
         default:
             alert("Проблемы с фазой игры, обратитесь к разработчику.")
     }
@@ -210,6 +220,15 @@ function checkUserRole(){
         console.log(request.responseText);
     };
     let login = document.getElementById("message_input_value").value;
+    sendRequest("GET", sockConst.REQUEST_GET_ROLE_INFO +"?login=" + login, "", callback, [8]);
+}
+
+function voteForUser(){
+    let callback = function (request) {
+
+        console.log(request.responseText);
+    };
+    let login = document.getElementById("user_login_value").value;
     sendRequest("GET", sockConst.REQUEST_GET_ROLE_INFO +"?login=" + login, "", callback, [8]);
 }
 

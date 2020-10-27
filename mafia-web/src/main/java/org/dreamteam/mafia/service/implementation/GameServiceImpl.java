@@ -225,7 +225,7 @@ public class GameServiceImpl implements GameService {
                     + currentUserDAO.get().getLogin() + "\' are in different rooms");
         }
 
-        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.CIVILIANS_PHASE)) {
+        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.CIVILIANS_DISCUSS_PHASE)) {
             throw new IllegalGamePhaseException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
         }
 

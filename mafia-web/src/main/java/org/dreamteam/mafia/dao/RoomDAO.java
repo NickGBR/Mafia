@@ -2,7 +2,6 @@ package org.dreamteam.mafia.dao;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dreamteam.mafia.dao.enums.DestinationEnum;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.hibernate.annotations.NotFound;
@@ -65,7 +64,7 @@ public class RoomDAO {
 
     public RoomDAO() {
         this.dayNumber = 0;
-        this.gamePhase = GamePhaseEnum.CIVILIANS_PHASE;
+        this.gamePhase = GamePhaseEnum.CIVILIANS_DISCUSS_PHASE;
         this.gameStatus = GameStatusEnum.NOT_STARTED;
         this.messageList = new HashSet<>();
         this.userList = new HashSet<>();

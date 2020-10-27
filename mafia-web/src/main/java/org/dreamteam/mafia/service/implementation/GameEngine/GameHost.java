@@ -41,12 +41,18 @@ public class GameHost implements Runnable {
 
         while (room.getGameStatus().equals(GameStatusEnum.IN_PROGRESS)) {
             switch (room.getGamePhase()) {
-                case CIVILIANS_PHASE:
+                case CIVILIANS_DISCUSS_PHASE:
                     dayCounter++;
-                    civiliansPhase(GameConst.CIVILIAN_PHASE_DURATION);
+                    civiliansDiscussPhase(GameConst.CIVILIAN_DISCUSS_PHASE_DURATION);
                     break;
-                case MAFIA_PHASE:
-                    mafiaPhase(GameConst.MAFIA_PHASE_DURATION);
+                case CIVILIANS_VOTE_PHASE:
+                    civiliansVotePhase(GameConst.CIVILIAN_VOTING_PHASE_DURATION);
+                    break;
+                case MAFIA_DISCUSS_PHASE:
+                    mafiaDiscussPhase(GameConst.MAFIA_DISCUSS_PHASE_DURATION);
+                    break;
+                case MAFIA_VOTE_PHASE:
+                    mafiaVotePhase(GameConst.MAFIA_VOTING_PHASE_DURATION);
                     break;
                 case DON_PHASE:
                     donPhase(GameConst.DON_PHASE_DURATION);
@@ -72,20 +78,7 @@ public class GameHost implements Runnable {
     }
 
     @SneakyThrows
-    private void mafiaPhase(int phaseTimeSec) {
-
-
-        gameDTO.setMessage("Ночь грядет, мафия в бой идет! ");
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
-
-        Thread.sleep(phaseTimeSec * 1000);
-
-        gameDTO.setGamePhase(GamePhaseEnum.DON_PHASE);
-        room.setGamePhase(gameDTO.getGamePhase());
-    }
-
-    @SneakyThrows
-    private void civiliansPhase(int phaseTimeSec) {
+    private void civiliansDiscussPhase(int phaseTimeSec) {
 
         room.setDayNumber(dayCounter);
 
@@ -94,7 +87,45 @@ public class GameHost implements Runnable {
 
         Thread.sleep(phaseTimeSec * 1000);
 
-        gameDTO.setGamePhase(GamePhaseEnum.MAFIA_PHASE);
+        gameDTO.setGamePhase(GamePhaseEnum.CIVILIANS_VOTE_PHASE);
+        room.setGamePhase(gameDTO.getGamePhase());
+    }
+
+    @SneakyThrows
+    private void civiliansVotePhase(int phaseTimeSec) {
+
+        gameDTO.setMessage("Мирные, ваше время пришло, голосуйте!");
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
+
+        Thread.sleep(phaseTimeSec * 1000);
+
+        gameDTO.setGamePhase(GamePhaseEnum.MAFIA_DISCUSS_PHASE);
+        room.setGamePhase(gameDTO.getGamePhase());
+    }
+
+    @SneakyThrows
+    private void mafiaDiscussPhase(int phaseTimeSec) {
+
+
+        gameDTO.setMessage("Ночь грядет, мафия в бой идет! ");
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
+
+        Thread.sleep(phaseTimeSec * 1000);
+
+        gameDTO.setGamePhase(GamePhaseEnum.MAFIA_VOTE_PHASE);
+        room.setGamePhase(gameDTO.getGamePhase());
+    }
+
+    @SneakyThrows
+    private void mafiaVotePhase(int phaseTimeSec) {
+
+
+        gameDTO.setMessage("Мафия голосует! ");
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
+
+        Thread.sleep(phaseTimeSec * 1000);
+
+        gameDTO.setGamePhase(GamePhaseEnum.DON_PHASE);
         room.setGamePhase(gameDTO.getGamePhase());
     }
 
@@ -116,7 +147,7 @@ public class GameHost implements Runnable {
 
         Thread.sleep(phaseTimeSec * 1000);
 
-        gameDTO.setGamePhase(GamePhaseEnum.CIVILIANS_PHASE);
+        gameDTO.setGamePhase(GamePhaseEnum.CIVILIANS_DISCUSS_PHASE);
         room.setGamePhase(gameDTO.getGamePhase());
     }
 
