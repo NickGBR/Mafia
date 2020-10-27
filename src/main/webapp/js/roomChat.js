@@ -3,6 +3,7 @@ let roomName;
 let roomID;
 let isAdmin;
 let isReady;
+let isRoomReady;
 let maxUserAmount;
 let mafiaAmount;
 let hasDon;
@@ -38,6 +39,7 @@ function afterConnect(connection) {
     mafiaAmount = init["mafiaAmount"];
     hasDon = init["hasDon"];
     hasSheriff = init["hasSheriff"];
+    isRoomReady = init["isRoomReady"];
 
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
@@ -75,19 +77,9 @@ function onError(error) {
  * Выводит информацю о пользователе в браузер.
  */
 function initCurrentRoomInfo() {
-    document.getElementById("roomName").innerText = roomName;
-    document.getElementById("max-amount").innerText = maxUserAmount;
-    document.getElementById("mafia-amount").innerText = mafiaAmount;
-    if (hasSheriff) {
-        document.getElementById("sheriff-present").innerText = "в игре";
-    } else {
-        document.getElementById("sheriff-present").innerText = "нет";
-    }
-    if (hasDon) {
-        document.getElementById("don-present").innerText = "в игре";
-    } else {
-        document.getElementById("don-present").innerText = "нет";
-    }
+
+    document.getElementById("room-description")
+        .innerText = generateDescription(init);
     let firstNode = document.getElementById("user_entry_1");
     let userEntry = initUserEntry(firstNode);
     userEntries.push(userEntry);
@@ -125,6 +117,8 @@ function initButtons() {
         elementsUsr.forEach((element) => {
             element.style.display = "none";
         })
+        let button = document.getElementById("start_game_button");
+        button.disabled = !isRoomReady;
     } else {
         updateReadyButton(isReady)
     }
@@ -150,7 +144,6 @@ function leaveRoom() {
     let callback = function () {
         window.location.href = "roomList.html";
     };
-
     sendRequest("POST", "/api/room/leave", "", callback, [8, 11]);
 }
 

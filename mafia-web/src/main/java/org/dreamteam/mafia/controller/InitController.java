@@ -50,10 +50,14 @@ public class InitController {
                 dto.setIsAdmin(roomService.isCurrentUserAdmin());
                 dto.setRole(userService.getCurrentUserDAO().get().getCharacter());
                 dto.setIsReady(user.get().isReady());
-                dto.setMaxUserAmount(currentRoom.getMaxPlayers());
+                dto.setMaxUserAmount(currentRoom.getMaxUserAmount());
                 dto.setMafiaAmount(roomDAO.getMafia());
                 dto.setHasSheriff(roomDAO.getSheriff());
                 dto.setHasDon(roomDAO.getDon());
+                dto.setIsRoomReady(roomService.isRoomReady());
+                if (dto.getIsGameStarted()) {
+                    dto.setGamePhase(roomDAO.getGamePhase());
+                }
             }
         }
         return dto;

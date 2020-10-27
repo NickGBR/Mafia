@@ -9,112 +9,125 @@ import org.dreamteam.mafia.dao.enums.EndGameReasons;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.GameDTO;
+import org.dreamteam.mafia.repository.api.RoomRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 
 public class GameHost implements Runnable {
     private final SimpMessagingTemplate messagingTemplate; // Используется для отправки сообщений клиенту
     private final GameDTO gameDTO = new GameDTO();
-    private final UserDAO user;
-    private int dayCounter = 0;
+    private RoomDAO room;
+    private final RoomRepository roomRepository;
+    private int dayCounter;
+    private final Logger logger = LoggerFactory.getLogger(GameHost.class);
 
     public GameHost(SimpMessagingTemplate messagingTemplate,
-                    UserDAO user) {
+                    RoomDAO room, RoomRepository roomRepository) {
         this.messagingTemplate = messagingTemplate;
-        this.user = user;
+        this.room = room;
+        this.roomRepository = roomRepository;
+        dayCounter = room.getDayNumber();
     }
 
     @SneakyThrows
     @Override
     public void run() {
 
-        user.getRoom().setGameStatus(GameStatusEnum.IN_PROGRESS);
-        RoomDAO roomDAO = user.getRoom();
-        gameDTO.setGamePhase(roomDAO.getGamePhase());
-        Thread.currentThread().setName(user.getRoom().getRoomId().toString());
-        Thread.sleep(5000);
+        gameDTO.setGamePhase(room.getGamePhase());
+        Thread.currentThread().setName(room.getRoomId().toString());
+        Thread.sleep(3000);
 
-
-        while (user.getRoom().getGameStatus().equals(GameStatusEnum.IN_PROGRESS)) {
-            switch (roomDAO.getGamePhase()) {
+        while (room.getGameStatus().equals(GameStatusEnum.IN_PROGRESS)) {
+            switch (room.getGamePhase()) {
                 case CIVILIANS_PHASE:
                     dayCounter++;
-                    civiliansPhase(user, gameDTO, 1);
+                    civiliansPhase(GameConst.CIVILIAN_PHASE_DURATION);
                     break;
                 case MAFIA_PHASE:
-                    mafiaPhase(user, gameDTO, 1);
+                    mafiaPhase(GameConst.MAFIA_PHASE_DURATION);
                     break;
                 case DON_PHASE:
-                    donPhase(user, gameDTO, 1);
+                    donPhase(GameConst.DON_PHASE_DURATION);
                     break;
                 case SHERIFF_PHASE:
-                    sheriffPhase(user, gameDTO, 1);
-                    if (isFinalDay(dayCounter)) endGame(user, gameDTO, EndGameReasons.LAST_DAY_CAME);
+                    sheriffPhase(GameConst.SHERIFF_PHASE_DURATION);
+                    if (isFinalDay(dayCounter)) {
+                        endGame(EndGameReasons.LAST_DAY_CAME);
+                    }
                     break;
+                case END_GAME_PHASE: {
+                    room = completeRoom();
+                    break;
+                }
                 default:
                     System.out.println("КОНЕЧНЫЙ АВТОМАТ СЛОМАЛСЯ");
             }
+            logger.debug("Room at the end of phase: " + room);
+            room = roomRepository.save(room);
         }
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId().toString(), gameDTO);
         System.out.println("Thread " + Thread.currentThread().getName() + " has been stopped!");
     }
 
     @SneakyThrows
-    private void mafiaPhase(UserDAO user, GameDTO gameDTO, int phaseTimeSec) {
+    private void mafiaPhase(int phaseTimeSec) {
 
 
         gameDTO.setMessage("Ночь грядет, мафия в бой идет! ");
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + user.getRoom().getRoomId(), gameDTO);
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
 
         Thread.sleep(phaseTimeSec * 1000);
 
         gameDTO.setGamePhase(GamePhaseEnum.DON_PHASE);
-        user.getRoom().setGamePhase(gameDTO.getGamePhase());
+        room.setGamePhase(gameDTO.getGamePhase());
     }
 
     @SneakyThrows
-    private void civiliansPhase(UserDAO user, GameDTO gameDTO, int phaseTimeSec) {
+    private void civiliansPhase(int phaseTimeSec) {
 
-        user.getRoom().setDayNumber(dayCounter);
+        room.setDayNumber(dayCounter);
 
         gameDTO.setMessage("Доброе утро ребята это " + dayCounter + " день!");
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + user.getRoom().getRoomId(), gameDTO);
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
 
         Thread.sleep(phaseTimeSec * 1000);
 
         gameDTO.setGamePhase(GamePhaseEnum.MAFIA_PHASE);
-        user.getRoom().setGamePhase(gameDTO.getGamePhase());
+        room.setGamePhase(gameDTO.getGamePhase());
     }
 
     @SneakyThrows
-    private void donPhase(UserDAO user, GameDTO gameDTO, int phaseTimeSec) {
+    private void donPhase(int phaseTimeSec) {
         gameDTO.setMessage("Время дона разобраться с шерифом!");
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + user.getRoom().getRoomId(), gameDTO);
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
 
         Thread.sleep(phaseTimeSec * 1000);
 
         gameDTO.setGamePhase(GamePhaseEnum.SHERIFF_PHASE);
-        user.getRoom().setGamePhase(gameDTO.getGamePhase());
+        room.setGamePhase(gameDTO.getGamePhase());
     }
 
     @SneakyThrows
-    private void sheriffPhase(UserDAO user, GameDTO gameDTO, int phaseTimeSec) {
+    private void sheriffPhase(int phaseTimeSec) {
         gameDTO.setMessage("Шериф, за работу!!!");
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + user.getRoom().getRoomId(), gameDTO);
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
 
         Thread.sleep(phaseTimeSec * 1000);
 
         gameDTO.setGamePhase(GamePhaseEnum.CIVILIANS_PHASE);
-        user.getRoom().setGamePhase(gameDTO.getGamePhase());
+        room.setGamePhase(gameDTO.getGamePhase());
     }
 
-    private void endGame(UserDAO user, GameDTO gameDTO, EndGameReasons reason) {
+    private void endGame(EndGameReasons reason) {
         switch (reason) {
             case LAST_DAY_CAME:
+                gameDTO.setGamePhase(GamePhaseEnum.END_GAME_PHASE);
                 gameDTO.setMessage("Игра окончена, дни вышли.");
-                user.getRoom().setGameStatus(GameStatusEnum.COMPLETED);
-                messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + user.getRoom().getRoomId(), gameDTO);
                 break;
         }
+        room.setGamePhase(gameDTO.getGamePhase());
     }
 
     private boolean isFinalDay(int day) {
@@ -122,5 +135,15 @@ public class GameHost implements Runnable {
             return true;
         }
         return false;
+    }
+
+    private RoomDAO completeRoom(){
+        room.setGameStatus(GameStatusEnum.COMPLETED);
+        for (UserDAO user : room.getUserList()) {
+            user.setIsReady(false);
+            user.setRoom(null);
+            user.setIsAdmin(false);
+        }
+        return room;
     }
 }
