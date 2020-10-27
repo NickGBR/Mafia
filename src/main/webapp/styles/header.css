@@ -12,6 +12,7 @@
     z-index: 3;
     font-family: 'PT Mono', monospace;
     font-weight: bold;
+    min-width: 45rem;
 }
 
 
@@ -29,6 +30,7 @@
 
 #content {
     margin-top: 4rem;
+    min-width: 45rem;
 }
 
 .login-link {
