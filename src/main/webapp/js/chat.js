@@ -35,8 +35,19 @@ function loadChatMessages() {
     let callback = function (request) {
         const data = JSON.parse(request.responseText);
         const chatbox = document.getElementById(roomChatId);
+        console.log(data);
         data.slice().reverse().forEach((message) => {
-            const div = convertMessageToDiv(message);
+            let div;
+            if (message["from"] !== '') {
+                div = convertMessageToDiv(message);
+                if (message["destination"] === DestinationConst.MAFIA) {
+                    div.classList.add("mafia-message");
+                }
+            } else {
+                div = document.createElement("DIV");      // Создаем <div>
+                div.innerText = message["text"];
+                div.classList.add("system-message");
+            }
             chatbox.insertBefore(div, chatbox.firstChild);
         });
     };
@@ -46,20 +57,15 @@ function loadChatMessages() {
 /**
  * Отправляет сообщения пользователей в end point.
  */
-function sendMessage(destination) {
+function sendMessage(destination = '') {
     let message = document.getElementById("message_input_value").value;
     document.getElementById("message_input_value").value = "";
     message = message.trim();
-    const data = JSON.stringify({
-        'text': message,
-        'destination': destination
-    })
-
     if (message !== "") {
         let callback = function (request) {
         };
         sendRequest("POST", "/api/message/send",
-            data, callback, [8]);
+            message, callback, [8]);
     }
 }
 

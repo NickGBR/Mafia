@@ -2,12 +2,16 @@ package org.dreamteam.mafia.service.implementation;
 
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.dao.enums.CharacterEnum;
+import org.dreamteam.mafia.dao.enums.DestinationEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.dto.UserDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.model.MessageDestinationDescriptor;
+import org.dreamteam.mafia.model.MessageRestorationDescriptor;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.service.api.RoomService;
 import org.dreamteam.mafia.service.api.UserService;
@@ -39,6 +43,56 @@ public class SimpleRoomService implements RoomService {
         this.userService = userService;
         this.encoder = encoder;
         this.repository = repository;
+    }
+
+    @Override
+    public MessageDestinationDescriptor getCurrentDestination() {
+        Optional<UserDAO> user = userService.getCurrentUserDAO();
+        if (!user.isPresent()) {
+            throw new SecurityException("Non authorised user is not allowed to request destinations");
+        }
+        MessageDestinationDescriptor descriptor = new MessageDestinationDescriptor();
+        if (user.get().getRoom() == null) {
+            descriptor.setDestination(DestinationEnum.COMMON);
+        } else {
+            descriptor.setRoom(user.get().getRoom());
+            if (user.get().getRoom().getGameStatus().equals(GameStatusEnum.IN_PROGRESS)) {
+                if (user.get().getCharacter().equals(CharacterEnum.DON) ||
+                        user.get().getCharacter().equals(CharacterEnum.MAFIA)) {
+                    descriptor.setDestination(DestinationEnum.MAFIA);
+                } else {
+                    descriptor.setDestination(DestinationEnum.CIVILIAN);
+                }
+            } else {
+                descriptor.setDestination(DestinationEnum.ROOM_USER);
+            }
+        }
+        return descriptor;
+    }
+
+    @Override
+    public MessageRestorationDescriptor getPermittedToRestorationDestinations() {
+        Optional<UserDAO> user = userService.getCurrentUserDAO();
+        MessageRestorationDescriptor descriptor = new MessageRestorationDescriptor();
+        if (!user.isPresent()) {
+            descriptor.getDestinations().add(DestinationEnum.COMMON);
+            return descriptor;
+        }
+        if (user.get().getRoom() == null) {
+            descriptor.getDestinations().add(DestinationEnum.COMMON);
+        } else {
+            descriptor.setRoom(user.get().getRoom());
+            if (user.get().getRoom().getGameStatus().equals(GameStatusEnum.IN_PROGRESS)) {
+                if (user.get().getCharacter().equals(CharacterEnum.DON) ||
+                        user.get().getCharacter().equals(CharacterEnum.MAFIA)) {
+                    descriptor.getDestinations().add(DestinationEnum.MAFIA);
+                }
+                descriptor.getDestinations().add(DestinationEnum.CIVILIAN);
+            } else {
+                descriptor.getDestinations().add(DestinationEnum.ROOM_USER);
+            }
+        }
+        return descriptor;
     }
 
     @Override

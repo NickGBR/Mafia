@@ -21,7 +21,7 @@ public class MessageController {
     }
 
     @PostMapping(SockConst.REQUEST_POST_MESSAGE)
-    public void sendMessage(@RequestBody ChatMessageDTO message) throws ClientErrorException {
+    public void sendMessage(@RequestBody String message) throws ClientErrorException {
         messageService.sendMessage(message);
     }
 

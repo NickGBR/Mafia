@@ -4,17 +4,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dreamteam.mafia.dao.enums.DestinationEnum;
-import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 
 import javax.persistence.*;
-
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "messages")
-
 public class MessageDAO {
 
     @Id
@@ -22,8 +19,12 @@ public class MessageDAO {
     @Column(name = "message_id", unique = true, nullable = false)
     private Long messageId;
 
-    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinColumn(name = "room_id")
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinTable(
+            name = "messages2rooms",
+            joinColumns = {@JoinColumn(name = "message_id")},
+            inverseJoinColumns = {@JoinColumn(name = "room_id")}
+    )
     private RoomDAO room;
 
     @Column(name = "destination", nullable = false)
@@ -31,27 +32,34 @@ public class MessageDAO {
     private DestinationEnum destination;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinTable(
+            name = "messages2users",
+            joinColumns = {@JoinColumn(name = "message_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")}
+    )
     private UserDAO user;
 
     @Column(name = "text", nullable = false)
     private String text;
 
-
-
-    public MessageDAO(RoomDAO room, UserDAO user, String text) {
-        this.room = room;
-        this.user = user;
-        this.text = text;
-    }
-
     @Override
     public String toString() {
-        return "MessageDAO{" +
-                "messageId=" + messageId +
-                ", roomId=" + room.getRoomId() +
-                ", user=" + user.getLogin() +
-                ", text='" + text + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("MessageDAO{");
+        sb.append("messageId=").append(messageId);
+        if (room != null) {
+            sb.append(", room=").append(room);
+        } else {
+            sb.append(", common chat");
+        }
+
+        sb.append(", destination=").append(destination);
+        if (user != null) {
+            sb.append(", user=").append(user);
+        } else {
+            sb.append(", system message");
+        }
+        sb.append(", text='").append(text).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

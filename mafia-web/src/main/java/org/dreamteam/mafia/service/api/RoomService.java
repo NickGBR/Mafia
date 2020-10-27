@@ -6,6 +6,8 @@ import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.dto.UserDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.model.MessageDestinationDescriptor;
+import org.dreamteam.mafia.model.MessageRestorationDescriptor;
 
 import java.util.List;
 
@@ -13,6 +15,22 @@ import java.util.List;
  * Интерфейс с ервиса, обслуживающего систему комнат
  */
 public interface RoomService {
+
+    /**
+     * Определяет какому адресату в данный момент времени могут отправлять сообщения
+     *
+     * @return - описание того кому и в какую комнату сейчас может быть отправлено сообщение
+     */
+    MessageDestinationDescriptor getCurrentDestination();
+
+    /**
+     * Определяет сообщения для каких адресатов текущий пользователь может получить
+     * сейчас из архива
+     *
+     * @return - описание того предназваченные кому и в какую комнату сообщения может восстановить
+     * их архива пользователь
+     */
+    MessageRestorationDescriptor getPermittedToRestorationDestinations();
 
     /**
      * Проверяет, является ли текущий пользователь администратором комнаты.

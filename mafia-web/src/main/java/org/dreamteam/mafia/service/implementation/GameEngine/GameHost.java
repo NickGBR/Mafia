@@ -2,18 +2,19 @@ package org.dreamteam.mafia.service.implementation.GameEngine;
 
 import lombok.SneakyThrows;
 import org.dreamteam.mafia.constants.GameConst;
-import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.dao.enums.DestinationEnum;
 import org.dreamteam.mafia.dao.enums.EndGameReasons;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.GameDTO;
+import org.dreamteam.mafia.model.MessageDestinationDescriptor;
 import org.dreamteam.mafia.repository.api.RoomRepository;
+import org.dreamteam.mafia.service.api.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-
 
 public class GameHost implements Runnable {
     private final SimpMessagingTemplate messagingTemplate; // Используется для отправки сообщений клиенту
@@ -21,14 +22,17 @@ public class GameHost implements Runnable {
     private RoomDAO room;
     private final RoomRepository roomRepository;
     private int dayCounter;
+    private final MessageService messageService;
     private final Logger logger = LoggerFactory.getLogger(GameHost.class);
 
-    public GameHost(SimpMessagingTemplate messagingTemplate,
-                    RoomDAO room, RoomRepository roomRepository) {
+    public GameHost(
+            SimpMessagingTemplate messagingTemplate,
+            RoomDAO room, RoomRepository roomRepository, MessageService messageService) {
         this.messagingTemplate = messagingTemplate;
         this.room = room;
         this.roomRepository = roomRepository;
         dayCounter = room.getDayNumber();
+        this.messageService = messageService;
     }
 
     @SneakyThrows
@@ -67,16 +71,17 @@ public class GameHost implements Runnable {
             logger.debug("Room at the end of phase: " + room);
             room = roomRepository.save(room);
         }
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId().toString(), gameDTO);
+        messageService.sendSystemMessage(gameDTO,
+                                         new MessageDestinationDescriptor(DestinationEnum.CIVILIAN, room));
         System.out.println("Thread " + Thread.currentThread().getName() + " has been stopped!");
     }
 
     @SneakyThrows
     private void mafiaPhase(int phaseTimeSec) {
 
-
         gameDTO.setMessage("Ночь грядет, мафия в бой идет! ");
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
+        messageService.sendSystemMessage(gameDTO,
+                                         new MessageDestinationDescriptor(DestinationEnum.CIVILIAN, room));
 
         Thread.sleep(phaseTimeSec * 1000);
 
@@ -90,7 +95,8 @@ public class GameHost implements Runnable {
         room.setDayNumber(dayCounter);
 
         gameDTO.setMessage("Доброе утро ребята это " + dayCounter + " день!");
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
+        messageService.sendSystemMessage(gameDTO,
+                                         new MessageDestinationDescriptor(DestinationEnum.CIVILIAN, room));
 
         Thread.sleep(phaseTimeSec * 1000);
 
@@ -101,7 +107,8 @@ public class GameHost implements Runnable {
     @SneakyThrows
     private void donPhase(int phaseTimeSec) {
         gameDTO.setMessage("Время дона разобраться с шерифом!");
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
+        messageService.sendSystemMessage(gameDTO,
+                                         new MessageDestinationDescriptor(DestinationEnum.CIVILIAN, room));
 
         Thread.sleep(phaseTimeSec * 1000);
 
@@ -112,7 +119,8 @@ public class GameHost implements Runnable {
     @SneakyThrows
     private void sheriffPhase(int phaseTimeSec) {
         gameDTO.setMessage("Шериф, за работу!!!");
-        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
+        messageService.sendSystemMessage(gameDTO,
+                                         new MessageDestinationDescriptor(DestinationEnum.CIVILIAN, room));
 
         Thread.sleep(phaseTimeSec * 1000);
 

@@ -10,6 +10,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Объект, связанный с таблицей пользователей в БД
@@ -59,6 +60,10 @@ public class UserDAO {
     @Column(name = "votes_against")
     private Integer votesAgainst;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Set<MessageDAO> messageList;
+
     public UserDAO(String login, String passwordHash) {
         this.login = login;
         this.passwordHash = passwordHash;
@@ -94,6 +99,7 @@ public class UserDAO {
         sb.append(", character=").append(character);
         sb.append(", characterStatus=").append(characterStatus);
         sb.append(", votesAgainst=").append(votesAgainst);
+        sb.append(", MessagesCount=").append(messageList.size());
         sb.append('}');
         return sb.toString();
     }

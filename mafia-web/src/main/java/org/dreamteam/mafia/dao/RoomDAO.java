@@ -2,7 +2,6 @@ package org.dreamteam.mafia.dao;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dreamteam.mafia.dao.enums.DestinationEnum;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.hibernate.annotations.NotFound;
@@ -60,7 +59,8 @@ public class RoomDAO {
     @NotFound(action = NotFoundAction.IGNORE)
     private Set<UserDAO> userList;
 
-    @OneToMany(mappedBy = "messageId", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @NotFound(action = NotFoundAction.IGNORE)
     private Set<MessageDAO> messageList;
 
     public RoomDAO() {

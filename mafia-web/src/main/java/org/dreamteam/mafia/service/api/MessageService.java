@@ -1,8 +1,10 @@
 package org.dreamteam.mafia.service.api;
 
 import org.dreamteam.mafia.dto.ChatMessageDTO;
+import org.dreamteam.mafia.dto.GameDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.model.MessageDestinationDescriptor;
 
 import java.util.List;
 
@@ -17,7 +19,16 @@ public interface MessageService {
      *
      * @param message - сообщение, полученное от интерфейса
      */
-    void sendMessage(ChatMessageDTO message) throws ClientErrorException;
+    void sendMessage(String message) throws ClientErrorException;
+
+    /**
+     * Отправляет сообщение от имени системы в указаннаю комнату. Адресаты определяются автоматически
+     *
+     * @param systemMessage - сообщение от системы
+     * @param descriptor    - описатель адреса для клиента. Само сообщение, впрочем, все равно будет отправлено,
+     *                      как системное
+     */
+    void sendSystemMessage(GameDTO systemMessage, MessageDestinationDescriptor descriptor) throws ClientErrorException;
 
     /**
      * Возвращает историю чата для текущего игрока.
