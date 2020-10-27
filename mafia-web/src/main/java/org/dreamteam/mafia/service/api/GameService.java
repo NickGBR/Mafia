@@ -1,13 +1,7 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.dto.CharacterDTO;
+import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.exceptions.*;
-import org.dreamteam.mafia.model.Character;
-import org.dreamteam.mafia.model.Message;
-import org.dreamteam.mafia.model.Room;
-import org.dreamteam.mafia.model.User;
-
-import java.util.List;
 
 /**
  * Интерфейс сервиса, обеспечивающего ведение самой игры.
@@ -15,52 +9,12 @@ import java.util.List;
 public interface GameService {
 
     /**
-     * Запускает игру.
+     * Меняет состояние игры на начатую,
+     * проверят существует ли пользоватеь в базе данных,
+     * проверяет достаточно ли у пльзователя прав для запуска комнаты,
+     * отправляет всем пользователям информацию об успешном старте игры.
      */
     void startGame() throws ClientErrorException;
-
-
-    /**
-     * Возвращает список всех персонажей в игре
-     *
-     * @param room - игра
-     * @return - список персонажей
-     */
-    List<Character> getCharactersInGame(Room room);
-
-    /**
-     * Возвращает список всех сообщений в чате игры
-     *
-     * @param room - игра
-     * @return - список сообщений
-     */
-    List<Message> getMessageLog(Room room);
-
-    /**
-     * Переводит игру в следующую фазу
-     *
-     * @param room - игра
-     * @throws ClientErrorException - если игра уже окончена
-     */
-    void advancePhase(Room room) throws ClientErrorException;
-
-    /**
-     * Выдвигает персонажа на голосование
-     *
-     * @param user         - выдвигающий игрок
-     * @param characterDTO - выдвигаемый персонаж
-     * @throws IllegalMoveException - если выдвижение нарушает правила игры
-     */
-    void nominateCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException;
-
-    /**
-     * Голосует против персонажа
-     *
-     * @param user         - голосующий игрок
-     * @param characterDTO - голосуемый против персонаж
-     * @throws IllegalMoveException - если голосование нарушает правила игры
-     */
-    void voteCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException;
 
     /**
      * Проверка является ли игрок шерифом.
@@ -100,4 +54,10 @@ public interface GameService {
     void countVotesAgainst(String login) throws RoomsMismatchException, UserDoesNotExistInDBException,
             IllegalGamePhaseException, CharacterAlreadyDeadException;
 
+    /**
+     * Распределение ролей игрокам.
+     *
+     * @param room - игровая комната
+     */
+    void setRolesToUsers(RoomDAO room);
 }

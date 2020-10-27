@@ -3,14 +3,11 @@ package org.dreamteam.mafia.service.implementation;
 import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.dao.enums.CharacterEnum;
 import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
-import org.dreamteam.mafia.dto.CharacterDTO;
 import org.dreamteam.mafia.exceptions.*;
-import org.dreamteam.mafia.model.*;
-import org.dreamteam.mafia.dao.enums.CharacterEnum;
-import org.dreamteam.mafia.model.Character;
 import org.dreamteam.mafia.repository.api.MessageRepository;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.repository.api.UserRepository;
@@ -24,7 +21,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service("GameService")
 public class GameServiceImpl implements GameService {
@@ -52,13 +52,6 @@ public class GameServiceImpl implements GameService {
         this.taskScheduler = taskScheduler;
     }
 
-
-    /**
-     * Меняет состояние игры на начатую,
-     * проверят существует ли пользоватеь в базе данных,
-     * проверяет достаточно ли у пльзователя прав для запуска комнаты,
-     * отправляет всем пользователям информацию об успешном старте игры.
-     */
     @Override
     public void startGame() throws ClientErrorException {
 
@@ -83,63 +76,6 @@ public class GameServiceImpl implements GameService {
         GameHost gameHost = new GameHost(messagingTemplate, currentUserDAO.get().getRoom(), roomRepository);
         Thread thread = new Thread(gameHost);
         thread.start();
-    }
-
-    /**
-     * Возвращает список всех персонажей в игре
-     *
-     * @param room - игра
-     * @return - список персонажей
-     */
-    @Override
-    public List<Character> getCharactersInGame(Room room) {
-        return null;
-    }
-
-    /**
-     * Возвращает список всех сообщений в чате игры
-     *
-     * @param room - игра
-     * @return - список сообщений
-     */
-    @Override
-    public List<Message> getMessageLog(Room room) {
-        return null;
-    }
-
-    /**
-     * Переводит игру в следующую фазу
-     *
-     * @param room - игра
-     * @throws ClientErrorException - если игра уже окончена
-     */
-    @Override
-    public void advancePhase(Room room) throws ClientErrorException {
-
-    }
-
-    /**
-     * Выдвигает персонажа на голосование
-     *
-     * @param user         - выдвигающий игрок
-     * @param characterDTO - выдвигаемый персонаж
-     * @throws IllegalMoveException - если выдвижение нарушает правила игры
-     */
-    @Override
-    public void nominateCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException {
-
-    }
-
-    /**
-     * Голосует против персонажа
-     *
-     * @param user         - голосующий игрок
-     * @param characterDTO - голосуемый против персонаж
-     * @throws IllegalMoveException - если голосование нарушает правила игры
-     */
-    @Override
-    public void voteCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException {
-
     }
 
     @Override
@@ -230,7 +166,7 @@ public class GameServiceImpl implements GameService {
         }
 
         if (userDAO.get().getCharacterStatus().equals(CharacterStatusEnum.DEAD) ||
-            currentUserDAO.get().getCharacterStatus().equals(CharacterStatusEnum.DEAD)) {
+                currentUserDAO.get().getCharacterStatus().equals(CharacterStatusEnum.DEAD)) {
             throw new CharacterAlreadyDeadException(ClientErrorCode.CHARACTER_IS_DEAD, "Character is out of game!");
         }
 
@@ -240,7 +176,8 @@ public class GameServiceImpl implements GameService {
 
     }
 
-    private void setRolesToUsers(RoomDAO room) {
+    @Override
+    public void setRolesToUsers(RoomDAO room) {
         ArrayList<CharacterEnum> roles = new ArrayList<>();
 
         int mafiaAmount = room.getMafia();
