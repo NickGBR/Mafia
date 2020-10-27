@@ -15,10 +15,14 @@ import org.dreamteam.mafia.service.api.MessageService;
 import org.dreamteam.mafia.service.api.RoomService;
 import org.dreamteam.mafia.service.api.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -87,17 +91,20 @@ public class SimpleMessageService implements MessageService {
         }
         List<ChatMessageDTO> dtos = new ArrayList<>();
         final MessageRestorationDescriptor descriptor = roomService.getPermittedToRestorationDestinations();
+        // Ограничиваем выборку сообщений из базы 500 записями
+        Pageable pageable = PageRequest.of(0, 500, Sort.Direction.DESC, "messageId");
         if (descriptor.getRoom().isPresent()) {
-            repository.findByRoomAndDestinationIn(descriptor.getRoom().get(), descriptor.getDestinations())
+            repository.findByRoomAndDestinationIn(descriptor.getRoom().get(), descriptor.getDestinations(), pageable)
                     .stream()
                     .map(ChatMessageDTO::new)
                     .collect(Collectors.toCollection(() -> dtos));
         } else {
-            repository.findByDestinationIn(descriptor.getDestinations())
+            repository.findByDestinationIn(descriptor.getDestinations(), pageable)
                     .stream()
                     .map(ChatMessageDTO::new)
                     .collect(Collectors.toCollection(() -> dtos));
         }
+        Collections.reverse(dtos);
         return dtos;
     }
 

@@ -3,6 +3,7 @@ package org.dreamteam.mafia.repository.api;
 import org.dreamteam.mafia.dao.MessageDAO;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.enums.DestinationEnum;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.Collection;
@@ -16,7 +17,7 @@ public interface MessageRepository extends PagingAndSortingRepository<MessageDAO
      * @param roomDAO комната
      * @return список сообщений комнаты
      */
-    List<MessageDAO> findByRoom(RoomDAO roomDAO);
+    List<MessageDAO> findByRoom(RoomDAO roomDAO, Pageable pageable);
 
     /**
      * Поиск сообщений с указанным адресатами
@@ -24,7 +25,7 @@ public interface MessageRepository extends PagingAndSortingRepository<MessageDAO
      * @param destinations - адресаты
      * @return - список сообщений по адресату
      */
-    List<MessageDAO> findByDestinationIn(Collection<DestinationEnum> destinations);
+    List<MessageDAO> findByDestinationIn(Collection<DestinationEnum> destinations, Pageable pageable);
 
     /**
      * Поиск сообщений комнаты с заданным адресатами
@@ -33,5 +34,6 @@ public interface MessageRepository extends PagingAndSortingRepository<MessageDAO
      * @param destinations - адресаты
      * @return - список сообщений для адресата в комнате
      */
-    List<MessageDAO> findByRoomAndDestinationIn(RoomDAO roomDAO, Collection<DestinationEnum> destinations);
+    List<MessageDAO> findByRoomAndDestinationIn(
+            RoomDAO roomDAO, Collection<DestinationEnum> destinations, Pageable pageable);
 }
