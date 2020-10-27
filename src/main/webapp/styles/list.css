@@ -39,3 +39,30 @@
     font-size: 1.1rem;
     width: 25rem;
 }
+
+.tooltip-container {
+    position: relative;
+}
+
+/* Tooltip text */
+.tooltip-container .tooltip {
+    visibility: hidden;
+    width: 30rem;
+    background-color: #540b0b;
+    color: wheat;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -15.5rem; /* Use half of the width (31rem/2), to center the tooltip */
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip-container:hover .tooltip {
+    visibility: visible;
+}

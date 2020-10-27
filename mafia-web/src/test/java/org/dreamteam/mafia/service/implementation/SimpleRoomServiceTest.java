@@ -163,7 +163,7 @@ public class SimpleRoomServiceTest {
         Assert.assertEquals("Returned incorrect current amount of users inside", users.size(),
                             (long) rooms.get(0).getCurrPlayers());
         Assert.assertEquals("Returned incorrect maximum possible amount of users", daoPrivate.getMaxUsersAmount(),
-                            rooms.get(0).getMaxPlayers());
+                            rooms.get(0).getMaxUserAmount());
         Assert.assertTrue("Incorrectly marked room as public", rooms.get(0).getPrivateRoom());
         Assert.assertEquals("Returned incorrect room name", daoPublic.getName(), rooms.get(1).getName());
         Assert.assertEquals("Returned incorrect description", daoPublic.getDescription(),
@@ -172,7 +172,7 @@ public class SimpleRoomServiceTest {
         Assert.assertEquals("Returned incorrect current amount of users inside", users.size(),
                             (long) rooms.get(1).getCurrPlayers());
         Assert.assertEquals("Returned incorrect maximum possible amount of users", daoPublic.getMaxUsersAmount(),
-                            rooms.get(1).getMaxPlayers());
+                            rooms.get(1).getMaxUserAmount());
         Assert.assertFalse("Incorrectly marked room as private", rooms.get(1).getPrivateRoom());
     }
 }
