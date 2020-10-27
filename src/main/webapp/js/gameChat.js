@@ -9,8 +9,8 @@ let gamePhase;
 let maxUserAmount;
 
 let selectedEntry = null;
-const usersListId = "users_list";
-let userEntries = [];
+const charactersListId = "characters_list";
+let characterEntries = [];
 
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
@@ -50,7 +50,7 @@ function afterConnect(connection) {
     loadChatMessages();
 
     //Получаем список пользователей
-    loadRoomUsers();
+    loadGameCharacters();
 
     setGamePhaseInterface(gamePhase);
 }
@@ -80,25 +80,25 @@ function subscribeByRole() {
  * Инициализирует поля веб-страницы информацией об игре
  */
 function initCurrentGameInfo() {
-    updateGameDescription;
-    let firstNode = document.getElementById("user_entry_1");
-    let userEntry = initUserEntry(firstNode);
-    userEntries.push(userEntry);
+    updateGameDescription();
+    let firstNode = document.getElementById("character_entry_1");
+    let userEntry = initCharacterEntry(firstNode);
+    characterEntries.push(userEntry);
     for (let i = 1; i < maxUserAmount; i++) {
         const copyNode = firstNode.cloneNode(true);
         copyNode.id = "user_entry_" + (i + 1);
-        document.getElementById(usersListId).appendChild(copyNode);
-        let userEntry = initUserEntry(copyNode);
-        userEntries.push(userEntry);
+        document.getElementById(charactersListId).appendChild(copyNode);
+        let userEntry = initCharacterEntry(copyNode);
+        characterEntries.push(userEntry);
     }
-    console.log(userEntries);
+    console.log(characterEntries);
 }
 
-function initUserEntry(node) {
+function initCharacterEntry(node) {
     let userEntry = {};
-    userEntry["login"] = "";
-    userEntry["admin"] = false;
-    userEntry["used"] = false;
+    userEntry["name"] = "";
+    userEntry["isAlive"] = false;
+    userEntry["role"] = "";
     userEntry["stamp-container"] = node.querySelector('.stamp-container');
     userEntry["text"] = node.querySelector('.text');
     return userEntry;
@@ -243,51 +243,51 @@ function getLog() {
 }
 
 /**
- * Отвечает за получение пользователей при заходе в комнату.
+ * Отвечает за получение персонажей при заходе в игру.
  */
-function loadRoomUsers() {
+function loadGameCharacters() {
     let callback = function (request) {
         const data = JSON.parse(request.responseText);
-        data.forEach((user) => {
-            showUser(user);
+        data.forEach((character) => {
+            showCharacter(character);
         });
     };
-    sendRequest("GET", "/api/room/getUsersList", "", callback, [8]);
+    sendRequest("GET", "/api/game/getCharacters", "", callback, [3, 8, 16]);
 }
 
 /**
- * Добавляет пользователя в отображаемый на экране список
- * @param user -  пользователь.
+ * Добавляет персонажа в отображаемый на экране список
+ * @param character -  персонаж.
  */
-function showUser(user) {
+function showCharacter(character) {
     let currentEntry = null;
-    for (let i = 0; i < userEntries.length; i++) {
-        if (!userEntries[i]["used"]) {
-            currentEntry = userEntries[i];
+    for (let i = 0; i < characterEntries.length; i++) {
+        if (!characterEntries[i]["used"]) {
+            currentEntry = characterEntries[i];
             break;
         }
     }
     currentEntry["used"] = true;
-    currentEntry["login"] = user["name"];
-    const textNodeName = document.createTextNode(user["name"]);
+    currentEntry["name"] = character["name"];
+    const textNodeName = document.createTextNode(character["name"]);
     currentEntry["text"].appendChild(textNodeName);
-    if (user["name"] !== userName) {
+    if (character["name"] !== userName && character["isAlive"]) {
         currentEntry["text"].classList.add("clickable");
         currentEntry["text"].onclick = function (event) {
-            selectUser(event.target);
+            selectCharacter(event.target);
             updateButtonsOnSelect();
         }
     }
-    if (true) {
+    if (!character["isAlive"]) {
         const strokeNode = currentEntry["text"].querySelector('.strikethrough');
         strokeNode.style.visibility = "visible";
     }
-    if (user["mafia"] || user["don"]) {
+    if (character["role"] === roleConst.MAFIA || character["role"] === roleConst.DON) {
         const stampNode = document.createElement("span");
         stampNode.classList.add("stamp");
         let textNodeStamp;
         stampNode.classList.add("red");
-        if (user["don"]) {
+        if (character["role"] === roleConst.DON) {
             textNodeStamp = document.createTextNode("Дон");
         } else {
             textNodeStamp = document.createTextNode("Мафия");
@@ -299,13 +299,13 @@ function showUser(user) {
     }
 }
 
-function selectUser(node) {
-    let login = node.innerText;
-    if (login !== userName) {
-        const foundEntry = userEntries.find(element => element["login"] === login);
+function selectCharacter(node) {
+    let name = node.innerText;
+    if (name !== userName) {
+        const foundEntry = characterEntries.find(element => element["name"] === name);
         if (selectedEntry !== null) {
             selectedEntry["text"].classList.remove("selected");
-            if (selectedEntry["login"] === login) {
+            if (selectedEntry["name"] === name) {
                 selectedEntry = null;
                 return;
             }

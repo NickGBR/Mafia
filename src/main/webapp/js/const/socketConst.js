@@ -41,7 +41,7 @@ var sockConst = {
     REQUEST_GET_ROLE_INFO: "api/room/GET/checkRole",
 
 
-    REQUEST_GET_START_GAME_INFO: '/api/room/startGame'
+    REQUEST_GET_START_GAME_INFO: '/api/game/startGame'
 }
 
 var destinationConst = {

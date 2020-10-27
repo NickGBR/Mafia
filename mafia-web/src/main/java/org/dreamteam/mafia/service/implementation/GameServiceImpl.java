@@ -7,11 +7,12 @@ import org.dreamteam.mafia.dao.enums.CharacterEnum;
 import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
-import org.dreamteam.mafia.exceptions.*;
-import org.dreamteam.mafia.repository.api.MessageRepository;
+import org.dreamteam.mafia.dto.CharacterDisplayDTO;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.GameService;
+import org.dreamteam.mafia.service.api.MessageService;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.service.implementation.GameEngine.GameHost;
 import org.dreamteam.mafia.util.ClientErrorCode;
@@ -21,10 +22,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service("GameService")
 public class GameServiceImpl implements GameService {
@@ -33,20 +32,21 @@ public class GameServiceImpl implements GameService {
     private final ThreadPoolTaskScheduler taskScheduler;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
-    private final MessageRepository messageRepository;
+    private final MessageService messageService;
     private final UserService userService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public GameServiceImpl(UserRepository userRepository,
-                           RoomRepository roomRepository,
-                           MessageRepository messageRepository,
-                           UserService userService,
-                           SimpMessagingTemplate messagingTemplate,
-                           ThreadPoolTaskScheduler taskScheduler) {
+    public GameServiceImpl(
+            UserRepository userRepository,
+            RoomRepository roomRepository,
+            MessageService messageService,
+            UserService userService,
+            SimpMessagingTemplate messagingTemplate,
+            ThreadPoolTaskScheduler taskScheduler) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
-        this.messageRepository = messageRepository;
+        this.messageService = messageService;
         this.userService = userService;
         this.messagingTemplate = messagingTemplate;
         this.taskScheduler = taskScheduler;
@@ -73,7 +73,8 @@ public class GameServiceImpl implements GameService {
         roomRepository.save(room);
         messagingTemplate.convertAndSend(SockConst.SYS_GAME_STARTED_INFO + roomId, true);
 
-        GameHost gameHost = new GameHost(messagingTemplate, currentUserDAO.get().getRoom(), roomRepository);
+        GameHost gameHost = new GameHost(messagingTemplate, currentUserDAO.get().getRoom(), roomRepository,
+                                         messageService);
         Thread thread = new Thread(gameHost);
         thread.start();
     }
@@ -202,4 +203,39 @@ public class GameServiceImpl implements GameService {
         }
     }
 
+    @Override
+    public List<CharacterDisplayDTO> getCharacterInGame() throws ClientErrorException {
+        Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
+        if (!currentUserDAO.isPresent()) {
+            throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
+        }
+        if (currentUserDAO.get().getRoom() == null) {
+            throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM, "Can't request characters outside of room");
+        }
+        if (!(currentUserDAO.get().getRoom().getGameStatus().equals(GameStatusEnum.IN_PROGRESS) ||
+                currentUserDAO.get().getRoom().getGameStatus().equals(GameStatusEnum.COMPLETED))) {
+            throw new ClientErrorException(ClientErrorCode.GAME_NOT_STARTED,
+                                           "Can't request characters from room without game");
+        }
+        List<CharacterDisplayDTO> dtoList = new ArrayList<>();
+        boolean allowedToSeeMafias = currentUserDAO.get().getCharacter().equals(CharacterEnum.DON)
+                || currentUserDAO.get().getCharacter().equals(CharacterEnum.MAFIA);
+        currentUserDAO.get().getRoom().getUserList().stream()
+                .map((dao) -> {
+                    CharacterDisplayDTO dto = new CharacterDisplayDTO();
+                    dto.setName(dao.getLogin());
+                    dto.setIsAlive(dao.getCharacterStatus().equals(CharacterStatusEnum.ALIVE));
+                    if (allowedToSeeMafias &&
+                            (dao.getCharacter().equals(CharacterEnum.MAFIA) ||
+                                    dao.getCharacter().equals(CharacterEnum.DON))) {
+                        dto.setRole(dao.getCharacter());
+                    } else {
+                        dto.setRole(CharacterEnum.CITIZEN);
+                    }
+                    return dto;
+                })
+                .sorted(Comparator.comparing(CharacterDisplayDTO::getName))
+                .collect(Collectors.toCollection(() -> dtoList));
+        return dtoList;
+    }
 }
