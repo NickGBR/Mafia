@@ -259,3 +259,6 @@ function updateButtonsOnSelect() {
     button.disabled = selectedEntry == null;
 }
 
+function sendMessageToCommon() {
+    sendMessage(destinationConst.ROOM_USER);
+}

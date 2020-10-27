@@ -46,13 +46,13 @@ function loadChatMessages() {
 /**
  * Отправляет сообщения пользователей в end point.
  */
-function sendMessage() {
+function sendMessage(destination) {
     let message = document.getElementById("message_input_value").value;
     document.getElementById("message_input_value").value = "";
     message = message.trim();
     const data = JSON.stringify({
         'text': message,
-        'destination': destinationConst.ROOM_USER
+        'destination': destination
     })
 
     if (message !== "") {
@@ -67,6 +67,21 @@ function receiveMessage(response) {
     const data = JSON.parse(response.body);
     // Отправляем сообщение в чат
     let div = convertMessageToDiv(data);
+    document.getElementById(roomChatId).appendChild(div);
+}
+
+function receiveMafiaMessage(response) {
+    const data = JSON.parse(response.body);
+    // Отправляем сообщение в чат
+    let div = convertMessageToDiv(data);
+    div.classList.add("mafia-message");
+    document.getElementById(roomChatId).appendChild(div);
+}
+
+function receiveSystemMessage(message) {
+    const div = document.createElement("DIV");      // Создаем <div>
+    div.innerText = message;
+    div.classList.add("system-message");
     document.getElementById(roomChatId).appendChild(div);
 }
 

@@ -324,3 +324,7 @@ function goToGameChat(response) {
     console.log(data);
     window.location.href = "gameChat.html";
 }
+
+function sendMessageInRoom() {
+    sendMessage(destinationConst.ROOM_USER);
+}

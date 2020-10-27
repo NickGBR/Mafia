@@ -53,9 +53,9 @@ public class GameHost implements Runnable {
                     break;
                 case SHERIFF_PHASE:
                     sheriffPhase(GameConst.SHERIFF_PHASE_DURATION);
-                    if (isFinalDay(dayCounter)) {
+                /*    if (isFinalDay(dayCounter)) {
                         endGame(EndGameReasons.LAST_DAY_CAME);
-                    }
+                    }*/
                     break;
                 case END_GAME_PHASE: {
                     room = completeRoom();

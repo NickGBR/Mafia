@@ -52,4 +52,9 @@ a:visited {
 }
 
 
-
+.description-container {
+    display: block;
+    margin: 2rem 2rem;
+    font-family: 'PT Mono', monospace;
+    font-size: 1.2rem;
+}
