@@ -24,14 +24,12 @@ public class GameController {
 
     @RequestMapping(value = SockConst.REQUEST_VOTE_FOR_USER, method = RequestMethod.GET)
     public void voteForUser(@RequestParam String login) throws ClientErrorException {
-        System.out.println(login);
         gameService.countVotesAgainst(login);
     }
 
     @RequestMapping(value = SockConst.REQUEST_GET_ROLE_INFO, method = RequestMethod.GET)
     public @ResponseBody
     Boolean getRoleInfo(@RequestParam String login) throws ClientErrorException {
-        System.out.println(login);
         if (userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.DON)) {
             return gameService.isSheriff(login);
         } else if (userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.SHERIFF)) {

@@ -73,7 +73,7 @@ public class GameServiceImpl implements GameService {
         roomRepository.save(room);
         messagingTemplate.convertAndSend(SockConst.SYS_GAME_STARTED_INFO + roomId, true);
 
-        GameHost gameHost = new GameHost(messagingTemplate, currentUserDAO.get().getRoom(), roomRepository);
+        GameHost gameHost = new GameHost(messagingTemplate, room, roomRepository);
         Thread thread = new Thread(gameHost);
         thread.start();
     }
@@ -168,7 +168,6 @@ public class GameServiceImpl implements GameService {
 
         Integer votesAgainst = userDAO.get().getVotesAgainst();
         userDAO.get().setVotesAgainst(votesAgainst + 1);
-        System.out.println(userDAO.get().getVotesAgainst());
         userRepository.save(userDAO.get());
     }
 

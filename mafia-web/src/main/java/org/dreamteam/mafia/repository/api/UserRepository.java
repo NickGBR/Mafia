@@ -1,6 +1,9 @@
 package org.dreamteam.mafia.repository.api;
 
+import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.dao.enums.CharacterEnum;
+import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -48,4 +51,7 @@ public interface UserRepository extends CrudRepository<UserDAO, Long> {
      */
     @Query("select count(u) from UserDAO u where u.room.roomId = ?1 and u.isReady = true")
     Integer findUsersAmountByRoomIdReadyToPlay(Integer roomId);
+
+    Long countByCharacterInAndAndCharacterStatusAndRoom(List<CharacterEnum> roles,
+                                                        CharacterStatusEnum status, RoomDAO room);
 }
