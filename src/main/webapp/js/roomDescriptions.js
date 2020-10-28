@@ -6,13 +6,13 @@ function generateDescription(data) {
         description = description + " играет за Мафию."
     }
     if (data["hasDon"] && data["hasSheriff"]) {
-        description = description + " В игре участвуют и Дон, и Шериф";
+        description = description + " В игре участвуют и Дон, и Шериф.";
     } else if (data["hasDon"] && !data["hasSheriff"]) {
-        description = description + " В игре участвует  Дон, но не Шериф";
+        description = description + " В игре участвует  Дон, но не Шериф.";
     } else if (!data["hasDon"] && data["hasSheriff"]) {
-        description = description + " В игре нет Дона,  но есть Шериф";
+        description = description + " В игре нет Дона,  но есть Шериф.";
     } else {
-        description = description + " В игре нет ни Дона, ни Шерифа";
+        description = description + " В игре нет ни Дона, ни Шерифа.";
     }
     return description;
 }

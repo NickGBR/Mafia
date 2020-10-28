@@ -62,7 +62,8 @@ public class RoomDAO {
     @NotFound(action = NotFoundAction.IGNORE)
     private Set<UserDAO> userList;
 
-    @OneToMany(mappedBy = "messageId", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @NotFound(action = NotFoundAction.IGNORE)
     private Set<MessageDAO> messageList;
     public RoomDAO() {
         this.dayNumber = 0;

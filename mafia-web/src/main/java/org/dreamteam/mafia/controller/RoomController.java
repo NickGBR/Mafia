@@ -164,6 +164,7 @@ public class RoomController {
         logger.debug("Incoming kick request. Target user login: " + target);
         roomService.kickUser(target);
         final RoomDisplayDTO currentRoom = roomService.getCurrentRoom();
+        messageService.sendKickUpdate(currentRoom, target);
         messageService.sendJoinUpdate(currentRoom, target);
         messageService.sendUpdateRoom(currentRoom);
     }

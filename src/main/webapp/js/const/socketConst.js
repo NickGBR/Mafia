@@ -11,15 +11,17 @@ var sockConst = {
     CIV_WEB_CHAT: '/chat/message/send/civilians/',
     SYS_WEB_CHAT: '/chat/system_messages/',
 
-    SYS_WEB_ROOMS_INFO_ADD: "/chat/system_messages/rooms/add",
-    SYS_WEB_ROOMS_INFO_REMOVE: "/chat/system_messages/rooms/remove",
-    SYS_WEB_ROOMS_INFO_UPDATE: "/chat/system_messages/rooms/update",
+    SYS_WEB_ROOMS_INFO_ADD: '/chat/system_messages/rooms/add',
+    SYS_WEB_ROOMS_INFO_REMOVE: '/chat/system_messages/rooms/remove',
+    SYS_WEB_ROOMS_INFO_UPDATE: '/chat/system_messages/rooms/update',
     SYS_WEB_USERS_INFO: '/chat/system_messages/users/',
+    SYS_WEB_USERS_INFO_KICKED: '/chat/system_messages/users/kicked',
+
     SYS_USERS_READY_TO_PLAY_INFO: '/chat/system_messages/users_ready_to_play_info/',
     SYS_GAME_STARTED_INFO: '/chat/system_message/game_started_message/',
 
     REQUEST_GET_ADD_USER_TO_ROOM: 'api/GET/addUserToRoom',
-    REQUEST_GET_VOTE_FOR_USER: 'api/room/voteForUser',
+    REQUEST_GET_VOTE_FOR_USER: 'api/game/voteForUser',
     REQUEST_GET_ROOM_ADMIN_NAME: "api/GET/get_room_admin_name",
     REQUEST_GET_MESSAGES: "api/GET/getMessages",
     REQUEST_GET_ROOMS: "api/GET/getRooms",
@@ -37,10 +39,10 @@ var sockConst = {
      * шериф првоеряет, явлеяется ли персонаж доном,
      * дон проверяет явлеся ли указанный персонаж шерифом.
      */
-    REQUEST_GET_ROLE_INFO: "api/room/GET/checkRole",
+    REQUEST_GET_ROLE_INFO: "api/game/GET/checkRole",
 
 
-    REQUEST_GET_START_GAME_INFO: '/api/room/startGame'
+    REQUEST_GET_START_GAME_INFO: '/api/game/startGame'
 }
 
 var destinationConst = {

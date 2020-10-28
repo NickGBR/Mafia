@@ -26,8 +26,10 @@ function afterConnect(connection) {
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_ADD, updateRoomToInterfaceAdd)
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE, updateRoomToInterfaceRemove)
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_UPDATE, updateRoomToInterface)
+    stompClient.subscribe(sockConst.ROOM_WEB_CHAT, receiveMessage);
     userName = initialisedUserName;
     getRooms();
+    loadChatMessages();
     stopSpinner();
 }
 
@@ -259,3 +261,6 @@ function updateButtonsOnSelect() {
     button.disabled = selectedEntry == null;
 }
 
+function sendMessageToCommon() {
+    sendMessage();
+}

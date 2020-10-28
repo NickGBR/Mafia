@@ -1,7 +1,10 @@
 package org.dreamteam.mafia.service.api;
 
 import org.dreamteam.mafia.dao.RoomDAO;
+import org.dreamteam.mafia.dto.CharacterDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+
+import java.util.List;
 
 /**
  * Интерфейс сервиса, обеспечивающего ведение самой игры.
@@ -50,4 +53,11 @@ public interface GameService {
      * @param room - игровая комната
      */
     void setRolesToUsers(RoomDAO room);
+
+    /**
+     * Возвращает список персонажей в игре: их имена, состояния и роли, если запрашивающий имеет право их видеть
+     *
+     * @return - список персонажей
+     */
+    List<CharacterDisplayDTO> getCharacterInGame() throws ClientErrorException;
 }
