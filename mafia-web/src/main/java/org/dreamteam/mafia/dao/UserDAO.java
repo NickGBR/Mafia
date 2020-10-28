@@ -1,7 +1,6 @@
 package org.dreamteam.mafia.dao;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dreamteam.mafia.dao.enums.CharacterEnum;
 import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
@@ -9,17 +8,18 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Объект, связанный с таблицей пользователей в БД
  */
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "users")
-
 public class UserDAO {
 
     @Id
@@ -29,6 +29,7 @@ public class UserDAO {
 
     @Column(name = "login", unique = true, nullable = false, length = 100)
     private String login;
+
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
@@ -45,6 +46,9 @@ public class UserDAO {
     @Column(name = "is_ready")
     private Boolean isReady;
 
+    @Column(name = "has_voted")
+    private Boolean hasVoted;
+
     @Column(name = "is_admin")
     private Boolean isAdmin;
 
@@ -58,6 +62,22 @@ public class UserDAO {
 
     @Column(name = "votes_against")
     private Integer votesAgainst;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Set<MessageDAO> messageList;
+
+    public UserDAO() {
+        login = "";
+        passwordHash = "";
+        isReady = false;
+        isAdmin = false;
+        character = CharacterEnum.CITIZEN;
+        characterStatus = CharacterStatusEnum.ALIVE;
+        votesAgainst = 0;
+        messageList = new HashSet<>();
+        hasVoted = false;
+    }
 
     public UserDAO(String login, String passwordHash) {
         this.login = login;
@@ -89,11 +109,16 @@ public class UserDAO {
         sb.append("userId=").append(userId);
         sb.append(", login='").append(login).append('\'');
         sb.append(", passwordHash='").append(passwordHash).append('\'');
-        sb.append(", roomId=").append(room.getRoomId());
+        if (room != null) {
+            sb.append(", roomId=").append(room.getRoomId());
+        } else {
+            sb.append(", not in the room");
+        }
         sb.append(", isReady=").append(isReady);
         sb.append(", character=").append(character);
         sb.append(", characterStatus=").append(characterStatus);
         sb.append(", votesAgainst=").append(votesAgainst);
+        sb.append(", MessagesCount=").append(messageList.size());
         sb.append('}');
         return sb.toString();
     }

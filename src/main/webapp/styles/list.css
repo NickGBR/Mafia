@@ -35,7 +35,49 @@
 }
 
 .text {
+    position: relative;
     font-family: 'PT Mono', monospace;
     font-size: 1.1rem;
     width: 25rem;
+}
+
+.tooltip-container {
+    position: relative;
+}
+
+/* Tooltip text */
+.tooltip-container .tooltip {
+    visibility: hidden;
+    width: 30rem;
+    background-color: rgba(00, 00, 00, 0.5);
+    color: wheat;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+
+    font-family: 'PT Mono', monospace;
+    text-align: left;
+
+    position: absolute;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -15.5rem; /* Use half of the width (31rem/2), to center the tooltip */
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip-container:hover .tooltip {
+    visibility: visible;
+}
+
+.strikethrough {
+    display: block;
+    visibility: hidden;
+    width: calc(100% + 2rem);
+    height: 80%;
+    stroke: black;
+    position: absolute;
+    left: -1rem;
+    bottom: 10%;
+    stroke-width: 1;
+    z-index: 1;
 }

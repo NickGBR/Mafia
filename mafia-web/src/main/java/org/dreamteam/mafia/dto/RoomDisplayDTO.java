@@ -16,16 +16,22 @@ public class RoomDisplayDTO {
     private String name;
     private String description;
     private Integer currPlayers;
-    private Integer maxPlayers;
+    private Integer maxUserAmount;
     private Boolean privateRoom;
+    private Integer mafiaAmount;
+    private Boolean hasSheriff;
+    private Boolean hasDon;
 
     public RoomDisplayDTO(RoomDAO dao) {
         this.setName(dao.getName());
         this.setId(dao.getRoomId());
         this.setDescription(dao.getDescription());
-        this.setMaxPlayers(dao.getMaxUsersAmount());
+        this.setMaxUserAmount(dao.getMaxUsersAmount());
         this.setPrivateRoom(!dao.getPasswordHash().equals(""));
         this.setCurrPlayers(dao.getUserList().size());
+        this.setMafiaAmount(dao.getMafia());
+        this.setHasSheriff(dao.getSheriff());
+        this.setHasDon(dao.getDon());
     }
 
     @Override
@@ -35,7 +41,7 @@ public class RoomDisplayDTO {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", currPlayers=" + currPlayers +
-                ", maxPlayers=" + maxPlayers +
+                ", maxUserAmount=" + maxUserAmount +
                 ", privateRoom=" + privateRoom +
                 '}';
     }

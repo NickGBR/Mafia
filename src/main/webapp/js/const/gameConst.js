@@ -1,19 +1,28 @@
-let gameConst = {
+const gameConst = {
     USERS_AMOUNT: 2,
     FULL_ROOM: -1,
 }
 
-let roleConst = {
+const roleConst = {
     DON: "DON",
     MAFIA: "MAFIA",
     SHERIFF: "SHERIFF",
     CITIZEN: "CITIZEN",
 }
 
-let gamePhaseConst = {
-    DON: "DON_PHASE",
-    MAFIA: "MAFIA_PHASE",
-    SHERIFF: "SHERIFF_PHASE",
-    CIVILIAN: "CIVILIANS_PHASE",
-    END: "END_GAME_PHASE"
+const gamePhaseConst = {
+    MAFIA_DISCUSS_PHASE:"MAFIA_DISCUSS_PHASE",
+    MAFIA_VOTE_PHASE:"MAFIA_VOTE_PHASE",
+    CIVILIANS_DISCUSS_PHASE:"CIVILIANS_DISCUSS_PHASE",
+    CIVILIANS_VOTE_PHASE:"CIVILIANS_VOTE_PHASE",
+    DON_PHASE:"DON_PHASE",
+    SHERIFF_PHASE:"SHERIFF_PHASE",
+    END_GAME_PHASE:"END_GAME_PHASE",
+}
+
+const DestinationConst = {
+    ROOM_USER: 'ROOM_USER',
+    MAFIA: 'MAFIA',
+    CIVILIAN: 'CIVILIAN',
+    COMMON: 'COMMON'
 }

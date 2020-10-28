@@ -8,6 +8,7 @@ let maxUserAmount;
 let mafiaAmount;
 let hasDon;
 let hasSheriff;
+let isKicked = false;
 let selectedEntry = null;
 const usersListId = "users_list";
 
@@ -54,7 +55,8 @@ function afterConnect(connection) {
 
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE + roomID, onDisbandment);
     stompClient.subscribe(sockConst.ROOM_WEB_CHAT + roomID, receiveMessage);
-    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomID, onUserUpdate);
+    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO + roomID, loadRoomUsers);
+    stompClient.subscribe(sockConst.SYS_WEB_USERS_INFO_KICKED + roomID, onUserKick);
     stompClient.subscribe(sockConst.SYS_USERS_READY_TO_PLAY_INFO + roomID, updateUsersReadiness);
     stompClient.subscribe(sockConst.SYS_GAME_STARTED_INFO + roomID, goToGameChat);
 
@@ -77,19 +79,9 @@ function onError(error) {
  * Выводит информацю о пользователе в браузер.
  */
 function initCurrentRoomInfo() {
-    document.getElementById("roomName").innerText = roomName;
-    document.getElementById("max-amount").innerText = maxUserAmount;
-    document.getElementById("mafia-amount").innerText = mafiaAmount;
-    if (hasSheriff) {
-        document.getElementById("sheriff-present").innerText = "в игре";
-    } else {
-        document.getElementById("sheriff-present").innerText = "нет";
-    }
-    if (hasDon) {
-        document.getElementById("don-present").innerText = "в игре";
-    } else {
-        document.getElementById("don-present").innerText = "нет";
-    }
+
+    document.getElementById("room-description")
+        .innerText = generateDescription(init);
     let firstNode = document.getElementById("user_entry_1");
     let userEntry = initUserEntry(firstNode);
     userEntries.push(userEntry);
@@ -154,7 +146,6 @@ function leaveRoom() {
     let callback = function () {
         window.location.href = "roomList.html";
     };
-
     sendRequest("POST", "/api/room/leave", "", callback, [8, 11]);
 }
 
@@ -166,16 +157,14 @@ function disbandRoom() {
 }
 
 
-function onUserUpdate(response) {
+function onUserKick(response) {
     const data = response.body;
     if (data === userName) {
+        isKicked = true;
         showModalMessage("Вас исключили", "Администратор исключил вас из комнаты.", function () {
             window.location.href = "roomList.html";
         });
-    } else {
-        loadRoomUsers();
     }
-
 }
 
 
@@ -183,6 +172,9 @@ function onUserUpdate(response) {
  * Отвечает за получение пользователей при заходе в комнату.
  */
 function loadRoomUsers() {
+    if (isKicked) {
+        return;
+    }
     let callback = function (request) {
         clearUsersList(); // Отчищаем список пользователей, перед обновлением.
         const data = JSON.parse(request.responseText);
@@ -331,4 +323,8 @@ function goToGameChat(response) {
     const data = JSON.parse(response.body);
     console.log(data);
     window.location.href = "gameChat.html";
+}
+
+function sendMessageInRoom() {
+    sendMessage(destinationConst.ROOM_USER);
 }

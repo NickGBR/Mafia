@@ -1,0 +1,20 @@
+.help-list {
+    padding: 0 1rem;
+    list-style: none;
+}
+
+.help-demo {
+    display: flex;
+    position: relative;
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+    transform: scale(0.75);
+}
+
+.help-text {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-family: "PT Serif", serif;
+    text-align: justify;
+}

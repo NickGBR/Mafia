@@ -13,6 +13,8 @@
     <script src="js/initPage.js"></script>
     <script src="js/chat.js"></script>
     <script src="js/modal.js"></script>
+    <script src="js/help.js"></script>
+    <script src="js/roomDescriptions.js"></script>
     <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
     <link href="styles/roomList.css" rel="stylesheet" type="text/css"/>
     <link href="styles/commonstyle.css" rel="stylesheet" type="text/css"/>
@@ -22,7 +24,7 @@
     <div id="divider">
         <div>
             <span class="header-button-container">
-                <button class="button round-button">?</button>
+                <button class="button round-button" onclick="switchHelp()">?</button>
             </span>
             <span>
                 Личное дело: <span id="userName"></span>
@@ -37,11 +39,11 @@
                 </div>
                 <div class="chat-controls">
                     <span class="chat-input">
-                        <label class="message-label" for="message_input_value">Введи сообщение: </label>
-                        <input class="message_input" id="message_input_value" placeholder="Введите сообщение..."/>
+                        <label class="message-label" for="message_input_value"> > </label>
+                        <input class="message_input" id="message_input_value" placeholder="Введи сообщение..."/>
                     </span>
-                    <button class="button rectangle-button" disabled="disabled" id="send_message_button"
-                            onclick="sendMessage()">
+                    <button class="button rectangle-button" id="send_message_button"
+                            onclick="sendMessageToCommon()">
                         Отправить
                     </button>
                 </div>
@@ -122,6 +124,54 @@
                 Отмена
             </button>
         </div>
+    </div>
+    <div id="modal-help">
+        <ul class="help-list">
+            <li class="help-text"> Ты сейчас на главной странице приложения. Прямо перед тобой список комнат. Вот так
+                выглядит обычная публичная комната, куда может зайти любой:
+                <div class="help-demo">
+                    <div class="entry-container" id="help_entry_public">
+                        <div class="entry">
+                    <span class="text"> Название комнаты будет здесь |
+                        <span style="font-style: italic">5</span>/10</span>
+                            <span class="stamp-container"></span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="help-text"> Два числа через / - это количество игроков. Первое - текущее, а второе - необходимое
+                для начала игры. А приватная комната, для входа в которую нужен пароль выглядит вот так:
+                <div class="help-demo">
+                    <div class="entry-container" id="help_entry_private">
+                        <div class="entry">
+                    <span class="text"> Секретная комната на одного |
+                        <span style="font-style: italic">1</span>/3 </span>
+                            <span class="stamp-container"><span class="red stamp">Секретно</span></span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="help-text"> Чтобы узнать о комнате больше, на нее можно навести мышкой:
+                <div class="help-demo">
+                    <div class="entry-container tooltip-container" id="help_entry_tooltip">
+                        <div class="entry selected">
+                    <span class="text"> Название комнаты будет здесь |
+                        <span style="font-style: italic">5</span>/10</span>
+                            <span class="stamp-container"></span>
+                        </div>
+                        <span class="tooltip" id="open-tooltip"> Здесь будет информация о настройках комнаты: число игроков за мафию и наличие в игре Дона и/или Шерифа</span>
+                    </div>
+                </div>
+            </li>
+
+
+            <!--    <li> Чтобы открыть чат, нажми <img src="img/references/chat.PNG" alt="Открыть чат"> </li>
+            <li> Чтобы создать новую комнату, нажми <img src="img/references/create_room.PNG" alt="Создать комнату"> </li>
+
+            <li> Чтобы войти в комнату, нажми <img src="img/references/enter_room.PNG" alt="Войти в комнату"> </li>
+            <li> Чтобы сменить пользователя, нажми <img src="img/references/change_user.PNG" alt="Сменить пользователя"> </li>
+        -->
+        </ul>
     </div>
 </div>
 

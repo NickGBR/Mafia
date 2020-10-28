@@ -16,7 +16,11 @@ public class ChatMessageDTO {
     DestinationEnum destination;
 
     public ChatMessageDTO(MessageDAO dao) {
-        this.from = dao.getUser().getLogin();
+        if (dao.getUser() != null) {
+            this.from = dao.getUser().getLogin();
+        } else {
+            this.from = "";
+        }
         this.text = dao.getText();
         this.destination = dao.getDestination();
     }

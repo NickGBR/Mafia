@@ -11,25 +11,64 @@
     <script src="js/spin.umd.js"></script>
     <script src="js/commonREST.js"></script>
     <script src="js/initPage.js"></script>
+    <script src="js/chat.js"></script>
     <script src="js/modal.js"></script>
     <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
-    <script
-            crossorigin="anonymous"
-            integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-            src="https://code.jquery.com/jquery-3.3.1.js">
-    </script>
-    <script>
-        $(function () {
-            $("#header").load("header.html");
-        });
-    </script>
-    <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
     <link href="styles/style.css" rel="stylesheet" type="text/css"/>
-    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" rel="stylesheet">
+    <link href="styles/commonstyle.css" rel="stylesheet" type="text/css"/>
+
 
 </head>
-<body class="bodyPadding" id="body" onload="onLoadInit()">
+<body class="background" id="body" onload="onLoadInit()">
+
+<svg height="0" id="stroke" width="0" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <path d="M2 2c49.7 2.6 100 3.1 150 1.7-46.5 2-93 4.4-139.2 7.3 45.2-1.5 90.6-1.8 135.8-.6" fill="none" id="line"
+              stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    </defs>
+</svg>
+
+<div id="header">
+    <div id="divider">
+        <div>
+            <span class="header-button-container">
+                <button class="button round-button">?</button>
+            </span>
+            <span>
+                Личное дело: <span id="userName"></span>
+            </span>
+            <span class="header-button-container">
+                <button class="button rectangle-button" id="switch_chat_button" onclick="switchChat()">Чат</button>
+            </span>
+            <a class="login-link" href="login.html"> Зайти от другого имени</a>
+            <!-- окно чата -->
+            <div id="chat_area">
+                <div class="chat-box" id="room_chat_box">
+                </div>
+                <div class="chat-controls">
+                    <span class="chat-input">
+                        <label class="message-label" for="message_input_value"> > </label>
+                        <input class="message_input" id="message_input_value" placeholder="Введи сообщение..."/>
+                    </span>
+                    <button class="button rectangle-button" disabled="disabled" id="send_message_button"
+                            onclick="sendMessageToDestination()">
+                        Отправить
+                    </button>
+                </div>
+                <script>
+                    document.getElementById("message_input_value")
+                        .addEventListener("keyup", function (event) {
+                            event.preventDefault();
+                            if (event.keyCode === 13) {
+                                document.getElementById("send_message_button").click();
+                            }
+                        });
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="overlay-chat"></div>
 <div id="overlay-modal">
     <div id="modal-spinner">
     </div>
@@ -43,34 +82,41 @@
         </div>
     </div>
 </div>
-<div id="header"></div>
-<p>
-    <label id="user_info_label"></label>
-</p>
-
-<!-- окно чата -->
-<div class="room_box" id="game_chat_box">
-</div>
-<input class="message_input" disabled="disabled" id="message_input_value" placeholder="Введите сообщение..."/>
-<button class="text" disabled="disabled" id="send_message_button" onclick="sendMessage()">Отправить сообщение</button>
-<button class="text"  onclick="getLog()">getLog</button>
-<button class="text" id="don_checker" onclick="checkUserRole()">Проверить шерифа</button>
-<button class="text" id="sheriff_checker" onclick="checkUserRole()">Проверить дона</button>
-
-<script>
-    document.getElementById("message_input_value")
-        .addEventListener("keyup", function (event) {
-            event.preventDefault();
-            if (event.keyCode === 13) {
-                document.getElementById("send_message_button").click();
-                document.getElementById("message_input_value").value = "";
-            }
-        });
-</script>
-<div>
-
-    <p id='users_list'></p>
-
+<div id="content">
+    <div class="description-container">
+        <span id="game-description"></span>
+    </div>
+    <!-- Кнопки управления -->
+    <div class="button-group">
+        <span class="button-container user-button">
+            <button class="button rectangle-button" disabled="disabled" id="vote_for_user_button" onclick="voteForUser()">
+            Проголосовать
+            </button>
+        </span>
+        <span class="button-container admin-button">
+         <button class="button rectangle-button" id="don_checker" onclick="checkUserRole()">
+            Проверить шерифа
+         </button>
+        </span>
+        <span class="button-container admin-button">
+         <button class="button rectangle-button" id="sheriff_checker" onclick="checkUserRole()">
+            Проверить дона
+         </button>
+        </span>
+    </div>
+    <!-- Список игроков -->
+    <ul class="list-container" id="characters_list">
+        <li class="entry-container" id="character_entry_1">
+            <div class="entry">
+                <span class="text">
+                    <svg class="strikethrough" viewBox="0 0 154 13">
+                        <use href="#line"></use>
+                    </svg>
+                </span>
+                <span class="stamp-container"></span>
+            </div>
+        </li>
+    </ul>
 </div>
 </body>
 </html>

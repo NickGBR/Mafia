@@ -62,6 +62,7 @@ function doRedirect() {
 
 function doInitGameChat() {
     connect();
+    setUserName();
     stopSpinner();
 }
 

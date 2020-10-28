@@ -1,11 +1,9 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.dto.CharacterDTO;
-import org.dreamteam.mafia.exceptions.*;
-import org.dreamteam.mafia.model.Character;
-import org.dreamteam.mafia.model.Message;
-import org.dreamteam.mafia.model.Room;
-import org.dreamteam.mafia.model.User;
+import org.dreamteam.mafia.dao.RoomDAO;
+import org.dreamteam.mafia.dao.enums.GameEndStatus;
+import org.dreamteam.mafia.dto.CharacterDisplayDTO;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 
 import java.util.List;
 
@@ -15,76 +13,60 @@ import java.util.List;
 public interface GameService {
 
     /**
-     * Запускает игру.
+     * Меняет состояние игры на начатую,
+     * проверят существует ли пользоватеь в базе данных,
+     * проверяет достаточно ли у пльзователя прав для запуска комнаты,
+     * отправляет всем пользователям информацию об успешном старте игры.
+     *
+     * @throws ClientErrorException - при возникновении ошибок на стороне клиента
      */
     void startGame() throws ClientErrorException;
-
-
-    /**
-     * Возвращает список всех персонажей в игре
-     *
-     * @param room - игра
-     * @return - список персонажей
-     */
-    List<Character> getCharactersInGame(Room room);
-
-    /**
-     * Возвращает список всех сообщений в чате игры
-     *
-     * @param room - игра
-     * @return - список сообщений
-     */
-    List<Message> getMessageLog(Room room);
-
-    /**
-     * Переводит игру в следующую фазу
-     *
-     * @param room - игра
-     * @throws ClientErrorException - если игра уже окончена
-     */
-    void advancePhase(Room room) throws ClientErrorException;
-
-    /**
-     * Выдвигает персонажа на голосование
-     *
-     * @param user         - выдвигающий игрок
-     * @param characterDTO - выдвигаемый персонаж
-     * @throws IllegalMoveException - если выдвижение нарушает правила игры
-     */
-    void nominateCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException;
-
-    /**
-     * Голосует против персонажа
-     *
-     * @param user         - голосующий игрок
-     * @param characterDTO - голосуемый против персонаж
-     * @throws IllegalMoveException - если голосование нарушает правила игры
-     */
-    void voteCharacter(User user, CharacterDTO characterDTO) throws IllegalMoveException;
 
     /**
      * Проверка является ли игрок шерифом.
      *
      * @param login - логин игрока
      * @return - true, если игрок явлеятся шерифом, нет в противном случае
-     * @throws IllegalGamePhaseException     - если не соответствует фаза дня (ночью шериф ищет мафию/дона, мафия ищет шерифа)
-     * @throws UserDoesNotExistInDBException - если игрока нет в базе
-     * @throws RoomsMismatchException        - если игроки находятся в разных комнатах
-     * @throws NotEnoughRightsException      - если у игрока нет прав голосовать в данную фазу
+     * @throws ClientErrorException - при возникновении ошибок на стороне клиента
      */
-    boolean isSheriff(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
-            RoomsMismatchException, NotEnoughRightsException;
+    boolean isSheriff(String login) throws ClientErrorException;
 
     /**
      * Проверка является ли игрок мафией/доном.
      *
      * @param login - логин игрока
      * @return - true, если игрок явлеятся мафией/доном, нет в противном случае
-     * @throws IllegalGamePhaseException     - если не соответствует фаза дня (ночью шериф ищет мафию/дона, мафия ищет шерифа)
-     * @throws UserDoesNotExistInDBException - если игрока нет в базе
-     * @throws RoomsMismatchException        - если игроки находятся в разных комнатах
-     * @throws NotEnoughRightsException      - если у игрока нет прав голосовать в данную фазу
+     * @throws ClientErrorException - при возникновении ошибок на стороне клиента
      */
-    boolean isMafia(String login) throws IllegalGamePhaseException, UserDoesNotExistInDBException,
-            RoomsMismatchException, NotEnoughRightsException;
+    boolean isMafia(String login) throws ClientErrorException;
+
+    /**
+     * Подсчет голосов против игрока.
+     *
+     * @param login - логин игрока, против которого голосуют
+     * @throws ClientErrorException - при возникновении ошибок на стороне клиента
+     */
+    void countVotesAgainst(String login) throws ClientErrorException;
+
+    /**
+     * Распределение ролей игрокам.
+     *
+     * @param room - игровая комната
+     */
+    void setRolesToUsers(RoomDAO room);
+
+    /**
+     * Возвращает список персонажей в игре: их имена, состояния и роли, если запрашивающий имеет право их видеть
+     *
+     * @return - список персонажей
+     */
+    List<CharacterDisplayDTO> getCharacterInGame() throws ClientErrorException;
+
+    /**
+     * Возращает информацию о победе мафии или мирных,
+     * если никто не побеждает, сообщеает об этом.
+     * @param room - комната в которй подсчитывается колличество мафии и мирных
+     * @return - возращет Enum о статусе игры.
+     */
+    public GameEndStatus isMafiaVictoryInRoom(RoomDAO room);
 }

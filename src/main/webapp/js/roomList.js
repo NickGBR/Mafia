@@ -26,8 +26,10 @@ function afterConnect(connection) {
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_ADD, updateRoomToInterfaceAdd)
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_REMOVE, updateRoomToInterfaceRemove)
     stompClient.subscribe(sockConst.SYS_WEB_ROOMS_INFO_UPDATE, updateRoomToInterface)
+    stompClient.subscribe(sockConst.ROOM_WEB_CHAT, receiveMessage);
     userName = initialisedUserName;
     getRooms();
+    loadChatMessages();
     stopSpinner();
 }
 
@@ -193,7 +195,7 @@ function addRoomText(text, room) {
     const currPlayersNode = document.createElement("SPAN");
     currPlayersNode.innerText = room["currPlayers"];
     currPlayersNode.style.fontStyle = "italic";
-    const maxPlayersNode = document.createTextNode(" / " + room["maxPlayers"]);
+    const maxPlayersNode = document.createTextNode(" / " + room["maxUserAmount"]);
     text.appendChild(nameTextNode);
     text.appendChild(currPlayersNode);
     text.appendChild(maxPlayersNode);
@@ -217,6 +219,9 @@ function addRoomToInterface(room) {
         selectRoom(event.target);
         updateButtonsOnSelect();
     }
+
+    addDescriptionTooltip(copyNode, room);
+
     if (room["privateRoom"]) {
         const stampContainer = copyNode.querySelector('.stamp-container');
         const stampNode = document.createElement("span");
@@ -256,3 +261,6 @@ function updateButtonsOnSelect() {
     button.disabled = selectedEntry == null;
 }
 
+function sendMessageToCommon() {
+    sendMessage();
+}

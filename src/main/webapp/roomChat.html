@@ -6,16 +6,17 @@
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="js/stomp.js"></script>
     <script src="js/const/socketConst.js" type="text/javascript"></script>
+    <script src="js/const/gameConst.js" type="text/javascript"></script>
     <script src="js/roomChat.js" type="text/javascript"></script>
     <script src="js/spin.umd.js"></script>
     <script src="js/commonREST.js"></script>
     <script src="js/initPage.js"></script>
     <script src="js/chat.js"></script>
     <script src="js/modal.js"></script>
+    <script src="js/roomDescriptions.js"></script>
     <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
     <link href="styles/commonstyle.css" rel="stylesheet" type="text/css"/>
     <link href="styles/roomChat.css" rel="stylesheet" type="text/css"/>
-
 </head>
 <body class="background" id="body" onload="onLoadInit()">
 <div id="header">
@@ -37,11 +38,11 @@
                 </div>
                 <div class="chat-controls">
                     <span class="chat-input">
-                        <label class="message-label" for="message_input_value">Введи сообщение: </label>
-                        <input class="message_input" id="message_input_value" placeholder="Введите сообщение..."/>
+                        <label class="message-label" for="message_input_value"> > </label>
+                        <input class="message_input" id="message_input_value" placeholder="Введи сообщение..."/>
                     </span>
                     <button class="button rectangle-button" disabled="disabled" id="send_message_button"
-                            onclick="sendMessage()">
+                            onclick="sendMessageInRoom()">
                         Отправить
                     </button>
                 </div>
@@ -88,52 +89,37 @@
                 </button>
             </span>
     </div>
-    <div class="room-param-container">
-            <span class="room-param">
-                Число игроков всего:  <span id="max-amount"></span>
-            </span>
-        <span class="room-param">
-                 Число игроков за мафию:  <span id="mafia-amount"></span>
-            </span>
+    <div class="description-container">
+        <span id="room-description"></span>
     </div>
-    <div class="room-param-container">
-        <span class="room-param">
-                Шериф:  <span id="sheriff-present"></span>
-            </span>
-        <span class="room-param">
-                 Дон:  <span id="don-present"></span>
-            </span>
-    </div>
-    <div>
-        <!-- Кнопки управления -->
-        <div class="button-group">
+    <!-- Кнопки управления -->
+    <div class="button-group">
         <span class="button-container user-button">
             <button class="button rectangle-button" id="user_ready_button" onclick="changeUserReadyStatus()">
             Я готов
             </button>
         </span>
-            <span class="button-container admin-button">
+        <span class="button-container admin-button">
          <button class="button rectangle-button" disabled id="start_game_button" onclick="startGame()">
             Начать игру
          </button>
         </span>
-            <span class="button-container admin-button">
+        <span class="button-container admin-button">
          <button class="button rectangle-button" disabled id="kick_user_button" onclick="kickUser()">
             Выгнать игрока
          </button>
         </span>
-        </div>
-
-        <!-- Список игроков -->
-        <ul class="list-container" id="users_list">
-            <li class="entry-container" id="user_entry_1">
-                <div class="entry">
-                    <span class="text"></span>
-                    <span class="stamp-container"></span>
-                </div>
-            </li>
-        </ul>
     </div>
+
+    <!-- Список игроков -->
+    <ul class="list-container" id="users_list">
+        <li class="entry-container" id="user_entry_1">
+            <div class="entry">
+                <span class="text"></span>
+                <span class="stamp-container"></span>
+            </div>
+        </li>
+    </ul>
 </div>
 </body>
 </html>
