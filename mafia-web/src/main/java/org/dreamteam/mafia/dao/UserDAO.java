@@ -41,7 +41,9 @@ public class UserDAO {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+
+    //@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     @JoinTable(
             name = "users2rooms",
             joinColumns = {@JoinColumn(name = "user_id")},

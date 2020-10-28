@@ -56,7 +56,9 @@ public class RoomDAO {
     @Column(name = "don")
     private Boolean don;
 
-    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! REFRESH
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @NotFound(action = NotFoundAction.IGNORE)
     private Set<UserDAO> userList;
 

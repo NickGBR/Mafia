@@ -12,6 +12,7 @@ import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.GameDTO;
 import org.dreamteam.mafia.dto.VotingResultDTO;
 import org.dreamteam.mafia.repository.api.RoomRepository;
+import org.dreamteam.mafia.service.api.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -26,6 +27,7 @@ public class GameHost implements Runnable {
     private final RoomRepository roomRepository;
     private int dayCounter;
     private final Logger logger = LoggerFactory.getLogger(GameHost.class);
+    private UserService userService;
 
     public GameHost(SimpMessagingTemplate messagingTemplate,
                     RoomDAO room, RoomRepository roomRepository) {
@@ -54,7 +56,7 @@ public class GameHost implements Runnable {
 
                 case CIVILIANS_VOTE_PHASE:
                     civiliansVotePhase(GameConst.CIVILIAN_VOTING_PHASE_DURATION);
-                    room.setUserList(roomRepository.findById(room.getRoomId()).get().getUserList());
+                    room = roomRepository.findById(room.getRoomId()).get();
                     getVotingResult();
                     goToPhase(GamePhaseEnum.MAFIA_DISCUSS_PHASE);
                     break;
@@ -66,7 +68,7 @@ public class GameHost implements Runnable {
 
                 case MAFIA_VOTE_PHASE:
                     mafiaVotePhase(GameConst.MAFIA_VOTING_PHASE_DURATION);
-                    room.setUserList(roomRepository.findById(room.getRoomId()).get().getUserList());
+                    room = roomRepository.findById(room.getRoomId()).get();
                     getVotingResult();
                     goToPhase(GamePhaseEnum.DON_PHASE);
                     break;
@@ -86,7 +88,7 @@ public class GameHost implements Runnable {
                 case END_GAME_PHASE: {
                     room = completeRoom();
                     System.out.println(room);
-                    room = roomRepository.save(room);
+                   // room = roomRepository.save(room);
                     break;
                 }
                 default:
@@ -94,7 +96,7 @@ public class GameHost implements Runnable {
             }
 
             logger.debug("Room at the end of phase: " + room);
-            //room = roomRepository.save(room);
+            room = roomRepository.save(room);
         }
         messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId().toString(), gameDTO);
         System.out.println("Thread " + Thread.currentThread().getName() + " has been stopped!");
@@ -271,11 +273,13 @@ public class GameHost implements Runnable {
             if (userDAO.getLogin().equals(login)) {
                 userDAO.setCharacterStatus(CharacterStatusEnum.DEAD);
             }
-
+            System.out.println(userDAO.getVotesAgainst());
         }
-        roomRepository.save(room);
+
+        //roomRepository.findById(room.getRoomId()).get().setUserList(room.getUserList());
         messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT + room.getRoomId(), gameDTO);
     }
+
 }
 
 
