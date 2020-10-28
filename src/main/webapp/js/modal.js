@@ -35,6 +35,7 @@ function hideModal() {
 let confirmCallback = null;
 
 function showModalMessage(title, text, callback = null) {
+    hideModal();
     let textNode = document.getElementById("modal-message-text");
     textNode.innerText = text;
     let titleNode = document.getElementById("modal-message-title");

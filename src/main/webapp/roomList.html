@@ -90,12 +90,12 @@
             <input id="new_room_mafia_amount" max="49" min="1" name="mafia" type="number" value="3">
         </div>
         <div class="input-container centered">
-            <label for="new_room_don">Присутствует ли в игре Дон:</label>
-            <input checked id="new_room_don" name="don" type="checkbox">
-        </div>
-        <div class="input-container centered">
             <label for="new_room_sheriff">Присутствует ли в игре шериф:</label>
             <input checked id="new_room_sheriff" name="sheriff" type="checkbox">
+        </div>
+        <div class="input-container centered">
+            <label for="new_room_don">Присутствует ли в игре Дон:</label>
+            <input checked id="new_room_don" name="don" type="checkbox">
         </div>
         <div class="input-container centered">
             <label for="new_room_password">Введите пароль комнаты:</label>
@@ -125,53 +125,135 @@
             </button>
         </div>
     </div>
-    <div id="modal-help">
-        <ul class="help-list">
-            <li class="help-text"> Ты сейчас на главной странице приложения. Прямо перед тобой список комнат. Вот так
-                выглядит обычная публичная комната, куда может зайти любой:
-                <div class="help-demo">
-                    <div class="entry-container" id="help_entry_public">
-                        <div class="entry">
+    <div id="modal-help" onclick="switchHelp()">
+        <div>
+            <ul class="help-list">
+                <li class="help-text"> Ты сейчас на главной странице приложения. Прямо перед тобой список комнат. Вот
+                    так
+                    выглядит обычная публичная комната, куда может зайти любой:
+                    <div class="help-demo">
+                        <div class="entry-container" id="help_entry_public">
+                            <div class="entry-non-selectable">
                     <span class="text"> Название комнаты будет здесь |
                         <span style="font-style: italic">5</span>/10</span>
-                            <span class="stamp-container"></span>
+                                <span class="stamp-container"></span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>
-            <li class="help-text"> Два числа через / - это количество игроков. Первое - текущее, а второе - необходимое
-                для начала игры. А приватная комната, для входа в которую нужен пароль выглядит вот так:
-                <div class="help-demo">
-                    <div class="entry-container" id="help_entry_private">
-                        <div class="entry">
+                </li>
+                <li class="help-text"> Два числа через / - это количество игроков. Первое - текущее, а второе -
+                    необходимое для начала игры. Чтобы узнать о комнате больше, на нее можно навести мышкой:
+                    <div class="help-demo">
+                        <div class="entry-container tooltip-container" id="help_entry_tooltip">
+                            <div class="entry selected">
+                    <span class="text"> Название комнаты будет здесь |
+                        <span style="font-style: italic">5</span>/10</span>
+                                <span class="stamp-container"></span>
+                            </div>
+                            <span class="tooltip" id="open-tooltip"> Здесь будет информация о настройках комнаты: число игроков за мафию и наличие в игре Дона и/или Шерифа</span>
+                        </div>
+                    </div>
+                </li>
+                <li class="help-text"> Если щелкнуть на комнату, то она становится выбранной, и остается выделенной
+                    жирным,
+                    даже если увести курсор:
+                    <div class="help-demo">
+                        <div class="entry-container" id="help_entry_selected">
+                            <div class="entry-non-selectable selected">
+                    <span class="text"> Название комнаты будет здесь |
+                        <span style="font-style: italic">5</span>/10</span>
+                                <span class="stamp-container"></span>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="help-text"> После выбора комнаты в нее можно войти, нажав соответствующую кнопку. Кнопка
+                    будет неактивной изначально и загорится, как только комната будет выбрана. Это выглядит вот так:
+                    <div class="help-demo">
+                        <button class="button rectangle-button" disabled>
+                            Войти в комнату
+                        </button>
+                        <button class="button rectangle-button">
+                            Войти в комнату
+                        </button>
+                    </div>
+                </li>
+                <li class="help-text"> Некоторые комнаты защищены паролем. В них не получится войти просто так. Такая
+                    приватная комната выглядит вот так:
+                    <div class="help-demo">
+                        <div class="entry-container" id="help_entry_private">
+                            <div class="entry-non-selectable">
                     <span class="text"> Секретная комната на одного |
                         <span style="font-style: italic">1</span>/3 </span>
-                            <span class="stamp-container"><span class="red stamp">Секретно</span></span>
+                                <span class="stamp-container"><span class="red stamp">Секретно</span></span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>
-            <li class="help-text"> Чтобы узнать о комнате больше, на нее можно навести мышкой:
-                <div class="help-demo">
-                    <div class="entry-container tooltip-container" id="help_entry_tooltip">
-                        <div class="entry selected">
-                    <span class="text"> Название комнаты будет здесь |
-                        <span style="font-style: italic">5</span>/10</span>
-                            <span class="stamp-container"></span>
+                </li>
+                <li class="help-text"> А если попробовать войти в нее, то появится такой диалог, запрашивающий пароль от
+                    комнаты. Войти получится, только введя правильный пароль:
+                    <div class="help-demo">
+                        <div>
+                            <div class="modal-header">Подтвердите допуск к комнате: <span></span></div>
+                            <div class="input-container centered">
+                                <label for="password_input_join-help">Введите пароль комнаты:</label>
+                                <input id="password_input_join-help" name="password" placeholder="******"
+                                       type="password">
+                            </div>
+                            <div class="input-button-confirmation-container centered">
+                                <button class="button rectangle-button">
+                                    Получить доступ
+                                </button>
+                                <button class="button rectangle-button">
+                                    Отмена
+                                </button>
+                            </div>
                         </div>
-                        <span class="tooltip" id="open-tooltip"> Здесь будет информация о настройках комнаты: число игроков за мафию и наличие в игре Дона и/или Шерифа</span>
                     </div>
-                </div>
-            </li>
+                </li>
+                <li class="help-text"> Кроме кнопки для входа в комнату на этом окне есть еще и кнопка создания комнаты.
+                    Если что, то она выглядит вот так:
+                    <div class="help-demo">
+                        <button class="button rectangle-button">
+                            Создать комнату
+                        </button>
+                    </div>
+                </li>
+                <li class="help-text"> Если нажать на него, то откроется окно конструктора комнат с несколькими полями.
+                    Первое из них - это имя комнаты. Оно должно быть не пустым и содержать не больше 20 символов:
+                    <div class="help-demo">
+                    </div>
+                </li>
+                <li class="help-text"> Второе - это количество игроков, необходимое для старта игры в комнате.
+                    Для игры в Мафию нужно не меньше 3 игроков, но не более 99 (лучший результат будет где-то между 5 и
+                    15 игроками):
+                    <div class="help-demo">
+                    </div>
+                </li>
+                <li class="help-text"> Третье поле - это число игроков за мафию. Оно должно быть меньше половины общего
+                    числа игроков.
+                    Иначе, мафия выигрывает сразу, как начинается игра, а это будет не интересно. Также не интересно
+                    играть в Мафию без мафии,
+                    так что это количество не должно быть меньше одного:
+                    <div class="help-demo">
+                    </div>
+                </li>
+                <li class="help-text"> : Следующее поле определяет будет ли в игре Шериф. Шериф - это особенный игрок за
+                    Мирных.
+                    Каждую ночь он может проверить любого игрока на то не работает ли он на Мафию. Если снять галочку с
+                    этого поля,
+                    то Шерифа в игре не будет.
+                    <div class="help-demo">
+                    </div>
+                </li>
+                <li class="help-text"> Пятое поле определяет будет ли в игре Дон. Дон - это специальный игрок за мафию.
+                    Он не только убивает игроков по ночам, но и пытается найти Шерифа среди других игроков:
+                    <div class="help-demo">
+                    </div>
+                </li>
 
-
-            <!--    <li> Чтобы открыть чат, нажми <img src="img/references/chat.PNG" alt="Открыть чат"> </li>
-            <li> Чтобы создать новую комнату, нажми <img src="img/references/create_room.PNG" alt="Создать комнату"> </li>
-
-            <li> Чтобы войти в комнату, нажми <img src="img/references/enter_room.PNG" alt="Войти в комнату"> </li>
-            <li> Чтобы сменить пользователя, нажми <img src="img/references/change_user.PNG" alt="Сменить пользователя"> </li>
-        -->
-        </ul>
+            </ul>
+        </div>
     </div>
 </div>
 
