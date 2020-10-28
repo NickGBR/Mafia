@@ -2,13 +2,11 @@ package org.dreamteam.mafia.controller;
 
 import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.dao.enums.CharacterEnum;
-import org.dreamteam.mafia.exceptions.*;
+import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/room")
@@ -19,20 +17,22 @@ public class GameController {
 
     @Autowired
     public GameController(GameService gameService,
-                          UserService userService)
-    {
+                          UserService userService) {
         this.gameService = gameService;
         this.userService = userService;
     }
 
+    @RequestMapping(value = SockConst.REQUEST_VOTE_FOR_USER, method = RequestMethod.GET)
+    public void voteForUser(@RequestParam String login) throws ClientErrorException {
+        gameService.countVotesAgainst(login);
+    }
 
     @RequestMapping(value = SockConst.REQUEST_GET_ROLE_INFO, method = RequestMethod.GET)
-    public @ResponseBody Boolean startGame(@RequestParam String login) throws ClientErrorException {
-        System.out.println(login);
-        if(userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.DON)){
+    public @ResponseBody
+    Boolean getRoleInfo(@RequestParam String login) throws ClientErrorException {
+        if (userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.DON)) {
             return gameService.isSheriff(login);
-        }
-        else if (userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.SHERIFF)){
+        } else if (userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.SHERIFF)) {
             return gameService.isMafia(login);
         }
         return null;
@@ -52,13 +52,13 @@ public class GameController {
 
     @Deprecated
     @RequestMapping(value = "/getIsSheriff", method = RequestMethod.GET)
-    public Boolean checkSheriff(@RequestParam String login) throws IllegalGamePhaseException, NotEnoughRightsException, UserDoesNotExistInDBException, RoomsMismatchException {
+    public Boolean checkSheriff(@RequestParam String login) throws ClientErrorException {
         return gameService.isSheriff(login);
     }
 
     @Deprecated
     @RequestMapping(value = "/getIsMafia", method = RequestMethod.GET)
-    public Boolean checkMafia(@RequestParam String login) throws IllegalGamePhaseException, NotEnoughRightsException, UserDoesNotExistInDBException, RoomsMismatchException {
+    public Boolean checkMafia(@RequestParam String login) throws ClientErrorException {
         return gameService.isMafia(login);
     }
 }

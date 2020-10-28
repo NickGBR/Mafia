@@ -5,6 +5,7 @@ import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.repository.api.RoomRepository;
+import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.service.implementation.GameEngine.GameHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -22,7 +23,7 @@ public class GamesRestarter implements
     private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public GamesRestarter(RoomRepository roomRepository, SimpMessagingTemplate messagingTemplate) {
+    public GamesRestarter(RoomRepository roomRepository, SimpMessagingTemplate messagingTemplate, UserService userService) {
         this.roomRepository = roomRepository;
         this.messagingTemplate = messagingTemplate;
     }

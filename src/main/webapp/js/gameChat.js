@@ -8,6 +8,13 @@ let isReady;
 let destination;
 let gamePhase;
 
+let inputForm;
+let voteButton;
+let donCheckerButton;
+let sheriffCheckerButton;
+let sendMessageButton;
+
+
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
     // или имитировать их другими средствами
@@ -24,6 +31,12 @@ function connect() {
 
 // Будем вызвано после установления соединения
 function afterConnect(connection) {
+
+     inputForm = document.getElementById("message_input_value");
+     voteButton = document.getElementById("vote_for_user_button");
+     donCheckerButton = document.getElementById("don_checker");
+     sheriffCheckerButton = document.getElementById("sheriff_checker");
+     sendMessageButton = document.getElementById("send_message_button");
 
     roomName = initialisedRoomName;
     roomID = initialisedRoomID;
@@ -44,6 +57,9 @@ function afterConnect(connection) {
 
     // Получаем историю чата.
     getUsersMessages();
+
+    //Отключем все кнопки.
+    disableInterface();
 
     setGamePhaseInterface(gamePhase);
 }
@@ -79,48 +95,88 @@ function subscribeByRole() {
 function setGamePhaseInterface(phase) {
     disableInterface();
     switch (phase) {
-        case gamePhaseConst.CIVILIAN:
+        case gamePhaseConst.CIVILIANS_DISCUSS_PHASE:
             destination = destinationConst.CIVILIAN;
-            activateInterface();
+            activateCivilianDiscussInterface()
             break;
-        case gamePhaseConst.MAFIA:
+
+        case gamePhaseConst.CIVILIANS_VOTE_PHASE:
+            activateCiviliansVotingInterface()
+            break;
+
+        case gamePhaseConst.MAFIA_DISCUSS_PHASE:
             destination = destinationConst.MAFIA;
             if (userRole === roleConst.MAFIA ||
-                userRole === roleConst.DON) activateInterface();
+                userRole === roleConst.DON)
+                activateMafiaDiscussInterface();
             break;
-        case gamePhaseConst.DON:
-            if (userRole === roleConst.DON) activateDonInterface();
+
+        case  gamePhaseConst.MAFIA_VOTE_PHASE:
+            activateMafiaVotingInterface();
             break;
-        case gamePhaseConst.SHERIFF:
+
+        case gamePhaseConst.DON_PHASE:
+            if (userRole === roleConst.DON)
+                activateDonInterface();
+            break;
+
+        case gamePhaseConst.SHERIFF_PHASE:
             if (userRole === roleConst.SHERIFF) activateSheriffInterface();
+            activateSheriffInterface();
             break;
+
         default:
-            alert("Проблемы с фазой игры, обратитесь к разработчику.")
+            alert("Проблемы с фазой игры, обратитесь к разработчику.");
     }
 }
 
-function disableInterface() {
-    document.getElementById('send_message_button').disabled = true;
-    document.getElementById('message_input_value').disabled = true;
-    document.getElementById('don_checker').style.display = 'none';
-    document.getElementById('sheriff_checker').style.display = 'none';
+function disableInterface(){
+    console.log(voteButton);
+    voteButton.disabled = true;
+    sendMessageButton.disabled = true;
+    inputForm.disabled = true;
+    sheriffCheckerButton.disabled = true;
+    donCheckerButton.disabled = true;
+    sheriffCheckerButton.style.display = "none";
+    donCheckerButton.style.display = "none"
+
+}
+
+function activateCivilianDiscussInterface() {
+    sendMessageButton.disabled = false;
+    inputForm.disabled = false;
+}
+
+function activateCiviliansVotingInterface() {
+    inputForm.disabled = false;
+    inputForm.placeHolder = "Введите логин Мафии!";
+    voteButton.disabled = false;
+}
+
+function activateMafiaDiscussInterface() {
+    sendMessageButton.disabled = false;
+    inputForm.disabled = false;
+}
+
+function activateMafiaVotingInterface() {
+voteButton.disabled = false;
+inputForm.placeHolder = "Кого желаете убить!";
+inputForm.disabled = false;
 }
 
 function activateDonInterface() {
-    activateInterface();
-    document.getElementById('don_checker').style.display = "block";
+    donCheckerButton.style.display = "block";
+    donCheckerButton.disabled = false;
+    inputForm.disabled = false;
 }
 
 function activateSheriffInterface() {
-    activateInterface();
-    document.getElementById('sheriff_checker').style.display = "block";
-
+    sheriffCheckerButton.style.display = "block";
+    sheriffCheckerButton.disabled = false;
+    inputForm.disabled = false;
 }
 
-function activateInterface() {
-    document.getElementById('send_message_button').disabled = false;
-    document.getElementById('message_input_value').disabled = false;
-}
+
 
 /**
  * Выводит информацю о пользователе в браузер.
@@ -187,7 +243,7 @@ function getUsersMessages() {
 function getGameStat(response) {
 
     const data = JSON.parse(response.body);
-    if (data["gamePhase"] === gamePhaseConst.END) {
+    if (data["gamePhase"] === gamePhaseConst.END_GAME_PHASE) {
         showEndGameScreen(data['message']);
         return;
     }
@@ -211,6 +267,15 @@ function checkUserRole(){
     };
     let login = document.getElementById("message_input_value").value;
     sendRequest("GET", sockConst.REQUEST_GET_ROLE_INFO +"?login=" + login, "", callback, [8]);
+}
+
+function voteForUser(){
+    let callback = function (request) {
+
+        console.log(request.responseText);
+    };
+    let login = inputForm.value;
+    sendRequest("GET", sockConst.REQUEST_GET_VOTE_FOR_USER +"?login=" + login, "", null, [8]);
 }
 
 function showEndGameScreen(message) {

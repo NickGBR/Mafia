@@ -12,6 +12,7 @@ import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 public class GameDTO {
     private GamePhaseEnum gamePhase;
     private String message;
+    private Integer timer;
 
     public GameDTO(RoomDAO roomDAO){
         gamePhase = roomDAO.getGamePhase();

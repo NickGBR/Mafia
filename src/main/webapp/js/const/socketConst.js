@@ -19,6 +19,7 @@ var sockConst = {
     SYS_GAME_STARTED_INFO: '/chat/system_message/game_started_message/',
 
     REQUEST_GET_ADD_USER_TO_ROOM: 'api/GET/addUserToRoom',
+    REQUEST_GET_VOTE_FOR_USER: 'api/room/voteForUser',
     REQUEST_GET_ROOM_ADMIN_NAME: "api/GET/get_room_admin_name",
     REQUEST_GET_MESSAGES: "api/GET/getMessages",
     REQUEST_GET_ROOMS: "api/GET/getRooms",
