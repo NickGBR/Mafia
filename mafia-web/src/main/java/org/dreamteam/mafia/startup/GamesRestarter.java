@@ -1,6 +1,5 @@
 package org.dreamteam.mafia.startup;
 
-
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.repository.api.RoomRepository;

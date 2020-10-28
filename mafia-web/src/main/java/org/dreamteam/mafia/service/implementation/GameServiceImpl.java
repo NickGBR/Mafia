@@ -73,7 +73,7 @@ public class GameServiceImpl implements GameService {
         roomRepository.save(room);
         messagingTemplate.convertAndSend(SockConst.SYS_GAME_STARTED_INFO + roomId, true);
 
-        GameHost gameHost = new GameHost(messagingTemplate, currentUserDAO.get().getRoom(), roomRepository,
+        GameHost gameHost = new GameHost(messagingTemplate, room, roomRepository,
                                          messageService);
         Thread thread = new Thread(gameHost);
         thread.start();
@@ -160,10 +160,6 @@ public class GameServiceImpl implements GameService {
                     + currentUserDAO.get().getLogin() + "\' are in different rooms");
         }
 
-        if (!currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.CIVILIANS_PHASE)) {
-            throw new ClientErrorException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
-        }
-
         if (userDAO.get().getCharacterStatus().equals(CharacterStatusEnum.DEAD) ||
                 currentUserDAO.get().getCharacterStatus().equals(CharacterStatusEnum.DEAD)) {
             throw new ClientErrorException(ClientErrorCode.CHARACTER_IS_DEAD, "Character is out of game!");
@@ -172,7 +168,6 @@ public class GameServiceImpl implements GameService {
         Integer votesAgainst = userDAO.get().getVotesAgainst();
         userDAO.get().setVotesAgainst(votesAgainst + 1);
         userRepository.save(userDAO.get());
-
     }
 
     @Override

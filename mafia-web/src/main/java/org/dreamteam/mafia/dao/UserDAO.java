@@ -9,6 +9,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.Set;
 

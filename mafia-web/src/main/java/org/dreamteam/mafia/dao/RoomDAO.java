@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
 import org.dreamteam.mafia.dao.enums.GameStatusEnum;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -16,8 +17,8 @@ import java.util.Set;
 @Entity
 @Table(name = "rooms")
 
-public class RoomDAO {
 
+public class RoomDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id", unique = true, nullable = false)
@@ -55,6 +56,8 @@ public class RoomDAO {
     @Column(name = "don")
     private Boolean don;
 
+
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! REFRESH
     @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @NotFound(action = NotFoundAction.IGNORE)
     private Set<UserDAO> userList;
@@ -62,10 +65,9 @@ public class RoomDAO {
     @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @NotFound(action = NotFoundAction.IGNORE)
     private Set<MessageDAO> messageList;
-
     public RoomDAO() {
         this.dayNumber = 0;
-        this.gamePhase = GamePhaseEnum.CIVILIANS_PHASE;
+        this.gamePhase = GamePhaseEnum.CIVILIANS_DISCUSS_PHASE;
         this.gameStatus = GameStatusEnum.NOT_STARTED;
         this.messageList = new HashSet<>();
         this.userList = new HashSet<>();

@@ -17,22 +17,24 @@ import java.util.List;
 @RequestMapping("/api/game")
 public class GameController {
 
-
     private final GameService gameService;
     private final UserService userService;
     private final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     @Autowired
-    public GameController(
-            GameService gameService,
-            UserService userService) {
+    public GameController(GameService gameService,
+                          UserService userService) {
         this.gameService = gameService;
         this.userService = userService;
     }
 
-    @RequestMapping(value = SockConst.REQUEST_GET_ROLE_INFO, method = RequestMethod.GET)
-    public Boolean startGame(@RequestParam String login) throws ClientErrorException {
-        System.out.println(login);
+    @RequestMapping(value = SockConst.REQUEST_VOTE_FOR_USER, method = RequestMethod.GET)
+    public void voteForUser(@RequestParam String login) throws ClientErrorException {
+        gameService.countVotesAgainst(login);
+    }
+
+
+    public Boolean getRoleInfo(@RequestParam String login) throws ClientErrorException {
         if (userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.DON)) {
             return gameService.isSheriff(login);
         } else if (userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.SHERIFF)) {
