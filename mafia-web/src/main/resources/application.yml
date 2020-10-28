@@ -1,13 +1,16 @@
+server:
+  port: {$PORT}
+
 spring:
   profiles.active: production
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
     properties:
       hibernate:
         format-sql: true
-        --server:
-          port=$PORT:
+
 logging:
   level:
     root: error
