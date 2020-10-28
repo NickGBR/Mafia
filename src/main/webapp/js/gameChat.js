@@ -12,10 +12,15 @@ let selectedEntry = null;
 const charactersListId = "characters_list";
 let characterEntries = [];
 
-let voteButton;
-let donCheckerButton;
-let sheriffCheckerButton;
 
+let sendMessageButton;
+
+let voteButton;
+let allowedVoteButton;
+let donCheckerButton;
+let allowedDonCheckerButton;
+let sheriffCheckerButton;
+let allowedSheriffCheckerButton;
 
 
 function connect() {
@@ -35,9 +40,9 @@ function connect() {
 // Будем вызвано после установления соединения
 function afterConnect(connection) {
 
-     voteButton = document.getElementById("vote_for_user_button");
-     donCheckerButton = document.getElementById("don_checker");
-     sheriffCheckerButton = document.getElementById("sheriff_checker");
+    voteButton = document.getElementById("vote_for_user_button");
+    donCheckerButton = document.getElementById("don_checker");
+    sheriffCheckerButton = document.getElementById("sheriff_checker");
 
     roomName = initialisedRoomName;
     roomID = initialisedRoomID;
@@ -47,6 +52,7 @@ function afterConnect(connection) {
     userRole = initialisedUserRole;
     gamePhase = init["gamePhase"];
     maxUserAmount = init["maxUserAmount"];
+    sendMessageButton = document.getElementById("send_message_button");
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
 
@@ -138,16 +144,22 @@ function updateGameDescription() {
     }
     description = description + " Сейчас: ";
     switch (gamePhase) {
-        case gamePhaseConst.CIVILIAN:
-            description = description + " День. Общайтесь и голосуйте.";
+        case gamePhaseConst.CIVILIANS_DISCUSS_PHASE:
+            description = description + " День. Обсудите, кто из вас может быть мафией.";
             break;
-        case gamePhaseConst.MAFIA:
+        case gamePhaseConst.CIVILIANS_VOTE_PHASE:
+            description = description + " День. Голосуйте против того, кого считайте мафией.";
+            break;
+        case gamePhaseConst.MAFIA_DISCUSS_PHASE:
+            description = description + " Ночь. Мафия обсуждает коварные планы";
+            break;
+        case gamePhaseConst.MAFIA_VOTE_PHASE:
             description = description + " Ночь. Мафия голосует, кого убить.";
             break;
-        case gamePhaseConst.DON:
+        case gamePhaseConst.DON_PHASE:
             description = description + " Ночь. Дон ищет шерифа.";
             break;
-        case gamePhaseConst.SHERIFF:
+        case gamePhaseConst.SHERIFF_PHASE:
             description = description + " Ночь. Шериф ищет мафию";
             break;
         default:
@@ -198,53 +210,46 @@ function setGamePhaseInterface(phase) {
     }
 }
 
-function disableInterface(){
+function disableInterface() {
     console.log(voteButton);
-    voteButton.disabled = true;
+    allowedVoteButton = false;
+    allowedDonCheckerButton = false;
+    allowedSheriffCheckerButton = false;
     sendMessageButton.disabled = true;
-    inputForm.disabled = true;
-    sheriffCheckerButton.disabled = true;
-    donCheckerButton.disabled = true;
+    updateButtonOnStateChange();
     sheriffCheckerButton.style.display = "none";
     donCheckerButton.style.display = "none"
-
 }
 
 function activateCivilianDiscussInterface() {
     sendMessageButton.disabled = false;
-    inputForm.disabled = false;
 }
 
 function activateCiviliansVotingInterface() {
-    inputForm.disabled = false;
-    inputForm.placeHolder = "Введите логин Мафии!";
-    voteButton.disabled = false;
+    allowedVoteButton = true;
+    updateButtonOnStateChange();
 }
 
 function activateMafiaDiscussInterface() {
     sendMessageButton.disabled = false;
-    inputForm.disabled = false;
 }
 
 function activateMafiaVotingInterface() {
-voteButton.disabled = false;
-inputForm.placeHolder = "Кого желаете убить!";
-inputForm.disabled = false;
+    allowedVoteButton = true;
+    updateButtonOnStateChange();
 }
 
 function activateDonInterface() {
     donCheckerButton.style.display = "block";
-    donCheckerButton.disabled = false;
-    inputForm.disabled = false;
+    allowedDonCheckerButton = true;
+    updateButtonOnStateChange();
 }
 
 function activateSheriffInterface() {
     sheriffCheckerButton.style.display = "block";
-    sheriffCheckerButton.disabled = false;
-    inputForm.disabled = false;
+    allowedSheriffCheckerButton = true;
+    updateButtonOnStateChange();
 }
-
-
 
 
 /**
@@ -274,22 +279,18 @@ function getGameStat(response) {
  * доном или шерифом. Проверка на дона или шерифа, происходит на сервере
  * автоматически, так как мы знаем роли игрока, сделавшего запрос.
  */
-function checkUserRole(){
+function checkUserRole() {
     let callback = function (request) {
 
         console.log(request.responseText);
     };
-    let login = document.getElementById("message_input_value").value;
-    sendRequest("GET", sockConst.REQUEST_GET_ROLE_INFO +"?login=" + login, "", callback, [8]);
+    let login = selectedEntry["name"];
+    sendRequest("GET", sockConst.REQUEST_GET_ROLE_INFO + "?login=" + login, "", callback, [8]);
 }
 
-function voteForUser(){
-    let callback = function (request) {
-
-        console.log(request.responseText);
-    };
-    let login = inputForm.value;
-    sendRequest("GET", sockConst.REQUEST_GET_VOTE_FOR_USER +"?login=" + login, "", null, [8]);
+function voteForUser() {
+    let login = selectedEntry["name"];
+    sendRequest("GET", sockConst.REQUEST_GET_VOTE_FOR_USER + "?login=" + login, "", null, [8]);
 }
 
 function showEndGameScreen(message) {
@@ -300,9 +301,6 @@ function showEndGameScreen(message) {
         });
 }
 
-function getLog() {
-    console.log(userRole);
-}
 
 /**
  * Отвечает за получение персонажей при заходе в игру.
@@ -337,7 +335,7 @@ function showCharacter(character) {
         currentEntry["text"].classList.add("clickable");
         currentEntry["text"].onclick = function (event) {
             selectCharacter(event.target);
-            updateButtonsOnSelect();
+            updateButtonOnStateChange();
         }
     }
     if (!character["isAlive"]) {
@@ -378,7 +376,8 @@ function selectCharacter(node) {
     }
 }
 
-function updateButtonsOnSelect() {
-    /* let button = document.getElementById("kick_user_button");
-     button.disabled = selectedEntry == null;*/
+function updateButtonOnStateChange() {
+    voteButton.disabled = !allowedVoteButton || (selectedEntry == null);
+    sheriffCheckerButton.disabled = !allowedSheriffCheckerButton || (selectedEntry == null);
+    donCheckerButton.disabled = !allowedDonCheckerButton || (selectedEntry == null);
 }
