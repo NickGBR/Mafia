@@ -290,7 +290,8 @@ function checkUserRole() {
 
 function voteForUser() {
     let login = selectedEntry["name"];
-    sendRequest("GET", sockConst.REQUEST_GET_VOTE_FOR_USER + "?login=" + login, "", null, [8]);
+    sendRequest("GET", sockConst.REQUEST_GET_VOTE_FOR_USER + "?login=" + login,
+        "", null, [3, 7, 15, 17]);//3 7 /15/ 17
 }
 
 function showEndGameScreen(message) {

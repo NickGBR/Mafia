@@ -25,4 +25,5 @@ public interface RoomRepository extends CrudRepository<RoomDAO, Long> {
      * @return - комнату пользователя или пустой Optional, если пользователь не находится в комнате
      */
     Optional<RoomDAO> findRoomDAOByUserListContains(UserDAO user);
+
 }

@@ -1,7 +1,8 @@
 package org.dreamteam.mafia.dao.enums;
 
-public enum  EndGameReasons {
+public enum GameEndStatus {
     LAST_DAY_CAME,
     MAFIA_WON,
-    CIVILIANS_WON
+    CIVILIANS_WON,
+    GAME_NOT_ENDED
 }

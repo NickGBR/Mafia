@@ -52,6 +52,6 @@ public interface UserRepository extends CrudRepository<UserDAO, Long> {
     @Query("select count(u) from UserDAO u where u.room.roomId = ?1 and u.isReady = true")
     Integer findUsersAmountByRoomIdReadyToPlay(Integer roomId);
 
-    Long countByCharacterInAndAndCharacterStatusAndRoom(List<CharacterEnum> roles,
+    Long countDistinctByCharacterInAndAndCharacterStatusAndRoom(List<CharacterEnum> roles,
                                                         CharacterStatusEnum status, RoomDAO room);
 }

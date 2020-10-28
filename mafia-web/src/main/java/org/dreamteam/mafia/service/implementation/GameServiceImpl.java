@@ -3,10 +3,7 @@ package org.dreamteam.mafia.service.implementation;
 import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dao.enums.CharacterEnum;
-import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
-import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
-import org.dreamteam.mafia.dao.enums.GameStatusEnum;
+import org.dreamteam.mafia.dao.enums.*;
 import org.dreamteam.mafia.dto.CharacterDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.repository.api.RoomRepository;
@@ -74,7 +71,7 @@ public class GameServiceImpl implements GameService {
         messagingTemplate.convertAndSend(SockConst.SYS_GAME_STARTED_INFO + roomId, true);
 
         GameHost gameHost = new GameHost(messagingTemplate, room, roomRepository,
-                                         messageService);
+                                         messageService, this);
         Thread thread = new Thread(gameHost);
         thread.start();
     }
@@ -165,9 +162,17 @@ public class GameServiceImpl implements GameService {
             throw new ClientErrorException(ClientErrorCode.CHARACTER_IS_DEAD, "Character is out of game!");
         }
 
+        if (currentUserDAO.get().getHasVoted()) {
+            throw new ClientErrorException(ClientErrorCode.USER_ALREADY_VOTED, "User doesn't exist in a database");
+        }
+
+        currentUserDAO.get().setHasVoted(true);
+
         Integer votesAgainst = userDAO.get().getVotesAgainst();
         userDAO.get().setVotesAgainst(votesAgainst + 1);
+
         userRepository.save(userDAO.get());
+        userRepository.save(currentUserDAO.get());
     }
 
     @Override
@@ -232,5 +237,30 @@ public class GameServiceImpl implements GameService {
                 .sorted(Comparator.comparing(CharacterDisplayDTO::getName))
                 .collect(Collectors.toCollection(() -> dtoList));
         return dtoList;
+    }
+
+    public GameEndStatus isMafiaVictoryInRoom(RoomDAO room) {
+        List<CharacterEnum> mafiaRoles = new ArrayList<>();
+        mafiaRoles.add(CharacterEnum.DON);
+        mafiaRoles.add(CharacterEnum.MAFIA);
+        List<CharacterEnum> civilianRoles = new ArrayList<>();
+        civilianRoles.add(CharacterEnum.CITIZEN);
+        civilianRoles.add(CharacterEnum.SHERIFF);
+        Long mafiaCount = userRepository.countDistinctByCharacterInAndAndCharacterStatusAndRoom(
+             mafiaRoles, CharacterStatusEnum.ALIVE, room
+        );
+        Long civilianCount = userRepository.countDistinctByCharacterInAndAndCharacterStatusAndRoom(
+             civilianRoles, CharacterStatusEnum.ALIVE, room
+        );
+
+        System.out.println("CIVILIAN " + civilianCount + "  " + "Mafia " + mafiaCount);
+
+        if(civilianCount<=mafiaCount){
+            return GameEndStatus.MAFIA_WON;
+        }
+        else if( mafiaCount==0){
+            return GameEndStatus.CIVILIANS_WON;
+        }
+        return GameEndStatus.GAME_NOT_ENDED;
     }
 }
