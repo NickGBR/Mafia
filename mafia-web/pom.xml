@@ -195,35 +195,35 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Fat jar plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.1.1</version>
+<!--            &lt;!&ndash; Fat jar plugin &ndash;&gt;-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-assembly-plugin</artifactId>-->
+<!--                <version>3.1.1</version>-->
 
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                        <archive>
-                            <manifest>
-                                <mainClass>org.dreamteam.mafia.Application</mainClass>
-                            </manifest>
-                        </archive>
+<!--                <configuration>-->
+<!--                    <descriptorRefs>-->
+<!--                        <descriptorRef>jar-with-dependencies</descriptorRef>-->
+<!--                    </descriptorRefs>-->
+<!--                        <archive>-->
+<!--                            <manifest>-->
+<!--                                <mainClass>org.dreamteam.mafia.Application</mainClass>-->
+<!--                            </manifest>-->
+<!--                        </archive>-->
 
-                </configuration>
+<!--                </configuration>-->
 
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>make-assembly</id>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>single</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
 
-            </plugin>
+<!--            </plugin>-->
         </plugins>
     </build>
 
