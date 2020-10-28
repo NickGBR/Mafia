@@ -89,3 +89,4 @@ function stopSpinner() {
     spinner.stop();
     hideModal();
 }
+

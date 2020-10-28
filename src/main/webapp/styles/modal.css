@@ -83,7 +83,7 @@
     height: auto;
     padding: 2rem 2rem;
     z-index: 5;
-    display: block;
+    display: none;
     background-image: url("/img/tilebackground.png");
     background-color: wheat;
     background-size: auto;

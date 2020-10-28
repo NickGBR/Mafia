@@ -5,6 +5,7 @@
 @import "input.css";
 @import "chat.css";
 @import "modal.css";
+@import "help.css";
 
 @font-face {
     font-family: 'PT Mono';
@@ -13,6 +14,18 @@
     url('/fonts/PTMono-Regular.woff2') format('woff2'),
     url('/fonts/PTMono-Regular.woff') format('woff'),
     url('/fonts/PTMono-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'PT Serif';
+    src: url('/fonts/PTSerif-Regular.eot');
+    src: url('/fonts/PTSerif-Regular.eot?#iefix') format('embedded-opentype'),
+    url('/fonts/PTSerif-Regular.woff2') format('woff2'),
+    url('/fonts/PTSerif-Regular.woff') format('woff'),
+    url('/fonts/PTSerif-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
