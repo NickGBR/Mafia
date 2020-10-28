@@ -26,6 +26,7 @@ public class InitDTO implements Serializable {
     Boolean hasSheriff = false;
     CharacterEnum role = null;
     Boolean isGameStarted = false;
+    Boolean isAlive = true;
 
     GamePhaseEnum  gamePhase = GamePhaseEnum.CIVILIANS_DISCUSS_PHASE;
     Boolean isRoomReady = false;

@@ -1,4 +1,4 @@
-var sockConst = {
+const sockConst = {
 
     SYSTEM_END_POINT: '/app/system_message',
     MAFIA_END_POINT: '/app/mafia_message',
@@ -16,6 +16,7 @@ var sockConst = {
     SYS_WEB_ROOMS_INFO_UPDATE: '/chat/system_messages/rooms/update',
     SYS_WEB_USERS_INFO: '/chat/system_messages/users/',
     SYS_WEB_USERS_INFO_KICKED: '/chat/system_messages/users/kicked',
+    SYS_WEB_CHARACTER_INFO_UPDATE: '/chat/system_message/game/character_update/',
 
     SYS_USERS_READY_TO_PLAY_INFO: '/chat/system_messages/users_ready_to_play_info/',
     SYS_GAME_STARTED_INFO: '/chat/system_message/game_started_message/',

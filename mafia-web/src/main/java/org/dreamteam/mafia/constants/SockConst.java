@@ -19,6 +19,7 @@ public class SockConst {
     public static final String SYS_WEB_USERS_INFO_KICKED = "/chat/system_messages/users/kicked";
     public static final String SYS_USERS_READY_TO_PLAY_INFO = "/chat/system_messages/users_ready_to_play_info/";
     public static final String SYS_GAME_STARTED_INFO = "/chat/system_message/game_started_message/";
+    public static final String SYS_WEB_CHARACTER_INFO_UPDATE = "/chat/system_message/game/character_update/";
 
     public static final String REQUEST_GET_ADD_USER_TO_ROOM = "api/GET/addUserToRoom";
     public static final String REQUEST_VOTE_FOR_USER = "/voteForUser";

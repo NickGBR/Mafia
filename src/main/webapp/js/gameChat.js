@@ -6,6 +6,7 @@ let isAdmin;
 let isReady;
 let destination;
 let gamePhase;
+let isAlive;
 let maxUserAmount;
 
 let selectedEntry = null;
@@ -14,7 +15,7 @@ let characterEntries = [];
 
 
 let sendMessageButton;
-
+let allowedSendMessageButton;
 let voteButton;
 let allowedVoteButton;
 let donCheckerButton;
@@ -52,6 +53,7 @@ function afterConnect(connection) {
     userRole = initialisedUserRole;
     gamePhase = init["gamePhase"];
     maxUserAmount = init["maxUserAmount"];
+    isAlive = init["isAlive"];
     sendMessageButton = document.getElementById("send_message_button");
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
@@ -87,6 +89,7 @@ function onError(error) {
 function subscribeByRole() {
     stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, receiveMessage);
     stompClient.subscribe(sockConst.SYS_WEB_CHAT + roomID, getGameStat);
+    stompClient.subscribe(sockConst.SYS_WEB_CHARACTER_INFO_UPDATE + roomID, updateCharacter);
     if (userRole === roleConst.MAFIA || userRole === roleConst.DON) {
         console.log("Подписался как мафия");
         stompClient.subscribe(sockConst.MAFIA_WEB_CHAT + roomID, receiveMafiaMessage)
@@ -215,14 +218,15 @@ function disableInterface() {
     allowedVoteButton = false;
     allowedDonCheckerButton = false;
     allowedSheriffCheckerButton = false;
-    sendMessageButton.disabled = true;
+    allowedSendMessageButton = false;
     updateButtonOnStateChange();
     sheriffCheckerButton.style.display = "none";
     donCheckerButton.style.display = "none"
 }
 
 function activateCivilianDiscussInterface() {
-    sendMessageButton.disabled = false;
+    allowedSendMessageButton = true;
+    updateButtonOnStateChange();
 }
 
 function activateCiviliansVotingInterface() {
@@ -231,7 +235,8 @@ function activateCiviliansVotingInterface() {
 }
 
 function activateMafiaDiscussInterface() {
-    sendMessageButton.disabled = false;
+    allowedSendMessageButton = true;
+    updateButtonOnStateChange();
 }
 
 function activateMafiaVotingInterface() {
@@ -290,8 +295,13 @@ function checkUserRole() {
 
 function voteForUser() {
     let login = selectedEntry["name"];
+    let callback = function () {
+        allowedVoteButton = false;
+        updateButtonOnStateChange();
+    };
+
     sendRequest("GET", sockConst.REQUEST_GET_VOTE_FOR_USER + "?login=" + login,
-        "", null, [3, 7, 15, 17]);//3 7 /15/ 17
+        "", callback, [3, 7, 15, 17]);//3 7 /15/ 17
 }
 
 function showEndGameScreen(message) {
@@ -332,14 +342,13 @@ function showCharacter(character) {
     currentEntry["name"] = character["name"];
     const textNodeName = document.createTextNode(character["name"]);
     currentEntry["text"].appendChild(textNodeName);
-    if (character["name"] !== userName && character["isAlive"]) {
+    if (character["isAlive"]) {
         currentEntry["text"].classList.add("clickable");
         currentEntry["text"].onclick = function (event) {
             selectCharacter(event.target);
             updateButtonOnStateChange();
         }
-    }
-    if (!character["isAlive"]) {
+    } else {
         const strokeNode = currentEntry["text"].querySelector('.strikethrough');
         strokeNode.style.visibility = "visible";
     }
@@ -357,6 +366,34 @@ function showCharacter(character) {
         // Случайный поворот от -5 до 5 градусов
         stampNode.style.transform = 'rotate(' + (Math.random() * (10) - 5) + 'deg) translateY(-0.5rem)';
         currentEntry["stamp-container"].appendChild(stampNode);
+    }
+}
+
+function updateCharacter(response) {
+    const character = JSON.parse(response.body);
+    const foundEntry = characterEntries.find(element => element["name"] === character["name"]);
+    if (character["name"] === userName) {
+        isAlive = character["isAlive"];
+        updateButtonOnStateChange();
+    }
+    if (!character["isAlive"]) {
+        const strokeNode = foundEntry["text"].querySelector('.strikethrough');
+        strokeNode.style.visibility = "visible";
+        foundEntry["text"].classList.remove("clickable");
+        foundEntry["text"].onclick = function () {
+        }
+        if (selectedEntry === foundEntry) {
+            selectedEntry["text"].classList.remove("selected");
+            selectedEntry = null;
+        }
+    } else {
+        const strokeNode = foundEntry["text"].querySelector('.strikethrough');
+        strokeNode.style.visibility = "hidden";
+        foundEntry["text"].classList.add("clickable");
+        foundEntry["text"].onclick = function (event) {
+            selectCharacter(event.target);
+            updateButtonOnStateChange();
+        }
     }
 }
 
@@ -378,7 +415,8 @@ function selectCharacter(node) {
 }
 
 function updateButtonOnStateChange() {
-    voteButton.disabled = !allowedVoteButton || (selectedEntry == null);
-    sheriffCheckerButton.disabled = !allowedSheriffCheckerButton || (selectedEntry == null);
-    donCheckerButton.disabled = !allowedDonCheckerButton || (selectedEntry == null);
+    sendMessageButton.disabled = !allowedSendMessageButton || !isAlive;
+    voteButton.disabled = !allowedVoteButton || (selectedEntry == null) || !isAlive;
+    sheriffCheckerButton.disabled = !allowedSheriffCheckerButton || (selectedEntry == null) || !isAlive;
+    donCheckerButton.disabled = !allowedDonCheckerButton || (selectedEntry == null) || !isAlive;
 }
