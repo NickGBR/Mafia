@@ -1,1 +1,1 @@
-web: java -jar target/Mafia-Online.jar
+web: java -jar mafia-web/target/Mafia-Online.jar
