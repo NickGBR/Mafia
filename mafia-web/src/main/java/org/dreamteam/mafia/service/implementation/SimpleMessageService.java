@@ -2,8 +2,11 @@ package org.dreamteam.mafia.service.implementation;
 
 import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.dao.MessageDAO;
+import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
 import org.dreamteam.mafia.dao.enums.DestinationEnum;
+import org.dreamteam.mafia.dto.CharacterUpdateDTO;
 import org.dreamteam.mafia.dto.ChatMessageDTO;
 import org.dreamteam.mafia.dto.GameDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
@@ -14,6 +17,7 @@ import org.dreamteam.mafia.repository.api.MessageRepository;
 import org.dreamteam.mafia.service.api.MessageService;
 import org.dreamteam.mafia.service.api.RoomService;
 import org.dreamteam.mafia.service.api.UserService;
+import org.dreamteam.mafia.util.ClientErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,7 +51,7 @@ public class SimpleMessageService implements MessageService {
     }
 
     @Override
-    public void sendMessage(String message) {
+    public void sendMessage(String message) throws ClientErrorException {
         final Optional<UserDAO> from = userService.getCurrentUserDAO();
         if (!from.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to send messages");
@@ -58,6 +62,12 @@ public class SimpleMessageService implements MessageService {
         dao.setUser(from.get());
         if (destinationDescriptor.getRoom().isPresent()) {
             dao.setRoom(destinationDescriptor.getRoom().get());
+        }
+        if (!destinationDescriptor.getDestination().equals(DestinationEnum.COMMON)
+                && !destinationDescriptor.getDestination().equals(DestinationEnum.ROOM_USER)) {
+            if (!from.get().getCharacterStatus().equals(CharacterStatusEnum.ALIVE)) {
+                throw new ClientErrorException(ClientErrorCode.CHARACTER_IS_DEAD, "Dead characters can't use chat");
+            }
         }
         dao.setDestination(destinationDescriptor.getDestination());
         dao = repository.save(dao);
@@ -81,6 +91,13 @@ public class SimpleMessageService implements MessageService {
             messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHAT,
                                              systemMessage);
         }
+    }
+
+    @Override
+    public void sendVotingResultUpdate(
+            CharacterUpdateDTO dto, RoomDAO room) {
+        messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHARACTER_INFO_UPDATE + room.getRoomId(),
+                                         dto);
     }
 
     @Override
@@ -118,7 +135,7 @@ public class SimpleMessageService implements MessageService {
         messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO_REMOVE, removedRoom);
         // Уведолмяем игроков в комнате о том, что комната была распущена.
         messagingTemplate.convertAndSend(SockConst.SYS_WEB_ROOMS_INFO_REMOVE + removedRoom.getId(),
-                "");
+                                         "");
     }
 
     @Override
@@ -143,6 +160,12 @@ public class SimpleMessageService implements MessageService {
         messagingTemplate.convertAndSend(SockConst.SYS_USERS_READY_TO_PLAY_INFO
                                                  + roomService.getCurrentRoom().getId(),
                                          roomService.isRoomReady());
+    }
+
+    @Override
+    public void sendGameStartUpdate() throws ClientErrorException {
+        messagingTemplate.convertAndSend(SockConst.SYS_GAME_STARTED_INFO
+                                                 + roomService.getCurrentRoom().getId(), true);
     }
 
     /**

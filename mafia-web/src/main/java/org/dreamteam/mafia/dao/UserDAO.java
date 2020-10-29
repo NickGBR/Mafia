@@ -30,6 +30,7 @@ public class UserDAO {
     @Column(name = "login", unique = true, nullable = false, length = 100)
     private String login;
 
+
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
@@ -44,6 +45,9 @@ public class UserDAO {
 
     @Column(name = "is_ready")
     private Boolean isReady;
+
+    @Column(name = "has_voted")
+    private Boolean hasVoted;
 
     @Column(name = "is_admin")
     private Boolean isAdmin;
@@ -72,6 +76,7 @@ public class UserDAO {
         characterStatus = CharacterStatusEnum.ALIVE;
         votesAgainst = 0;
         messageList = new HashSet<>();
+        hasVoted = false;
     }
 
     public UserDAO(String login, String passwordHash) {

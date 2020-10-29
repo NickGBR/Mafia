@@ -1,6 +1,8 @@
 package org.dreamteam.mafia.service.api;
 
 import org.dreamteam.mafia.dao.RoomDAO;
+import org.dreamteam.mafia.dao.enums.CharacterEnum;
+import org.dreamteam.mafia.dao.enums.GameEndStatus;
 import org.dreamteam.mafia.dto.CharacterDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 
@@ -60,4 +62,22 @@ public interface GameService {
      * @return - список персонажей
      */
     List<CharacterDisplayDTO> getCharacterInGame() throws ClientErrorException;
+
+    /**
+     * Возращает информацию о победе мафии или мирных,
+     * если никто не побеждает, сообщеает об этом.
+     *
+     * @param room - комната в которй подсчитывается колличество мафии и мирных
+     * @return - возращет Enum о статусе игры.
+     */
+    GameEndStatus isMafiaVictoryInRoom(RoomDAO room);
+
+    /**
+     * Возвращает роль текущего игрока если он в комнате с начатой игрой
+     *
+     * @return - роль текущего игрока
+     * @throws ClientErrorException - если игрок не в комнате,
+     *                              или игра в комнате еще не началась
+     */
+    CharacterEnum getRole() throws ClientErrorException;
 }

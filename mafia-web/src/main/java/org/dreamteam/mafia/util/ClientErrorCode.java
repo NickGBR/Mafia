@@ -24,7 +24,8 @@ public enum ClientErrorCode {
     INVALID_NAME(13),
     INVALID_ROOM_PARAMETERS(14),
     CHARACTER_IS_DEAD(15),
-    GAME_NOT_STARTED(16);
+    GAME_NOT_STARTED(16),
+    USER_ALREADY_VOTED(17);
 
     private final int value;
 
