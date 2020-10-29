@@ -1,10 +1,11 @@
-package org.dreamteam.mafia.service.implementation.GameEngine;
+package org.dreamteam.mafia.service.implementation.engine;
 
 import lombok.SneakyThrows;
 import org.dreamteam.mafia.constants.GameConst;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dao.enums.*;
+import org.dreamteam.mafia.dto.CharacterUpdateDTO;
 import org.dreamteam.mafia.dto.GameDTO;
 import org.dreamteam.mafia.dto.VotingResultDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
@@ -12,83 +13,77 @@ import org.dreamteam.mafia.model.MessageDestinationDescriptor;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.MessageService;
-import org.dreamteam.mafia.service.implementation.GameServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
+import java.util.*;
 
 public class GameHost implements Runnable {
-    private final SimpMessagingTemplate messagingTemplate; // Используется для отправки сообщений клиенту
     private final GameDTO gameDTO = new GameDTO();
     private RoomDAO room;
     private final RoomRepository roomRepository;
     private int dayCounter;
     private final MessageService messageService;
     private final GameService gameService;
+    private final Map<String, Integer> durations;
     private final Logger logger = LoggerFactory.getLogger(GameHost.class);
 
-
     public GameHost(
-            SimpMessagingTemplate messagingTemplate,
-            RoomDAO room, RoomRepository roomRepository, MessageService messageService, GameService gameService) {
-        this.messagingTemplate = messagingTemplate;
+            RoomDAO room, RoomRepository roomRepository, MessageService messageService,
+            GameService gameService, GamePhaseDurationsService durationsService) {
         this.room = room;
         this.roomRepository = roomRepository;
         dayCounter = room.getDayNumber();
         this.messageService = messageService;
         this.gameService = gameService;
+        this.durations = durationsService.getDurations();
     }
 
     @SneakyThrows
     @Override
     public void run() {
-
         gameDTO.setGamePhase(room.getGamePhase());
         Thread.currentThread().setName(room.getRoomId().toString());
-        Thread.sleep(3000);
 
+        Thread.sleep(durations.get("GRACE_DURATION") * 1000);
         while (room.getGameStatus().equals(GameStatusEnum.IN_PROGRESS)) {
             switch (room.getGamePhase()) {
                 case CIVILIANS_DISCUSS_PHASE:
                     dayCounter++;
-                    civiliansDiscussPhase(GameConst.CIVILIAN_DISCUSS_PHASE_DURATION);
-                    if(dayCounter==1) {
+                    civiliansDiscussPhase(durations.get("CIVILIAN_DISCUSS_PHASE_DURATION"));
+                    if (dayCounter == 1) {
                         goToPhase(GamePhaseEnum.MAFIA_VOTE_PHASE);
+                    } else {
+                        goToPhase(GamePhaseEnum.CIVILIANS_VOTE_PHASE);
                     }
-                    else goToPhase(GamePhaseEnum.CIVILIANS_VOTE_PHASE);
                     break;
 
                 case CIVILIANS_VOTE_PHASE:
-                    civiliansVotePhase(GameConst.CIVILIAN_VOTING_PHASE_DURATION);
+                    civiliansVotePhase(durations.get("CIVILIAN_VOTING_PHASE_DURATION"));
                     room = roomRepository.findById(room.getRoomId()).get();
                     getVotingResult();
                     goToPhase(GamePhaseEnum.MAFIA_DISCUSS_PHASE);
                     break;
 
                 case MAFIA_DISCUSS_PHASE:
-                    mafiaDiscussPhase(GameConst.MAFIA_DISCUSS_PHASE_DURATION);
+                    mafiaDiscussPhase(durations.get("MAFIA_DISCUSS_PHASE_DURATION"));
                     goToPhase(GamePhaseEnum.MAFIA_VOTE_PHASE);
                     break;
 
                 case MAFIA_VOTE_PHASE:
-                    mafiaVotePhase(GameConst.MAFIA_VOTING_PHASE_DURATION);
+                    mafiaVotePhase(durations.get("MAFIA_VOTING_PHASE_DURATION"));
                     room = roomRepository.findById(room.getRoomId()).get();
                     getVotingResult();
                     goToPhase(GamePhaseEnum.DON_PHASE);
                     break;
 
                 case DON_PHASE:
-                    donPhase(GameConst.DON_PHASE_DURATION);
+                    donPhase(durations.get("DON_PHASE_DURATION"));
                     goToPhase(GamePhaseEnum.SHERIFF_PHASE);
                     break;
 
                 case SHERIFF_PHASE:
-                    sheriffPhase(GameConst.SHERIFF_PHASE_DURATION);
+                    sheriffPhase(durations.get("SHERIFF_PHASE_DURATION"));
                     goToPhase(GamePhaseEnum.CIVILIANS_DISCUSS_PHASE);
                     break;
                 case END_GAME_PHASE: {
@@ -98,7 +93,8 @@ public class GameHost implements Runnable {
                 default:
                     System.out.println("КОНЕЧНЫЙ АВТОМАТ СЛОМАЛСЯ");
             }
-            logger.debug("Room at the end of phase: " + room);
+            Thread.sleep(durations.get("GRACE_DURATION") * 1000);
+            logger.trace("Room at the end of phase: " + room);
             room = roomRepository.save(room);
         }
         messageService.sendSystemMessage(gameDTO,
@@ -109,10 +105,11 @@ public class GameHost implements Runnable {
     /**
      * Переходит в уезынный этам игры, если не одна из сторон
      * не победила после голосования.
+     *
      * @param phase
      */
     private void goToPhase(GamePhaseEnum phase) {
-        switch (gameService.isMafiaVictoryInRoom(room)){
+        switch (gameService.isMafiaVictoryInRoom(room)) {
             case CIVILIANS_WON:
                 room.setGamePhase(phase);
                 gameDTO.setGamePhase(GamePhaseEnum.END_GAME_PHASE);
@@ -173,12 +170,10 @@ public class GameHost implements Runnable {
         messageService.sendSystemMessage(gameDTO,
                                          new MessageDestinationDescriptor(DestinationEnum.CIVILIAN, room));
         Thread.sleep(phaseTimeSec * 1000);
-
     }
 
     @SneakyThrows
     private void mafiaVotePhase(int phaseTimeSec) {
-
 
         gameDTO.setMessage("Мафия голосует! ");
 
@@ -254,7 +249,7 @@ public class GameHost implements Runnable {
         return room;
     }
 
-    private void getVotingResult() throws ClientErrorException {
+    private void getVotingResult() throws ClientErrorException, InterruptedException {
 
         ArrayList<VotingResultDTO> result = new ArrayList<>();
 
@@ -270,7 +265,11 @@ public class GameHost implements Runnable {
         result.sort(Collections.reverseOrder(Comparator.comparing(VotingResultDTO::getResult)));
 
         if (!checkTie(result)) {
-            KillUser(result);
+            final UserDAO victim = KillUser(result);
+            messageService.sendVotingResultUpdate(new CharacterUpdateDTO(victim), room);
+            Thread.sleep(durations.get("GRACE_DURATION") * 1000);
+        } else {
+            messageService.sendVotingResultUpdate(new CharacterUpdateDTO(), room);
         }
         refreshVotingResult(result);
     }
@@ -281,46 +280,37 @@ public class GameHost implements Runnable {
 
     private boolean checkTie(ArrayList<VotingResultDTO> result) throws ClientErrorException {
         if (result.get(0).getResult().intValue() == result.get(1).getResult().intValue()) {
-            if (gameDTO.getGamePhase().equals(GamePhaseEnum.MAFIA_VOTE_PHASE)) {
-                gameDTO.setMessage("Мафия не определилась с жертвой");
-            } else {
-                gameDTO.setMessage("Мирные не смогли определиться с выбором мафии");
-            }
-            messageService.sendSystemMessage(gameDTO,
-                                             new MessageDestinationDescriptor(DestinationEnum.CIVILIAN, room));
             return true;
         }
         return false;
     }
 
-    private void KillUser(ArrayList<VotingResultDTO> result) throws ClientErrorException {
+    private UserDAO KillUser(ArrayList<VotingResultDTO> result) throws ClientErrorException {
         String login = result.get(0).getLogin();
-        if (gameDTO.getGamePhase().equals(GamePhaseEnum.MAFIA_VOTE_PHASE)) {
-            gameDTO.setMessage("Мафия убила " + login);
-        } else {
-            gameDTO.setMessage("Мирные убили " + login);
+        final Optional<UserDAO> victim = room.getUserList().stream()
+                .filter(
+                        (dao) -> dao.getLogin().equals(login))
+                .findFirst();
+        if (!victim.isPresent()) {
+            throw new RuntimeException(
+                    "Server internal logic error. User, that was voted out? is not present in the room");
         }
-
-        for (UserDAO userDAO : room.getUserList()) {
-            if (userDAO.getLogin().equals(login)) {
-                userDAO.setCharacterStatus(CharacterStatusEnum.DEAD);
-            }
-        }
-        messageService.sendSystemMessage(gameDTO,
-                                         new MessageDestinationDescriptor(DestinationEnum.CIVILIAN, room));
+        victim.get().setCharacterStatus(CharacterStatusEnum.DEAD);
+        ;
+        return victim.get();
     }
 
-    /** Обновляет данные просле этапа голосования.
+    /**
+     * Обновляет данные просле этапа голосования.
      *
      * @param result список пользователей комнаты, для обновления.
      */
-    private void refreshVotingResult(ArrayList<VotingResultDTO> result){
+    private void refreshVotingResult(ArrayList<VotingResultDTO> result) {
         for (UserDAO userDAO : room.getUserList()) {
             userDAO.setVotesAgainst(0);
             userDAO.setHasVoted(false);
         }
     }
-
 }
 
 

@@ -51,7 +51,7 @@ function loadChatMessages() {
             chatbox.insertBefore(div, chatbox.firstChild);
         });
     };
-    sendRequest("GET", "/api/message/restore", "", callback, [8]);
+    sendRequest("GET", "/api/message/restore", "", callback, []);
 }
 
 /**
@@ -65,7 +65,7 @@ function sendMessage(destination = '') {
         let callback = function (request) {
         };
         sendRequest("POST", "/api/message/send",
-            message, callback, [8]);
+            message, callback, [15]);
     }
 }
 

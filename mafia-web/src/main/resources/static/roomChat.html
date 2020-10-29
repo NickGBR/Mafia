@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Чат комнаты!</title>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typeit@7.0.4/dist/typeit.min.js"></script>
     <script src="js/stomp.js"></script>
     <script src="js/const/socketConst.js" type="text/javascript"></script>
     <script src="js/const/gameConst.js" type="text/javascript"></script>
@@ -61,8 +62,7 @@
 </div>
 <div id="overlay-chat"></div>
 <div id="overlay-modal">
-    <div id="modal-spinner">
-    </div>
+    <div id="modal-spinner"></div>
     <div id="modal-message">
         <div class="modal-header" id="modal-message-title"></div>
         <div id="modal-message-text"></div>
@@ -70,6 +70,14 @@
             <button class="button rectangle-button" id="confirm-message-button" onclick="confirmModalMessage()">
                 ОК
             </button>
+        </div>
+    </div>
+    <div id="modal-typeit-message">
+        <div id="modal-typit-text-container">
+            <span id="modal-static-text"></span>
+            <span id="typeit-text"></span>
+        </div>
+        <div class="input-button-confirmation-container centered">
         </div>
     </div>
 </div>

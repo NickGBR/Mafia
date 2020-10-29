@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Чат комнаты!</title>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typeit@7.0.4/dist/typeit.min.js"></script>
     <script src="js/stomp.js"></script>
     <script src="js/const/socketConst.js" type="text/javascript"></script>
     <script src="js/const/gameConst.js" type="text/javascript"></script>
@@ -14,8 +15,8 @@
     <script src="js/chat.js"></script>
     <script src="js/modal.js"></script>
     <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
-    <link href="styles/style.css" rel="stylesheet" type="text/css"/>
     <link href="styles/commonstyle.css" rel="stylesheet" type="text/css"/>
+    <link href="styles/gameChat.css" rel="stylesheet" type="text/css"/>
 
 
 </head>
@@ -24,7 +25,7 @@
 <svg height="0" id="stroke" width="0" xmlns="http://www.w3.org/2000/svg">
     <defs>
         <path d="M2 2c49.7 2.6 100 3.1 150 1.7-46.5 2-93 4.4-139.2 7.3 45.2-1.5 90.6-1.8 135.8-.6" fill="none" id="line"
-              stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+              stroke-linecap="round" stroke-linejoin="round"/>
     </defs>
 </svg>
 
@@ -81,6 +82,15 @@
             </button>
         </div>
     </div>
+    <div id="modal-typeit-message">
+        <div id="modal-typit-text-container">
+            <span id="modal-static-text"></span>
+            <span id="typeit-text"></span>
+        </div>
+        <div class="input-button-confirmation-container centered">
+        </div>
+    </div>
+</div>
 </div>
 <div id="content">
     <div class="description-container">
@@ -88,19 +98,19 @@
     </div>
     <!-- Кнопки управления -->
     <div class="button-group">
-        <span class="button-container user-button">
-            <button class="button rectangle-button" disabled="disabled" id="vote_for_user_button" onclick="voteForUser()">
+        <span class="button-container">
+            <button class="button rectangle-button" disabled id="vote_for_user_button" onclick="voteForUser()">
             Проголосовать
             </button>
         </span>
-        <span class="button-container admin-button">
-         <button class="button rectangle-button" id="don_checker" onclick="checkUserRole()">
-            Проверить шерифа
+        <span class="button-container">
+         <button class="button rectangle-button" disabled id="don_checker" onclick="checkUserRoleDon()">
+            Проверить на шерифа
          </button>
         </span>
-        <span class="button-container admin-button">
-         <button class="button rectangle-button" id="sheriff_checker" onclick="checkUserRole()">
-            Проверить дона
+        <span class="button-container">
+         <button class="button rectangle-button" disabled id="sheriff_checker" onclick="checkUserRoleSheriff()">
+            Проверить на мафию
          </button>
         </span>
     </div>

@@ -57,6 +57,7 @@ public class InitController {
                 dto.setIsRoomReady(roomService.isRoomReady());
                 if (dto.getIsGameStarted()) {
                     dto.setGamePhase(roomDAO.getGamePhase());
+                    dto.setIsAlive(user.get().getIsAlive());
                 }
             }
         }

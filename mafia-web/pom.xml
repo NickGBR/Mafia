@@ -20,6 +20,12 @@
 
 
     <dependencies>
+        <!-- Для обработки аннотаций, привязанных к application.yml-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
         <!-- Для аннотаций Lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -195,35 +201,6 @@
                     </execution>
                 </executions>
             </plugin>
-<!--            &lt;!&ndash; Fat jar plugin &ndash;&gt;-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-assembly-plugin</artifactId>-->
-<!--                <version>3.1.1</version>-->
-
-<!--                <configuration>-->
-<!--                    <descriptorRefs>-->
-<!--                        <descriptorRef>jar-with-dependencies</descriptorRef>-->
-<!--                    </descriptorRefs>-->
-<!--                        <archive>-->
-<!--                            <manifest>-->
-<!--                                <mainClass>org.dreamteam.mafia.Application</mainClass>-->
-<!--                            </manifest>-->
-<!--                        </archive>-->
-
-<!--                </configuration>-->
-
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>make-assembly</id>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>single</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-
-<!--            </plugin>-->
         </plugins>
     </build>
 

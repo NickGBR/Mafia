@@ -6,6 +6,7 @@ let isAdmin;
 let isReady;
 let destination;
 let gamePhase;
+let isAlive;
 let maxUserAmount;
 
 let selectedEntry = null;
@@ -14,7 +15,7 @@ let characterEntries = [];
 
 
 let sendMessageButton;
-
+let allowedSendMessageButton;
 let voteButton;
 let allowedVoteButton;
 let donCheckerButton;
@@ -52,6 +53,7 @@ function afterConnect(connection) {
     userRole = initialisedUserRole;
     gamePhase = init["gamePhase"];
     maxUserAmount = init["maxUserAmount"];
+    isAlive = init["isAlive"];
     sendMessageButton = document.getElementById("send_message_button");
     console.log("Успешное подключение: " + connection);
     // Теперь когда подключение установлено
@@ -61,6 +63,9 @@ function afterConnect(connection) {
 
     // Заполняем информацию об игре.
     initCurrentGameInfo();
+
+    // Настраиваем интерфейс
+    setupInterfaceByRole();
 
     // Получаем историю чата.
     loadChatMessages();
@@ -87,11 +92,20 @@ function onError(error) {
 function subscribeByRole() {
     stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, receiveMessage);
     stompClient.subscribe(sockConst.SYS_WEB_CHAT + roomID, getGameStat);
+    stompClient.subscribe(sockConst.SYS_WEB_CHARACTER_INFO_UPDATE + roomID, receiveCharacterUpdate);
     if (userRole === roleConst.MAFIA || userRole === roleConst.DON) {
         console.log("Подписался как мафия");
         stompClient.subscribe(sockConst.MAFIA_WEB_CHAT + roomID, receiveMafiaMessage)
     } else {
         console.log("Подписался как мирный на " + sockConst.CIV_WEB_CHAT);
+    }
+}
+
+function setupInterfaceByRole() {
+    if (userRole === roleConst.DON) {
+        document.getElementById("don_checker").style.display = "inline";
+    } else if (userRole === roleConst.SHERIFF) {
+        document.getElementById("sheriff_checker").style.display = "inline";
     }
 }
 
@@ -110,7 +124,6 @@ function initCurrentGameInfo() {
         let userEntry = initCharacterEntry(copyNode);
         characterEntries.push(userEntry);
     }
-    console.log(characterEntries);
 }
 
 function initCharacterEntry(node) {
@@ -211,18 +224,16 @@ function setGamePhaseInterface(phase) {
 }
 
 function disableInterface() {
-    console.log(voteButton);
     allowedVoteButton = false;
     allowedDonCheckerButton = false;
     allowedSheriffCheckerButton = false;
-    sendMessageButton.disabled = true;
+    allowedSendMessageButton = false;
     updateButtonOnStateChange();
-    sheriffCheckerButton.style.display = "none";
-    donCheckerButton.style.display = "none"
 }
 
 function activateCivilianDiscussInterface() {
-    sendMessageButton.disabled = false;
+    allowedSendMessageButton = true;
+    updateButtonOnStateChange();
 }
 
 function activateCiviliansVotingInterface() {
@@ -231,7 +242,8 @@ function activateCiviliansVotingInterface() {
 }
 
 function activateMafiaDiscussInterface() {
-    sendMessageButton.disabled = false;
+    allowedSendMessageButton = true;
+    updateButtonOnStateChange();
 }
 
 function activateMafiaVotingInterface() {
@@ -240,13 +252,11 @@ function activateMafiaVotingInterface() {
 }
 
 function activateDonInterface() {
-    donCheckerButton.style.display = "block";
     allowedDonCheckerButton = true;
     updateButtonOnStateChange();
 }
 
 function activateSheriffInterface() {
-    sheriffCheckerButton.style.display = "block";
     allowedSheriffCheckerButton = true;
     updateButtonOnStateChange();
 }
@@ -267,6 +277,7 @@ function getGameStat(response) {
         return;
     }
     gamePhase = data['gamePhase'];
+    showPhaseModal()
     setGamePhaseInterface(data['gamePhase']);
     updateGameDescription();
     if (data['message'] !== 0) {
@@ -274,24 +285,82 @@ function getGameStat(response) {
     }
 }
 
+
+function showPhaseModal() {
+    let description;
+    switch (gamePhase) {
+        case gamePhaseConst.CIVILIANS_DISCUSS_PHASE:
+            description = " День. Обсуждение";
+            break;
+        case gamePhaseConst.CIVILIANS_VOTE_PHASE:
+            description = " День. Голосование";
+            break;
+        case gamePhaseConst.MAFIA_DISCUSS_PHASE:
+            description = " Ночь. Обсуждение мафии";
+            break;
+        case gamePhaseConst.MAFIA_VOTE_PHASE:
+            description = " Ночь. Выбор жертвы мафии";
+            break;
+        case gamePhaseConst.DON_PHASE:
+            description = " Ночь. Фаза Дона";
+            break;
+        case gamePhaseConst.SHERIFF_PHASE:
+            description = " Ночь. Фаза Шерифа";
+            break;
+        default:
+            showModalMessage("Ошибка", "Проблемы с фазой игры, обратитесь к разработчику.");
+            return;
+    }
+    showTypeitModalMessage("Начинается:", description);
+}
+
 /**
- * Функция для шерифа и дона, проверяющая является ли тот или иной игрок
- * доном или шерифом. Проверка на дона или шерифа, происходит на сервере
+ * Функция для дона, проверяющая является ли тот или иной игрок
+ * шерифом. Проверка на дона или шерифа, происходит на сервере
  * автоматически, так как мы знаем роли игрока, сделавшего запрос.
  */
-function checkUserRole() {
+function checkUserRoleDon() {
     let callback = function (request) {
-
-        console.log(request.responseText);
+        allowedDonCheckerButton = false;
+        updateButtonOnStateChange();
+        if (request.responseText === "true") {
+            showTypeitModalMessage("Результат проверки: ", "Шериф");
+        } else {
+            showTypeitModalMessage("Результат проверки: ", "НЕ Шериф");
+        }
     };
     let login = selectedEntry["name"];
-    sendRequest("GET", sockConst.REQUEST_GET_ROLE_INFO + "?login=" + login, "", callback, [8]);
+    sendRequest("GET", sockConst.REQUEST_GET_OTHER_ROLE_INFO + "?login=" + login, "", callback, [8]);
+}
+
+/**
+ * Функция для шерифаа, проверяющая является ли тот или иной игрок
+ * мафией. Проверка на дона или шерифа, происходит на сервере
+ * автоматически, так как мы знаем роли игрока, сделавшего запрос.
+ */
+function checkUserRoleSheriff() {
+    let callback = function (request) {
+        allowedSheriffCheckerButton = false;
+        updateButtonOnStateChange();
+        if (request.responseText === "true") {
+            showTypeitModalMessage("Результат проверки: ", "Мафия");
+        } else {
+            showTypeitModalMessage("Результат проверки: ", "Мирный");
+        }
+    };
+    let login = selectedEntry["name"];
+    sendRequest("GET", sockConst.REQUEST_GET_OTHER_ROLE_INFO + "?login=" + login, "", callback, [8]);
 }
 
 function voteForUser() {
     let login = selectedEntry["name"];
+    let callback = function () {
+        allowedVoteButton = false;
+        updateButtonOnStateChange();
+    };
+
     sendRequest("GET", sockConst.REQUEST_GET_VOTE_FOR_USER + "?login=" + login,
-        "", null, [3, 7, 15, 17]);//3 7 /15/ 17
+        "", callback, [3, 7, 15, 17]);//3 7 /15/ 17
 }
 
 function showEndGameScreen(message) {
@@ -332,14 +401,13 @@ function showCharacter(character) {
     currentEntry["name"] = character["name"];
     const textNodeName = document.createTextNode(character["name"]);
     currentEntry["text"].appendChild(textNodeName);
-    if (character["name"] !== userName && character["isAlive"]) {
+    if (character["isAlive"]) {
         currentEntry["text"].classList.add("clickable");
         currentEntry["text"].onclick = function (event) {
             selectCharacter(event.target);
             updateButtonOnStateChange();
         }
-    }
-    if (!character["isAlive"]) {
+    } else {
         const strokeNode = currentEntry["text"].querySelector('.strikethrough');
         strokeNode.style.visibility = "visible";
     }
@@ -360,25 +428,62 @@ function showCharacter(character) {
     }
 }
 
-function selectCharacter(node) {
-    let name = node.innerText;
-    if (name !== userName) {
-        const foundEntry = characterEntries.find(element => element["name"] === name);
-        if (selectedEntry !== null) {
-            selectedEntry["text"].classList.remove("selected");
-            if (selectedEntry["name"] === name) {
-                selectedEntry = null;
-                return;
-            }
-            selectedEntry = null;
-        }
-        selectedEntry = foundEntry;
-        foundEntry["text"].classList.add("selected");
+function receiveCharacterUpdate(response) {
+    const character = JSON.parse(response.body);
+    if (character["name"] === "") {
+        showTypeitModalMessage("Итог голосования: ", "не определились");
+    } else {
+        updateCharacter(character);
+        showTypeitModalMessage("Итог голосования: ", "Убит " + character["name"]);
     }
 }
 
+function updateCharacter(character) {
+
+    const foundEntry = characterEntries.find(element => element["name"] === character["name"]);
+    if (character["name"] === userName) {
+        isAlive = character["isAlive"];
+        updateButtonOnStateChange();
+    }
+    if (!character["isAlive"]) {
+        const strokeNode = foundEntry["text"].querySelector('.strikethrough');
+        strokeNode.style.visibility = "visible";
+        foundEntry["text"].classList.remove("clickable");
+        foundEntry["text"].onclick = function () {
+        }
+        if (selectedEntry === foundEntry) {
+            selectedEntry["text"].classList.remove("selected");
+            selectedEntry = null;
+        }
+    } else {
+        const strokeNode = foundEntry["text"].querySelector('.strikethrough');
+        strokeNode.style.visibility = "hidden";
+        foundEntry["text"].classList.add("clickable");
+        foundEntry["text"].onclick = function (event) {
+            selectCharacter(event.target);
+            updateButtonOnStateChange();
+        }
+    }
+}
+
+function selectCharacter(node) {
+    let name = node.innerText;
+    const foundEntry = characterEntries.find(element => element["name"] === name);
+    if (selectedEntry !== null) {
+        selectedEntry["text"].classList.remove("selected");
+        if (selectedEntry["name"] === name) {
+            selectedEntry = null;
+            return;
+        }
+        selectedEntry = null;
+    }
+    selectedEntry = foundEntry;
+    foundEntry["text"].classList.add("selected");
+}
+
 function updateButtonOnStateChange() {
-    voteButton.disabled = !allowedVoteButton || (selectedEntry == null);
-    sheriffCheckerButton.disabled = !allowedSheriffCheckerButton || (selectedEntry == null);
-    donCheckerButton.disabled = !allowedDonCheckerButton || (selectedEntry == null);
+    sendMessageButton.disabled = !allowedSendMessageButton || !isAlive;
+    voteButton.disabled = !allowedVoteButton || (selectedEntry == null) || !isAlive;
+    sheriffCheckerButton.disabled = !allowedSheriffCheckerButton || (selectedEntry == null) || !isAlive;
+    donCheckerButton.disabled = !allowedDonCheckerButton || (selectedEntry == null) || !isAlive;
 }
