@@ -52,4 +52,6 @@ public interface MessageService {
     void sendKickUpdate(RoomDisplayDTO room, String login);
 
     void sendReadinessUpdate() throws ClientErrorException;
+
+    void sendGameStartUpdate() throws ClientErrorException;
 }

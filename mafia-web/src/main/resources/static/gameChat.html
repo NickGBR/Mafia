@@ -17,6 +17,7 @@
     <link href="styles/spin.css" rel="stylesheet" type="text/css"/>
     <link href="styles/style.css" rel="stylesheet" type="text/css"/>
     <link href="styles/commonstyle.css" rel="stylesheet" type="text/css"/>
+    <link href="styles/gameChat.css" rel="stylesheet" type="text/css"/>
 
 
 </head>
@@ -83,7 +84,12 @@
         </div>
     </div>
     <div id="modal-typeit-message">
-        <div id="modal-typeit-static-text"><span id="modal-typeit-dynamic-text"></span></div>
+        <div id="modal-typit-text-container">
+            <span id="modal-static-text"></span>
+            <span id="typeit-text"></span>
+        </div>
+        <div class="input-button-confirmation-container centered">
+        </div>
     </div>
 </div>
 </div>
@@ -93,19 +99,19 @@
     </div>
     <!-- Кнопки управления -->
     <div class="button-group">
-        <span class="button-container user-button">
-            <button class="button rectangle-button" disabled="disabled" id="vote_for_user_button" onclick="voteForUser()">
+        <span class="button-container">
+            <button class="button rectangle-button" disabled id="vote_for_user_button" onclick="voteForUser()">
             Проголосовать
             </button>
         </span>
-        <span class="button-container admin-button">
-         <button class="button rectangle-button" id="don_checker" onclick="checkUserRole()">
-            Проверить шерифа
+        <span class="button-container">
+         <button class="button rectangle-button" disabled id="don_checker" onclick="checkUserRoleDon()">
+            Проверить на шерифа
          </button>
         </span>
-        <span class="button-container admin-button">
-         <button class="button rectangle-button" id="sheriff_checker" onclick="checkUserRole()">
-            Проверить дона
+        <span class="button-container">
+         <button class="button rectangle-button" disabled id="sheriff_checker" onclick="checkUserRoleSheriff()">
+            Проверить на мафию
          </button>
         </span>
     </div>

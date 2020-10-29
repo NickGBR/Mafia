@@ -13,8 +13,8 @@ import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
 @NoArgsConstructor
 public class CharacterUpdateDTO {
 
-    private String name;
-    private Boolean isAlive;
+    private String name = "";
+    private Boolean isAlive = true;
 
     public CharacterUpdateDTO(UserDAO dao) {
         this.name = dao.getLogin();

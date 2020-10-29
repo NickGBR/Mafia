@@ -162,6 +162,12 @@ public class SimpleMessageService implements MessageService {
                                          roomService.isRoomReady());
     }
 
+    @Override
+    public void sendGameStartUpdate() throws ClientErrorException {
+        messagingTemplate.convertAndSend(SockConst.SYS_GAME_STARTED_INFO
+                                                 + roomService.getCurrentRoom().getId(), true);
+    }
+
     /**
      * Отправляет сообщения подписчикам, в зависимости от роли.
      *

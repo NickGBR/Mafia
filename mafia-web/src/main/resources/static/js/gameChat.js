@@ -64,6 +64,9 @@ function afterConnect(connection) {
     // Заполняем информацию об игре.
     initCurrentGameInfo();
 
+    // Настраиваем интерфейс
+    setupInterfaceByRole();
+
     // Получаем историю чата.
     loadChatMessages();
 
@@ -89,12 +92,20 @@ function onError(error) {
 function subscribeByRole() {
     stompClient.subscribe(sockConst.CIV_WEB_CHAT + roomID, receiveMessage);
     stompClient.subscribe(sockConst.SYS_WEB_CHAT + roomID, getGameStat);
-    stompClient.subscribe(sockConst.SYS_WEB_CHARACTER_INFO_UPDATE + roomID, updateCharacter);
+    stompClient.subscribe(sockConst.SYS_WEB_CHARACTER_INFO_UPDATE + roomID, receiveCharacterUpdate);
     if (userRole === roleConst.MAFIA || userRole === roleConst.DON) {
         console.log("Подписался как мафия");
         stompClient.subscribe(sockConst.MAFIA_WEB_CHAT + roomID, receiveMafiaMessage)
     } else {
         console.log("Подписался как мирный на " + sockConst.CIV_WEB_CHAT);
+    }
+}
+
+function setupInterfaceByRole() {
+    if (userRole === roleConst.DON) {
+        document.getElementById("don_checker").style.display = "inline";
+    } else if (userRole === roleConst.SHERIFF) {
+        document.getElementById("sheriff_checker").style.display = "inline";
     }
 }
 
@@ -113,7 +124,6 @@ function initCurrentGameInfo() {
         let userEntry = initCharacterEntry(copyNode);
         characterEntries.push(userEntry);
     }
-    console.log(characterEntries);
 }
 
 function initCharacterEntry(node) {
@@ -214,14 +224,11 @@ function setGamePhaseInterface(phase) {
 }
 
 function disableInterface() {
-    console.log(voteButton);
     allowedVoteButton = false;
     allowedDonCheckerButton = false;
     allowedSheriffCheckerButton = false;
     allowedSendMessageButton = false;
     updateButtonOnStateChange();
-    sheriffCheckerButton.style.display = "none";
-    donCheckerButton.style.display = "none"
 }
 
 function activateCivilianDiscussInterface() {
@@ -245,13 +252,11 @@ function activateMafiaVotingInterface() {
 }
 
 function activateDonInterface() {
-    donCheckerButton.style.display = "block";
     allowedDonCheckerButton = true;
     updateButtonOnStateChange();
 }
 
 function activateSheriffInterface() {
-    sheriffCheckerButton.style.display = "block";
     allowedSheriffCheckerButton = true;
     updateButtonOnStateChange();
 }
@@ -272,6 +277,7 @@ function getGameStat(response) {
         return;
     }
     gamePhase = data['gamePhase'];
+    showPhaseModal()
     setGamePhaseInterface(data['gamePhase']);
     updateGameDescription();
     if (data['message'] !== 0) {
@@ -279,15 +285,68 @@ function getGameStat(response) {
     }
 }
 
+
+function showPhaseModal() {
+    let description;
+    switch (gamePhase) {
+        case gamePhaseConst.CIVILIANS_DISCUSS_PHASE:
+            description = " День. Обсуждение";
+            break;
+        case gamePhaseConst.CIVILIANS_VOTE_PHASE:
+            description = " День. Голосование";
+            break;
+        case gamePhaseConst.MAFIA_DISCUSS_PHASE:
+            description = " Ночь. Обсуждение мафии";
+            break;
+        case gamePhaseConst.MAFIA_VOTE_PHASE:
+            description = " Ночь. Выбор жертвы мафии";
+            break;
+        case gamePhaseConst.DON_PHASE:
+            description = " Ночь. Фаза Дона";
+            break;
+        case gamePhaseConst.SHERIFF_PHASE:
+            description = " Ночь. Фаза Шерифа";
+            break;
+        default:
+            showModalMessage("Ошибка", "Проблемы с фазой игры, обратитесь к разработчику.");
+            return;
+    }
+    showTypeitModalMessage("Начинается:", description);
+}
+
 /**
- * Функция для шерифа и дона, проверяющая является ли тот или иной игрок
- * доном или шерифом. Проверка на дона или шерифа, происходит на сервере
+ * Функция для дона, проверяющая является ли тот или иной игрок
+ * шерифом. Проверка на дона или шерифа, происходит на сервере
  * автоматически, так как мы знаем роли игрока, сделавшего запрос.
  */
-function checkUserRole() {
+function checkUserRoleDon() {
     let callback = function (request) {
+        allowedDonCheckerButton = false;
+        updateButtonOnStateChange();
+        if (request.responseText === "true") {
+            showTypeitModalMessage("Результат проверки: ", "Шериф");
+        } else {
+            showTypeitModalMessage("Результат проверки: ", "НЕ Шериф");
+        }
+    };
+    let login = selectedEntry["name"];
+    sendRequest("GET", sockConst.REQUEST_GET_OTHER_ROLE_INFO + "?login=" + login, "", callback, [8]);
+}
 
-        console.log(request.responseText);
+/**
+ * Функция для шерифаа, проверяющая является ли тот или иной игрок
+ * мафией. Проверка на дона или шерифа, происходит на сервере
+ * автоматически, так как мы знаем роли игрока, сделавшего запрос.
+ */
+function checkUserRoleSheriff() {
+    let callback = function (request) {
+        allowedSheriffCheckerButton = false;
+        updateButtonOnStateChange();
+        if (request.responseText === "true") {
+            showTypeitModalMessage("Результат проверки: ", "Мафия");
+        } else {
+            showTypeitModalMessage("Результат проверки: ", "Мирный");
+        }
     };
     let login = selectedEntry["name"];
     sendRequest("GET", sockConst.REQUEST_GET_OTHER_ROLE_INFO + "?login=" + login, "", callback, [8]);
@@ -369,8 +428,18 @@ function showCharacter(character) {
     }
 }
 
-function updateCharacter(response) {
+function receiveCharacterUpdate(response) {
     const character = JSON.parse(response.body);
+    if (character["name"] === "") {
+        showTypeitModalMessage("Итог голосования: ", "не определились");
+    } else {
+        updateCharacter(character);
+        showTypeitModalMessage("Итог голосования: ", "Убит " + character["name"]);
+    }
+}
+
+function updateCharacter(character) {
+
     const foundEntry = characterEntries.find(element => element["name"] === character["name"]);
     if (character["name"] === userName) {
         isAlive = character["isAlive"];

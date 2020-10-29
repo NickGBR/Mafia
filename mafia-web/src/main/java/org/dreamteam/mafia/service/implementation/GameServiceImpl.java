@@ -1,6 +1,5 @@
 package org.dreamteam.mafia.service.implementation;
 
-import org.dreamteam.mafia.constants.SockConst;
 import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dao.enums.*;
@@ -12,6 +11,7 @@ import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.MessageService;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.service.implementation.engine.GameHost;
+import org.dreamteam.mafia.service.implementation.engine.GamePhaseDurationsService;
 import org.dreamteam.mafia.util.ClientErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +34,7 @@ public class GameServiceImpl implements GameService {
     private final MessageService messageService;
     private final UserService userService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final GamePhaseDurationsService durationsService;
 
     private final Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
 
@@ -44,13 +45,15 @@ public class GameServiceImpl implements GameService {
             MessageService messageService,
             UserService userService,
             SimpMessagingTemplate messagingTemplate,
-            ThreadPoolTaskScheduler taskScheduler) {
+            ThreadPoolTaskScheduler taskScheduler,
+            GamePhaseDurationsService durationsService) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.messageService = messageService;
         this.userService = userService;
         this.messagingTemplate = messagingTemplate;
         this.taskScheduler = taskScheduler;
+        this.durationsService = durationsService;
     }
 
     @Override
@@ -72,10 +75,9 @@ public class GameServiceImpl implements GameService {
         room.setGameStatus(GameStatusEnum.IN_PROGRESS);
         setRolesToUsers(room);
         roomRepository.save(room);
-        messagingTemplate.convertAndSend(SockConst.SYS_GAME_STARTED_INFO + roomId, true);
 
-        GameHost gameHost = new GameHost(messagingTemplate, room, roomRepository,
-                                         messageService, this);
+        GameHost gameHost = new GameHost(room, roomRepository,
+                                         messageService, this, durationsService);
         Thread thread = new Thread(gameHost);
         thread.start();
     }

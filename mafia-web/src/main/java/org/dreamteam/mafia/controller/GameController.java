@@ -5,6 +5,7 @@ import org.dreamteam.mafia.dao.enums.CharacterEnum;
 import org.dreamteam.mafia.dto.CharacterDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.service.api.GameService;
+import org.dreamteam.mafia.service.api.MessageService;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.util.ClientErrorCode;
 import org.slf4j.Logger;
@@ -20,13 +21,16 @@ public class GameController {
 
     private final GameService gameService;
     private final UserService userService;
+    private final MessageService messageService;
     private final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     @Autowired
-    public GameController(GameService gameService,
-                          UserService userService) {
+    public GameController(
+            GameService gameService,
+            UserService userService, MessageService messageService) {
         this.gameService = gameService;
         this.userService = userService;
+        this.messageService = messageService;
     }
 
     @RequestMapping(value = SockConst.REQUEST_VOTE_FOR_USER, method = RequestMethod.GET)
@@ -34,7 +38,7 @@ public class GameController {
         gameService.countVotesAgainst(login);
     }
 
-
+    @RequestMapping(value = "/checkRole", method = RequestMethod.GET)
     public Boolean getRoleInfo(@RequestParam String login) throws ClientErrorException {
         if (userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.DON)) {
             return gameService.isSheriff(login);
@@ -48,6 +52,7 @@ public class GameController {
     @RequestMapping(value = SockConst.REQUEST_GET_START_GAME_INFO, method = RequestMethod.GET)
     public void startGame() throws ClientErrorException {
         gameService.startGame();
+        messageService.sendGameStartUpdate();
     }
 
     @GetMapping(value = "/getRole")

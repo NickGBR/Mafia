@@ -56,9 +56,13 @@ function showTypeitModalMessage(text, typeText, callback = null) {
     textNode.innerText = text;
     hideOnEnd = true;
     document.getElementById("typeit-text").innerText = "";
+    setupModal("modal-typeit-message");
     new TypeIt("#typeit-text", {
-        speed: 300,
-        waitUntilVisible: true
+        speed: 150,
+        waitUntilVisible: false,
+        afterComplete: function (instance) {
+            instance.destroy();
+        }
     })
         .pause(200)
         .type(typeText)
@@ -72,7 +76,6 @@ function showTypeitModalMessage(text, typeText, callback = null) {
             }
         })
         .go();
-    setupModal("modal-typeit-message");
 }
 
 
