@@ -6,7 +6,7 @@
 
     <groupId>org.dreamteam.mafia</groupId>
     <artifactId>mafia-online</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0-ALPHA</version>
     <packaging>pom</packaging>
 
     <name>Mafia Online</name>

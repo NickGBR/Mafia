@@ -334,7 +334,6 @@ public class SimpleRoomService implements RoomService {
         return new Room(getCurrentRoomDAO());
     }
 
-    @Override
     public RoomEntity getCurrentRoomDAO() throws ClientErrorException {
         final Optional<UserEntity> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {

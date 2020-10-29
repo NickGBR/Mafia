@@ -4,7 +4,6 @@ import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.dto.UserDisplayDTO;
-import org.dreamteam.mafia.entities.RoomEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.MessageDestinationDescriptor;
 import org.dreamteam.mafia.model.MessageRestorationDescriptor;
@@ -134,11 +133,4 @@ public interface RoomService {
      */
     Room getCurrentRoom() throws ClientErrorException;
 
-    /**
-     * Возвращает описание текущей комнаты для других сервисов
-     *
-     * @return -  описание комнаты, связанное с базой
-     * @throws ClientErrorException - если пользователь не находится в комнате.
-     */
-    RoomEntity getCurrentRoomDAO() throws ClientErrorException;
 }

@@ -41,17 +41,54 @@ public interface MessageService {
      */
     List<ChatMessageDTO> getChatHistory() throws ClientErrorException;
 
+    /**
+     * Рассылает клиентам уведомление о добавлении комнаты в список доступных
+     *
+     * @param addedRoom - описание добавленной комнаты
+     */
     void sendAddRoom(RoomDisplayDTO addedRoom);
 
+    /**
+     * Рассылает клиентам уведомление об удаленнии комнаты из списка доступных
+     *
+     * @param removedRoom - описание удаленной комнаты
+     */
     void sendRemoveRoom(RoomDisplayDTO removedRoom);
 
+    /**
+     * Рассылает клиентам уведомление об обновлении состояния комнаты в списке доступных
+     *
+     * @param updatedRoom - описание обновленной комнаты
+     */
     void sendUpdateRoom(RoomDisplayDTO updatedRoom);
 
+    /**
+     * Рассылает клиентам уведомление о присоединении игрока к комнате
+     *
+     * @param room  - описание комнаты, к которой присоединился игрок
+     * @param login - логин присоединившегося игрока
+     */
     void sendJoinUpdate(RoomDisplayDTO room, String login);
 
+    /**
+     * Рассылает клиентам уведомление об изгнании игрока из комнаты
+     *
+     * @param room  - описание комнаты, из которой был изгнан игрок
+     * @param login - логин изгнанного игрока
+     */
     void sendKickUpdate(RoomDisplayDTO room, String login);
 
+    /**
+     * Рассылает клиентам уведомление о готовности комнаты к началу игры
+     *
+     * @throws ClientErrorException - если текущий пользователь не находится в комнате
+     */
     void sendReadinessUpdate() throws ClientErrorException;
 
+    /**
+     * Рассылает клиентам уведомление о начале игры в комнате
+     *
+     * @throws ClientErrorException - если текущий пользователь не находится в комнате
+     */
     void sendGameStartUpdate() throws ClientErrorException;
 }
