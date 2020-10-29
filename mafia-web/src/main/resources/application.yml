@@ -1,5 +1,5 @@
 spring:
-  profiles.active: local
+  profiles.active: heroku
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
