@@ -256,7 +256,7 @@ public class GameServiceImpl implements GameService {
                 civilianRoles, CharacterStatusEnum.ALIVE, room
         );
 
-        System.out.println("CIVILIAN " + civilianCount + "  " + "Mafia " + mafiaCount);
+        logger.trace("CIVILIAN " + civilianCount + "  " + "Mafia " + mafiaCount);
 
         if (civilianCount <= mafiaCount) {
             return GameEndStatus.MAFIA_WON;
@@ -272,7 +272,7 @@ public class GameServiceImpl implements GameService {
         if (!currentUserDAO.isPresent()) {
             throw new SecurityException("User doesn't exist in a database");
         }
-        logger.debug("Determining role of user: " + currentUserDAO.get().getLogin());
+        logger.trace("Determining role of user: " + currentUserDAO.get().getLogin());
         if (currentUserDAO.get().getRoom() == null) {
             throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM, "User is not im the room");
         }
