@@ -1,4 +1,4 @@
-package org.dreamteam.mafia.service.implementation.GameEngine;
+package org.dreamteam.mafia.service.implementation.engine;
 
 import lombok.SneakyThrows;
 import org.dreamteam.mafia.constants.GameConst;

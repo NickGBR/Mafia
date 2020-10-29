@@ -12,3 +12,4 @@ logging:
     spring.framework: info
     org.dreamteam: debug
     org.dreamteam.mafia.security: error
+    org.dreamteam.mafia.service.implementation.engine: error

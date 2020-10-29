@@ -290,7 +290,7 @@ function checkUserRole() {
         console.log(request.responseText);
     };
     let login = selectedEntry["name"];
-    sendRequest("GET", sockConst.REQUEST_GET_ROLE_INFO + "?login=" + login, "", callback, [8]);
+    sendRequest("GET", sockConst.REQUEST_GET_OTHER_ROLE_INFO + "?login=" + login, "", callback, [8]);
 }
 
 function voteForUser() {
@@ -399,19 +399,17 @@ function updateCharacter(response) {
 
 function selectCharacter(node) {
     let name = node.innerText;
-    if (name !== userName) {
-        const foundEntry = characterEntries.find(element => element["name"] === name);
-        if (selectedEntry !== null) {
-            selectedEntry["text"].classList.remove("selected");
-            if (selectedEntry["name"] === name) {
-                selectedEntry = null;
-                return;
-            }
+    const foundEntry = characterEntries.find(element => element["name"] === name);
+    if (selectedEntry !== null) {
+        selectedEntry["text"].classList.remove("selected");
+        if (selectedEntry["name"] === name) {
             selectedEntry = null;
+            return;
         }
-        selectedEntry = foundEntry;
-        foundEntry["text"].classList.add("selected");
+        selectedEntry = null;
     }
+    selectedEntry = foundEntry;
+    foundEntry["text"].classList.add("selected");
 }
 
 function updateButtonOnStateChange() {

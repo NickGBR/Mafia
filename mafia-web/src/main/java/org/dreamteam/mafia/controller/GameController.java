@@ -6,6 +6,7 @@ import org.dreamteam.mafia.dto.CharacterDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.UserService;
+import org.dreamteam.mafia.util.ClientErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,8 @@ public class GameController {
         } else if (userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.SHERIFF)) {
             return gameService.isMafia(login);
         }
-        return null;
+        throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS,
+                                       "Only sheriff or don players can perform this action");
     }
 
     @RequestMapping(value = SockConst.REQUEST_GET_START_GAME_INFO, method = RequestMethod.GET)
@@ -48,12 +50,13 @@ public class GameController {
         gameService.startGame();
     }
 
-//    @RequestMapping(value = SockConst.REQUEST_GET_USER_ROLES_INFO, method = RequestMethod.GET)
-//    public void getUserRoles() throws ClientErrorException {
-//        gameService.startGame();
-//        Set<UserDAO> userList = userService.getCurrentUserDAO().get().getRoom().getUserList();
-//        messagingTemplate.convertAndSend(SockConst.SYS_WEB_USER_ROLES_INFO, userList);
-//    }
+    @GetMapping(value = "/getRole")
+    public CharacterEnum getRole() throws ClientErrorException {
+        logger.debug("Incoming request for the self-role.");
+        final CharacterEnum role = gameService.getRole();
+        logger.debug("Role: " + role);
+        return role;
+    }
 
     @Deprecated
     @RequestMapping(value = "/getIsSheriff", method = RequestMethod.GET)

@@ -319,10 +319,37 @@ function startGame() {
 
 
 function goToGameChat(response) {
-    console.log(response);
-    const data = JSON.parse(response.body);
-    console.log(data);
-    window.location.href = "gameChat.html";
+    let callback = function (request) {
+        const data = request.responseText;
+        console.log(data);
+        const roleCode = JSON.parse(data);
+        console.log(roleCode);
+        let role;
+        switch (roleCode) {
+            case roleConst.CITIZEN: {
+                role = "Мирный"
+                break;
+            }
+            case roleConst.MAFIA: {
+                role = "Мафия"
+                break;
+            }
+            case roleConst.DON: {
+                role = "Дон"
+                break;
+            }
+            case roleConst.SHERIFF: {
+                role = "Шериф"
+                break;
+            }
+        }
+        showTypeitModalMessage("Игра начинается. Ваша роль:", role,
+            function () {
+                window.location.href = "gameChat.html";
+            });
+    };
+    sendRequest("GET", sockConst.REQUEST_GET_SELF_ROLE_INFO,
+        "", callback, [8, 16]);
 }
 
 function sendMessageInRoom() {

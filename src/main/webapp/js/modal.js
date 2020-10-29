@@ -17,6 +17,8 @@ function setupModal(modalID) {
     }
 }
 
+let hideOnEnd = false;
+
 function hideModal() {
     const overlay = document.getElementById("overlay-modal");
     const body = document.getElementById("body");
@@ -30,6 +32,7 @@ function hideModal() {
         item.style.display = "none";
     });
     overlay.style.display = "none";
+    hideOnEnd = false;
 }
 
 let confirmCallback = null;
@@ -45,6 +48,33 @@ function showModalMessage(title, text, callback = null) {
         confirmCallback = callback;
     }
 }
+
+
+function showTypeitModalMessage(text, typeText, callback = null) {
+    hideModal();
+    let textNode = document.getElementById("modal-static-text");
+    textNode.innerText = text;
+    hideOnEnd = true;
+    document.getElementById("typeit-text").innerText = "";
+    new TypeIt("#typeit-text", {
+        speed: 300,
+        waitUntilVisible: true
+    })
+        .pause(200)
+        .type(typeText)
+        .pause(1000)
+        .exec(function () {
+            if (hideOnEnd) {
+                hideModal();
+            }
+            if (callback !== null) {
+                callback();
+            }
+        })
+        .go();
+    setupModal("modal-typeit-message");
+}
+
 
 function confirmModalMessage() {
     hideModal();

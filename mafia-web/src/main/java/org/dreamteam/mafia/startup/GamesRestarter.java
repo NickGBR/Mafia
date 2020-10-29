@@ -5,7 +5,7 @@ import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.MessageService;
-import org.dreamteam.mafia.service.implementation.GameEngine.GameHost;
+import org.dreamteam.mafia.service.implementation.engine.GameHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;

@@ -42,7 +42,7 @@ public class SockConst {
      * шериф првоеряет, явлеяется ли персонаж доном,
      * дон проверяет явлеся ли указанный персонаж шерифом.
      */
-    public static final String REQUEST_GET_ROLE_INFO = "/GET/checkRole";
+    public static final String REQUEST_GET_OTHER_ROLE_INFO = "/checkRole";
 
 
     public static final String REQUEST_GET_START_GAME_INFO = "/startGame";

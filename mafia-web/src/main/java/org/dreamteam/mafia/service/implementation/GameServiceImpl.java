@@ -11,8 +11,10 @@ import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.MessageService;
 import org.dreamteam.mafia.service.api.UserService;
-import org.dreamteam.mafia.service.implementation.GameEngine.GameHost;
+import org.dreamteam.mafia.service.implementation.engine.GameHost;
 import org.dreamteam.mafia.util.ClientErrorCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -32,6 +34,8 @@ public class GameServiceImpl implements GameService {
     private final MessageService messageService;
     private final UserService userService;
     private final SimpMessagingTemplate messagingTemplate;
+
+    private final Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
 
     @Autowired
     public GameServiceImpl(
@@ -81,7 +85,7 @@ public class GameServiceImpl implements GameService {
         Optional<UserDAO> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
-                    + "\' doesn't exist in a database" );
+                    + "\' doesn't exist in a database");
         }
 
         Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
@@ -104,7 +108,6 @@ public class GameServiceImpl implements GameService {
         }
 
         return userDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.SHERIFF);
-
     }
 
     @Override
@@ -247,20 +250,36 @@ public class GameServiceImpl implements GameService {
         civilianRoles.add(CharacterEnum.CITIZEN);
         civilianRoles.add(CharacterEnum.SHERIFF);
         Long mafiaCount = userRepository.countDistinctByCharacterInAndAndCharacterStatusAndRoom(
-             mafiaRoles, CharacterStatusEnum.ALIVE, room
+                mafiaRoles, CharacterStatusEnum.ALIVE, room
         );
         Long civilianCount = userRepository.countDistinctByCharacterInAndAndCharacterStatusAndRoom(
-             civilianRoles, CharacterStatusEnum.ALIVE, room
+                civilianRoles, CharacterStatusEnum.ALIVE, room
         );
 
         System.out.println("CIVILIAN " + civilianCount + "  " + "Mafia " + mafiaCount);
 
-        if(civilianCount<=mafiaCount){
+        if (civilianCount <= mafiaCount) {
             return GameEndStatus.MAFIA_WON;
-        }
-        else if( mafiaCount==0){
+        } else if (mafiaCount == 0) {
             return GameEndStatus.CIVILIANS_WON;
         }
         return GameEndStatus.GAME_NOT_ENDED;
+    }
+
+    @Override
+    public CharacterEnum getRole() throws ClientErrorException {
+        Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
+        if (!currentUserDAO.isPresent()) {
+            throw new SecurityException("User doesn't exist in a database");
+        }
+        logger.debug("Determining role of user: " + currentUserDAO.get().getLogin());
+        if (currentUserDAO.get().getRoom() == null) {
+            throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM, "User is not im the room");
+        }
+        if (currentUserDAO.get().getRoom().getGameStatus().equals(GameStatusEnum.NOT_STARTED) ||
+                (currentUserDAO.get().getRoom().getGameStatus().equals(GameStatusEnum.DELETED))) {
+            throw new ClientErrorException(ClientErrorCode.GAME_NOT_STARTED, "Game has not started in current room");
+        }
+        return currentUserDAO.get().getCharacter();
     }
 }

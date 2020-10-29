@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Чат комнаты!</title>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typeit@7.0.4/dist/typeit.min.js"></script>
     <script src="js/stomp.js"></script>
     <script src="js/const/socketConst.js" type="text/javascript"></script>
     <script src="js/const/gameConst.js" type="text/javascript"></script>
@@ -24,7 +25,7 @@
 <svg height="0" id="stroke" width="0" xmlns="http://www.w3.org/2000/svg">
     <defs>
         <path d="M2 2c49.7 2.6 100 3.1 150 1.7-46.5 2-93 4.4-139.2 7.3 45.2-1.5 90.6-1.8 135.8-.6" fill="none" id="line"
-              stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+              stroke-linecap="round" stroke-linejoin="round"/>
     </defs>
 </svg>
 
@@ -81,6 +82,10 @@
             </button>
         </div>
     </div>
+    <div id="modal-typeit-message">
+        <div id="modal-typeit-static-text"><span id="modal-typeit-dynamic-text"></span></div>
+    </div>
+</div>
 </div>
 <div id="content">
     <div class="description-container">

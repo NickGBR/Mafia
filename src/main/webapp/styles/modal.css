@@ -46,6 +46,7 @@
     border-radius: 1rem;
 }
 
+
 #modal-message-text {
     padding-top: 3rem;
     width: 40rem;
@@ -58,6 +59,36 @@
 
 #confirm-message-button {
     margin: 0;
+}
+
+#modal-typeit-message {
+    position: relative;
+    top: 20%;
+    margin: auto;
+    width: 60%;
+    min-width: 48rem;
+    height: auto;
+    padding: 2rem 2rem;
+    z-index: 5;
+    display: none;
+    background-image: url("/img/tilebackground.png");
+    background-color: wheat;
+    background-size: auto;
+    border-radius: 1rem;
+}
+
+#modal-typit-text-container {
+    width: 40rem;
+    height: auto;
+    margin: auto;
+    font-size: 1.2rem;
+    font-family: 'PT Mono', monospace;
+    text-align: justify;
+    border-bottom: solid black 1px;
+}
+
+#typeit-text {
+    font-weight: bold;
 }
 
 #modal-spinner {

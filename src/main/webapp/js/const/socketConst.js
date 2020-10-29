@@ -40,13 +40,14 @@ const sockConst = {
      * шериф првоеряет, явлеяется ли персонаж доном,
      * дон проверяет явлеся ли указанный персонаж шерифом.
      */
-    REQUEST_GET_ROLE_INFO: "api/game/GET/checkRole",
+    REQUEST_GET_OTHER_ROLE_INFO: "api/game/checkRole",
 
 
-    REQUEST_GET_START_GAME_INFO: '/api/game/startGame'
+    REQUEST_GET_START_GAME_INFO: '/api/game/startGame',
+    REQUEST_GET_SELF_ROLE_INFO: '/api/game/getRole'
 }
 
-var destinationConst = {
+const destinationConst = {
 
     ROOM_USER: 'ROOM_USER',
     MAFIA: "MAFIA",
