@@ -1,0 +1,43 @@
+#modal-help {
+    position: relative;
+    top: 5%;
+    margin: auto;
+    width: 80%;
+    min-width: 48rem;
+    height: 80%;
+    padding: 2rem 2rem;
+    z-index: 5;
+    display: none;
+    background-image: url("/img/tilebackground.png");
+    background-color: wheat;
+    background-size: auto;
+    border-radius: 1rem;
+    overflow-y: scroll;
+}
+
+.help-list {
+    padding: 0 1rem;
+    list-style: none;
+}
+
+.help-demo {
+    display: flex;
+    position: relative;
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+    transform: scale(0.75);
+}
+
+.help-text {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-family: "PT Serif", serif;
+    text-align: justify;
+}
+
+.entry-non-selectable {
+    width: 31rem;
+    height: 2rem;
+    border-bottom: black solid 1px;
+}

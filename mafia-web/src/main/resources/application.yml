@@ -1,13 +1,28 @@
 spring:
-  profiles.active: no_db
+  profiles.active: local
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format-sql: true
+  flyway:
+    clean-on-validation-error: true
+
 logging:
   level:
     root: error
     spring.framework: info
     org.dreamteam: debug
+    org.dreamteam.mafia.security: error
+token:
+  expirationPeriodInHours: 24
+engine:
+  durations:
+    CIVILIAN_DISCUSS_PHASE_DURATION: 60
+    CIVILIAN_VOTING_PHASE_DURATION: 30
+    MAFIA_DISCUSS_PHASE_DURATION: 30
+    MAFIA_VOTING_PHASE_DURATION: 30
+    DON_PHASE_DURATION: 30
+    SHERIFF_PHASE_DURATION: 30
+    GRACE_DURATION: 5

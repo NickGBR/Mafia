@@ -1,0 +1,96 @@
+label {
+    font-family: 'PT Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: bold;
+    width: 10rem;
+}
+
+input {
+    font-family: 'PT Mono', monospace;
+    font-size: 1.1rem;
+    background: transparent;
+    border: none;
+}
+
+input[type="text"] {
+    width: 25rem;
+}
+
+.input-container {
+    width: 42rem;
+    margin: 3rem 3rem 0;
+    border-bottom: black 1px solid;
+}
+
+.input-button-confirmation-container {
+    width: 40rem;
+    margin-top: 3px;
+    padding: 3rem 3rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.label-text {
+    font-family: 'PT Mono', monospace;
+    font-size: 1.1rem;
+    border-bottom: black 1px solid;
+    width: 40rem;
+}
+
+#input-error-message {
+    display: none;
+    font-family: 'PT Mono', monospace;
+    font-size: 1.1rem;
+    color: #540b0b;
+    border-bottom: #540b0b 1px solid;
+    width: 40rem;
+    padding-top: 3rem;
+    margin: auto;
+    text-align: center;
+}
+
+input[type=checkbox] {
+    position: relative;
+    cursor: pointer;
+    transform: translateY(-10px) translateX(10px);
+}
+
+input[type=checkbox]:before {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 0;
+    left: -7px;
+    background-image: url("/img/tilebackground.png");
+    border: black solid 1px;
+}
+
+input[type=checkbox]:checked:before {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 0;
+    left: -7px;
+    background-image: url("/img/tilebackground.png");
+    border: black solid 1px;
+}
+
+input[type=checkbox]:checked:after {
+    content: "";
+    display: block;
+    width: 5px;
+    height: 10px;
+    border: solid black;
+    border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    position: absolute;
+    top: 2px;
+}
+

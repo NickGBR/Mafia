@@ -7,17 +7,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.web.util.matcher.*;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
@@ -29,10 +25,16 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    // Доступны анонимным пользователя URL среди API
+    private static final RequestMatcher PUBLIC_API_URLS = new OrRequestMatcher(
+            new AntPathRequestMatcher("/api/user/register"),
+            new AntPathRequestMatcher("/api/user/login")
+    );
+
     // Защищаемые URL
-    private static final RequestMatcher SECURED_URLS = new OrRequestMatcher(
-            new AntPathRequestMatcher("/api/room/*"),
-            new AntPathRequestMatcher("/api/game/*"));
+    private static final RequestMatcher SECURED_URLS = new AndRequestMatcher(
+            new NegatedRequestMatcher(PUBLIC_API_URLS),
+            new AntPathRequestMatcher("/api/**"));
     private final TokenAuthenticationProvider provider;
 
     @Autowired
@@ -52,18 +54,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Настраивает параметры web-безопасности
-     *
-     * @param web - параметры web-безопасности
-     */
-    @Override
-    public void configure(WebSecurity web) {
-        // Spring Security не распространяется на все URL, не попадающие в SECURED_URLS
-        web.ignoring().requestMatchers(
-                new NegatedRequestMatcher(SECURED_URLS));
-    }
-
-    /**
      * Настраивает параметры безопасноти HTTP
      *
      * @param http - параметры безопасноти HTTP
@@ -77,16 +67,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(STATELESS)
                 .and()
-                // Настраиваем bean, отвечающий за обработку отказа аутентификации по указанным URL
-                .exceptionHandling()
-                .defaultAuthenticationEntryPointFor(forbiddenEntryPoint(), SECURED_URLS)
-                .and()
-                // Добавляем наш фильтр в начало цепочки аутентификации по указанным URL
+                // Добавляем наш фильтр в начало цепочки аутентификации
                 .authenticationProvider(provider)
                 .addFilterBefore(restAuthenticationFilter(), AnonymousAuthenticationFilter.class)
                 .authorizeRequests()
+                // Публичные API-запросы аутентифицируем, но разрешаем даже анонимным
+                .requestMatchers(PUBLIC_API_URLS)
+                .permitAll()
+                // Защищенные разрешаем только успешно аутентифицирвоанным
                 .requestMatchers(SECURED_URLS)
                 .authenticated()
+                .and()
+                // Настраиваем bean, отвечающий за обработку отказа аутентификации по указанным URL
+                .exceptionHandling()
+                .defaultAuthenticationEntryPointFor(forbiddenEntryPoint(), SECURED_URLS)
                 .and()
                 // Отключаем подедржку CSRF, встроенной формы логина, аутентификации по HTTP и logout-а
                 .csrf().disable()

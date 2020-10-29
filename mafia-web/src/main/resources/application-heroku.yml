@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://heroku.server:5432/database
+    username: postgres
+    password: postgres

@@ -1,0 +1,44 @@
+{
+  "properties": [
+    {
+      "name": "token.expirationPeriodInHours",
+      "type": "java.lang.Long",
+      "description": "Время в часах в течение которого действительны JWT, выдаваемые при логине."
+    },
+    {
+      "name": "engine.durations.CIVILIAN_DISCUSS_PHASE_DURATION",
+      "type": "java.lang.Integer",
+      "description": "Длительность дневной фазы обсуждения в секундах."
+    },
+    {
+      "name": "engine.durations.CIVILIAN_VOTING_PHASE_DURATION",
+      "type": "java.lang.Integer",
+      "description": "Длительность дневной фазы голосовани в секундах."
+    },
+    {
+      "name": "engine.durations.MAFIA_DISCUSS_PHASE_DURATION",
+      "type": "java.lang.Integer",
+      "description": "Длительность ночной фазы обсуждения мафией в секундах."
+    },
+    {
+      "name": "engine.durations.MAFIA_VOTING_PHASE_DURATION",
+      "type": "java.lang.Integer",
+      "description": "Длительность ночной фазы голосования мафии в секундах."
+    },
+    {
+      "name": "engine.durations.DON_PHASE_DURATION",
+      "type": "java.lang.Integer",
+      "description": "Длительность ночной фазы Дона в секундах."
+    },
+    {
+      "name": "engine.durations.SHERIFF_PHASE_DURATION",
+      "type": "java.lang.Integer",
+      "description": "Длительность ночной фазы Шерифа в секундах."
+    },
+    {
+      "name": "engine.durations.GRACE_DURATION",
+      "type": "java.lang.Integer",
+      "description": "Период задержки между фазами для того, чтобы дать клиентам время обновить свое состояние."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+#login_button, #send_registration_button {
+    padding: 0.7rem 1.5rem;
+}
+
+#login_input {
+    background: transparent;
+!important;
+}

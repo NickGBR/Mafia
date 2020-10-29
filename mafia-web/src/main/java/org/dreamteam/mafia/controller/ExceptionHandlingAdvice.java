@@ -2,11 +2,13 @@ package org.dreamteam.mafia.controller;
 
 import org.dreamteam.mafia.dto.ErrorResponse;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.util.ClientErrorCode;
 import org.dreamteam.mafia.util.ServerErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,7 +23,7 @@ public class ExceptionHandlingAdvice {
     private final Logger logger = LoggerFactory.getLogger(ExceptionHandlingAdvice.class);
 
     /**
-     * Обрабатывает исключения, вызванные некорректным запросом со стороны клиента
+     * Обрабатывает исключения, вызванные читаемым, но некорректным запросом со стороны клиента
      *
      * @param exception - обрабатываемое исключение
      * @return - JSON ответ для отправки клиенту вместе с кодом 400
@@ -36,6 +38,37 @@ public class ExceptionHandlingAdvice {
     }
 
     /**
+     * Обрабатывает исключения, вызванные нечитаемым запросом со стороны клиента
+     *
+     * @param exception - обрабатываемое исключение
+     * @return - JSON ответ для отправки клиенту вместе с кодом 400
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)  // 400
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseBody
+    public ErrorResponse handleRequestError(HttpMessageNotReadableException exception) {
+        logger.debug("User send in unreadable request: "
+                             + exception.getLocalizedMessage());
+        return new ErrorResponse(ClientErrorCode.INVALID_REQUEST.getValue(), exception.getLocalizedMessage());
+    }
+
+    /**
+     * Обрабатывает исключения, вызванные нарушением безопасности
+     *
+     * @param exception - обрабатываемое исключение
+     * @return - JSON ответ для отправки клиенту вместе с кодом 400
+     */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)  // 401
+    @ExceptionHandler(SecurityException.class)
+    @ResponseBody
+    public ErrorResponse handleClientError(SecurityException exception) {
+        logger.error("Security violation caused exception: "
+                             + exception.getLocalizedMessage());
+        return new ErrorResponse(ClientErrorCode.SECURITY_VIOLATION.getValue(),
+                                 exception.getLocalizedMessage());
+    }
+
+    /**
      * Обрабатывает исключения, вызванные ошибкой в работе БД или запросах к ней
      *
      * @param exception - обрабатываемое исключение
@@ -44,7 +77,7 @@ public class ExceptionHandlingAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  // 500
     @ExceptionHandler(DataAccessException.class)
     @ResponseBody
-    public ErrorResponse handleClientError(DataAccessException exception) {
+    public ErrorResponse handleDatabaseError(DataAccessException exception) {
         logger.error("DB caused exception: "
                              + exception.getLocalizedMessage());
         return new ErrorResponse(ServerErrorCode.DB_FAILURE.getValue(), exception.getLocalizedMessage());
@@ -59,7 +92,7 @@ public class ExceptionHandlingAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  // 500
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public ErrorResponse handleClientError(Exception exception) {
+    public ErrorResponse handleServerError(Exception exception) {
         logger.error("Internal logic caused exception: "
                              + exception.getLocalizedMessage());
         return new ErrorResponse(ServerErrorCode.SERVER_CODE_FAILURE.getValue(), exception.getLocalizedMessage());
