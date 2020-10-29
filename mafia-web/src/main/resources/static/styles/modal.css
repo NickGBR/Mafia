@@ -1,0 +1,107 @@
+#overlay-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 4;
+    display: none;
+}
+
+#overlay-modal-open {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 4;
+    display: block;
+}
+
+
+.modal-header {
+    width: 40rem;
+    margin: auto;
+    font-family: 'PT Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+#modal-message {
+    position: relative;
+    top: 20%;
+    margin: auto;
+    width: 60%;
+    min-width: 48rem;
+    height: auto;
+    padding: 2rem 2rem;
+    z-index: 5;
+    display: none;
+    background-image: url("/img/tilebackground.png");
+    background-color: wheat;
+    background-size: auto;
+    border-radius: 1rem;
+}
+
+
+#modal-message-text {
+    padding-top: 3rem;
+    width: 40rem;
+    height: auto;
+    margin: auto;
+    font-size: 1.2rem;
+    font-family: 'PT Mono', monospace;
+    text-align: justify;
+}
+
+#confirm-message-button {
+    margin: 0;
+}
+
+#modal-typeit-message {
+    position: relative;
+    top: 20%;
+    margin: auto;
+    width: 60%;
+    min-width: 48rem;
+    height: auto;
+    padding: 2rem 2rem;
+    z-index: 5;
+    display: none;
+    background-image: url("/img/tilebackground.png");
+    background-color: wheat;
+    background-size: auto;
+    border-radius: 1rem;
+}
+
+#modal-typit-text-container {
+    width: 40rem;
+    height: auto;
+    margin: auto;
+    font-size: 1.2rem;
+    font-family: 'PT Mono', monospace;
+    text-align: justify;
+    border-bottom: solid black 1px;
+}
+
+#typeit-text {
+    font-weight: bold;
+}
+
+#modal-spinner {
+    position: relative;
+    top: 35%;
+    margin: auto;
+    width: 30%;
+    height: 30%;
+    padding: 2rem 2rem;
+    z-index: 5;
+    display: none;
+    background-image: url("/img/tilebackground.png");
+    background-size: auto;
+    border-radius: 1rem;
+}
+

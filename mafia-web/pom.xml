@@ -20,6 +20,12 @@
 
 
     <dependencies>
+        <!-- Для обработки аннотаций, привязанных к application.yml-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
         <!-- Для аннотаций Lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>

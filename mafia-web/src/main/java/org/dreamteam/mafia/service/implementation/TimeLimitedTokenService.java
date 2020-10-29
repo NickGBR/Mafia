@@ -8,6 +8,9 @@ import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.security.SignedJsonWebToken;
 import org.dreamteam.mafia.service.api.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -20,11 +23,18 @@ import java.util.Optional;
  * Класс реализующий выдачу JWT c ограниченным сроком действия: 24 часа
  */
 @Service
+@EnableConfigurationProperties
+@ConfigurationProperties(prefix = "token")
 public class TimeLimitedTokenService implements TokenService {
 
-    private final static long TIME_LIMIT_IN_HOURS = 24;
+    @Value("${token.expirationPeriodInHours}")
+    private Long expirationPeriodInHours;
 
     private final SecretKey secretKey;
+
+    public void setExpirationPeriodInHours(Long expirationPeriodInHours) {
+        this.expirationPeriodInHours = expirationPeriodInHours;
+    }
 
     @Autowired
     public TimeLimitedTokenService(SecretKey secretKey) {
@@ -34,7 +44,7 @@ public class TimeLimitedTokenService implements TokenService {
     @Override
     public SignedJsonWebToken getTokenFor(User user) {
         final Instant now = Instant.now();
-        final Instant expiredBy = now.plus(Duration.ofHours(TIME_LIMIT_IN_HOURS));
+        final Instant expiredBy = now.plus(Duration.ofHours(expirationPeriodInHours));
         final Claims claims = Jwts
                 .claims()
                 .setExpiration(Date.from(expiredBy))
