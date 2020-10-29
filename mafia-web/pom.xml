@@ -30,6 +30,11 @@
 
 
     <dependencies>
+        <!-- Для выполнени миграций при запуске приложения-->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
         <!-- Для обработки аннотаций, привязанных к application.yml-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

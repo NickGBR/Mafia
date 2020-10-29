@@ -6,6 +6,9 @@ spring:
     properties:
       hibernate:
         format-sql: true
+  flyway:
+    clean-on-validation-error: true
+
 logging:
   level:
     root: error
