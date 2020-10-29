@@ -1,5 +1,8 @@
-package org.dreamteam.mafia.dao.enums;
+package org.dreamteam.mafia.model;
 
+/**
+ * Фазы игрового дня
+ */
 public enum GamePhaseEnum {
     MAFIA_DISCUSS_PHASE,
     MAFIA_VOTE_PHASE,

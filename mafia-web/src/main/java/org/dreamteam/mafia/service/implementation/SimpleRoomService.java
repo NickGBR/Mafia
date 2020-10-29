@@ -1,17 +1,13 @@
 package org.dreamteam.mafia.service.implementation;
 
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dao.enums.CharacterEnum;
-import org.dreamteam.mafia.dao.enums.DestinationEnum;
-import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.dto.UserDisplayDTO;
+import org.dreamteam.mafia.entities.RoomEntity;
+import org.dreamteam.mafia.entities.UserEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
-import org.dreamteam.mafia.model.MessageDestinationDescriptor;
-import org.dreamteam.mafia.model.MessageRestorationDescriptor;
+import org.dreamteam.mafia.model.*;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.service.api.RoomService;
 import org.dreamteam.mafia.service.api.UserService;
@@ -47,7 +43,7 @@ public class SimpleRoomService implements RoomService {
 
     @Override
     public MessageDestinationDescriptor getCurrentDestination() {
-        Optional<UserDAO> user = userService.getCurrentUserDAO();
+        Optional<UserEntity> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to request destinations");
         }
@@ -72,7 +68,7 @@ public class SimpleRoomService implements RoomService {
 
     @Override
     public MessageRestorationDescriptor getPermittedToRestorationDestinations() {
-        Optional<UserDAO> user = userService.getCurrentUserDAO();
+        Optional<UserEntity> user = userService.getCurrentUserDAO();
         MessageRestorationDescriptor descriptor = new MessageRestorationDescriptor();
         if (!user.isPresent()) {
             descriptor.getDestinations().add(DestinationEnum.COMMON);
@@ -97,11 +93,11 @@ public class SimpleRoomService implements RoomService {
 
     @Override
     public boolean isCurrentUserAdmin() {
-        Optional<UserDAO> user = userService.getCurrentUserDAO();
+        Optional<UserEntity> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {
             return false;
         }
-        Optional<RoomDAO> room = repository.findRoomDAOByUserListContains(user.get());
+        Optional<RoomEntity> room = repository.findRoomDAOByUserListContains(user.get());
         return room.isPresent() && user.get().getIsAdmin();
     }
 
@@ -115,7 +111,7 @@ public class SimpleRoomService implements RoomService {
             throw new ClientErrorException(ClientErrorCode.INVALID_ROOM_PARAMETERS,
                                            "Too many mafia - game would end immediately");
         }
-        RoomDAO dao = new RoomDAO();
+        RoomEntity dao = new RoomEntity();
         dao.setName(name);
         if (roomDTO.getPassword().isEmpty()) {
             dao.setPasswordHash("");
@@ -127,11 +123,11 @@ public class SimpleRoomService implements RoomService {
         dao.setMafia(roomDTO.getMafia());
         dao.setDon(roomDTO.isDon());
         dao.setSheriff(roomDTO.isSheriff());
-        Optional<UserDAO> admin = userService.getCurrentUserDAO();
+        Optional<UserEntity> admin = userService.getCurrentUserDAO();
         if (!admin.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to create rooms");
         }
-        Optional<RoomDAO> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
+        Optional<RoomEntity> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
         if (adminCurrRoom.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.ALREADY_IN_ROOM,
                                            "Can't create a room for a user, that is already in a room");
@@ -144,11 +140,11 @@ public class SimpleRoomService implements RoomService {
     }
 
     public void disbandRoom() throws ClientErrorException {
-        Optional<UserDAO> admin = userService.getCurrentUserDAO();
+        Optional<UserEntity> admin = userService.getCurrentUserDAO();
         if (!admin.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to disband rooms");
         }
-        Optional<RoomDAO> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
+        Optional<RoomEntity> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
         if (!adminCurrRoom.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM, "Current user is not in a room");
         }
@@ -160,7 +156,7 @@ public class SimpleRoomService implements RoomService {
             throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS,
                                            "Only room administrator can disband it");
         }
-        for (UserDAO user : adminCurrRoom.get().getUserList()) {
+        for (UserEntity user : adminCurrRoom.get().getUserList()) {
             user.setRoom(null);
             user.setIsReady(false);
         }
@@ -173,11 +169,11 @@ public class SimpleRoomService implements RoomService {
 
     @Override
     public void joinRoom(JoinRoomDTO dto) throws ClientErrorException {
-        Optional<UserDAO> user = userService.getCurrentUserDAO();
+        Optional<UserEntity> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to join rooms");
         }
-        Optional<RoomDAO> room = repository.findById(dto.getId());
+        Optional<RoomEntity> room = repository.findById(dto.getId());
         if (!room.isPresent() || room.get().getGameStatus().equals(GameStatusEnum.DELETED)) {
             throw new ClientErrorException(ClientErrorCode.ROOM_NOT_EXIST, "Requested room does not exist");
         }
@@ -185,7 +181,7 @@ public class SimpleRoomService implements RoomService {
             throw new ClientErrorException(ClientErrorCode.GAME_ALREADY_STARTED,
                                            "Can't join already started game");
         }
-        Optional<RoomDAO> userCurrRoom = repository.findRoomDAOByUserListContains(user.get());
+        Optional<RoomEntity> userCurrRoom = repository.findRoomDAOByUserListContains(user.get());
         if (userCurrRoom.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.ALREADY_IN_ROOM,
                                            "Current user is already in a room");
@@ -205,12 +201,12 @@ public class SimpleRoomService implements RoomService {
     }
 
     @Override
-    public void leaveRoom() throws ClientErrorException {
-        Optional<UserDAO> user = userService.getCurrentUserDAO();
+    public Room leaveRoom() throws ClientErrorException {
+        Optional<UserEntity> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to join rooms");
         }
-        Optional<RoomDAO> room = repository.findRoomDAOByUserListContains(user.get());
+        Optional<RoomEntity> room = repository.findRoomDAOByUserListContains(user.get());
         if (!room.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM,
                                            "User is not in room. Nothing to leave from");
@@ -223,24 +219,25 @@ public class SimpleRoomService implements RoomService {
         user.get().setRoom(null);
         user.get().setIsReady(false);
         repository.save(room.get());
+        return new Room(room.get());
     }
 
     @Override
     public List<RoomDisplayDTO> getAvailableRooms() {
-        List<RoomDAO> availableRooms = repository.findRoomDAOByGameStatus(GameStatusEnum.NOT_STARTED);
+        List<RoomEntity> availableRooms = repository.findRoomDAOByGameStatus(GameStatusEnum.NOT_STARTED);
         List<RoomDisplayDTO> dtoRooms = new ArrayList<>();
-        availableRooms.stream().map(RoomDisplayDTO::new)
+        availableRooms.stream().map(Room::new).map(RoomDisplayDTO::new)
                 .collect(Collectors.toCollection(() -> dtoRooms));
         return dtoRooms;
     }
 
     @Override
     public List<UserDisplayDTO> getUsersInRoom() throws ClientErrorException {
-        final Optional<UserDAO> user = userService.getCurrentUserDAO();
+        final Optional<UserEntity> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to get users in room");
         }
-        Optional<RoomDAO> room = repository.findRoomDAOByUserListContains(user.get());
+        Optional<RoomEntity> room = repository.findRoomDAOByUserListContains(user.get());
         if (!room.isPresent() || room.get().getGameStatus().equals(GameStatusEnum.DELETED)) {
             throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM,
                                            "User is not in room. Nothing to list");
@@ -261,11 +258,11 @@ public class SimpleRoomService implements RoomService {
 
     @Override
     public void kickUser(String target) throws ClientErrorException {
-        Optional<UserDAO> admin = userService.getCurrentUserDAO();
+        Optional<UserEntity> admin = userService.getCurrentUserDAO();
         if (!admin.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to kick others out of rooms");
         }
-        Optional<RoomDAO> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
+        Optional<RoomEntity> adminCurrRoom = repository.findRoomDAOByUserListContains(admin.get());
         if (!adminCurrRoom.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM, "Current user is not in a room");
         }
@@ -277,7 +274,7 @@ public class SimpleRoomService implements RoomService {
             throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS,
                                            "Only room administrator can kick users");
         }
-        Optional<UserDAO> targetUser = adminCurrRoom.get().getUserList().stream()
+        Optional<UserEntity> targetUser = adminCurrRoom.get().getUserList().stream()
                 .filter((user) -> user.getLogin().equals(target)).findFirst();
         if (!targetUser.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.ROOMS_MISMATCH, "Target is not in the same room");
@@ -291,11 +288,11 @@ public class SimpleRoomService implements RoomService {
 
     @Override
     public void setReady(boolean ready) throws ClientErrorException {
-        final Optional<UserDAO> user = userService.getCurrentUserDAO();
+        final Optional<UserEntity> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to change readiness");
         }
-        Optional<RoomDAO> room = repository.findRoomDAOByUserListContains(user.get());
+        Optional<RoomEntity> room = repository.findRoomDAOByUserListContains(user.get());
         if (!room.isPresent() || room.get().getGameStatus().equals(GameStatusEnum.DELETED)) {
             throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM,
                                            "User is not in room. Can't change readiness");
@@ -306,17 +303,17 @@ public class SimpleRoomService implements RoomService {
 
     @Override
     public boolean isRoomReady() throws ClientErrorException {
-        final Optional<UserDAO> user = userService.getCurrentUserDAO();
+        final Optional<UserEntity> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to change readiness");
         }
-        Optional<RoomDAO> room = repository.findRoomDAOByUserListContains(user.get());
+        Optional<RoomEntity> room = repository.findRoomDAOByUserListContains(user.get());
         if (!room.isPresent() || room.get().getGameStatus().equals(GameStatusEnum.DELETED)) {
             throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM,
                                            "User is not in room. Can't check room readiness");
         }
         final long count = room.get().getUserList().stream()
-                .map(UserDAO::getIsReady)
+                .map(UserEntity::getIsReady)
                 .filter((ready) -> ready)
                 .count();
         return count == (room.get().getMaxUsersAmount() - 1);
@@ -324,26 +321,26 @@ public class SimpleRoomService implements RoomService {
 
     @Override
     public boolean isCurrentlyInRoom() {
-        final Optional<UserDAO> user = userService.getCurrentUserDAO();
+        final Optional<UserEntity> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {
             return false;
         }
-        Optional<RoomDAO> room = repository.findRoomDAOByUserListContains(user.get());
+        Optional<RoomEntity> room = repository.findRoomDAOByUserListContains(user.get());
         return room.isPresent();
     }
 
     @Override
-    public RoomDisplayDTO getCurrentRoom() throws ClientErrorException {
-        return new RoomDisplayDTO(getCurrentRoomDAO());
+    public Room getCurrentRoom() throws ClientErrorException {
+        return new Room(getCurrentRoomDAO());
     }
 
     @Override
-    public RoomDAO getCurrentRoomDAO() throws ClientErrorException {
-        final Optional<UserDAO> user = userService.getCurrentUserDAO();
+    public RoomEntity getCurrentRoomDAO() throws ClientErrorException {
+        final Optional<UserEntity> user = userService.getCurrentUserDAO();
         if (!user.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to get its room ID");
         }
-        Optional<RoomDAO> room = repository.findRoomDAOByUserListContains(user.get());
+        Optional<RoomEntity> room = repository.findRoomDAOByUserListContains(user.get());
         if (!room.isPresent() || room.get().getGameStatus().equals(GameStatusEnum.DELETED)) {
             throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM,
                                            "User is not in room. Can't get ID");

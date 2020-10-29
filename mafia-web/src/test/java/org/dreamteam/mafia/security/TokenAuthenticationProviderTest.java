@@ -1,6 +1,6 @@
 package org.dreamteam.mafia.security;
 
-import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.entities.UserEntity;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.TokenService;
 import org.junit.Assert;
@@ -23,7 +23,7 @@ public class TokenAuthenticationProviderTest {
     @Mock
     SignedJsonWebToken mockToken;
     String token;
-    UserDAO daoNormal;
+    UserEntity daoNormal;
     @InjectMocks
     private TokenAuthenticationProvider testedService;
 
@@ -32,7 +32,7 @@ public class TokenAuthenticationProviderTest {
         token = "42";
         MockitoAnnotations.initMocks(this);
         Mockito.when(mockToken.getCredentials()).thenReturn(token);
-        daoNormal = new UserDAO();
+        daoNormal = new UserEntity();
         daoNormal.setLogin("a");
         daoNormal.setPasswordHash("b");
     }

@@ -1,10 +1,10 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.enums.CharacterEnum;
-import org.dreamteam.mafia.dao.enums.GameEndStatus;
 import org.dreamteam.mafia.dto.CharacterDisplayDTO;
+import org.dreamteam.mafia.entities.RoomEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.model.CharacterEnum;
+import org.dreamteam.mafia.model.GameEndStatus;
 
 import java.util.List;
 
@@ -54,7 +54,7 @@ public interface GameService {
      *
      * @param room - игровая комната
      */
-    void setRolesToUsers(RoomDAO room);
+    void setRolesToUsers(RoomEntity room);
 
     /**
      * Возвращает список персонажей в игре: их имена, состояния и роли, если запрашивающий имеет право их видеть
@@ -70,7 +70,7 @@ public interface GameService {
      * @param room - комната в которй подсчитывается колличество мафии и мирных
      * @return - возращет Enum о статусе игры.
      */
-    GameEndStatus isMafiaVictoryInRoom(RoomDAO room);
+    GameEndStatus isMafiaVictoryInRoom(RoomEntity room);
 
     /**
      * Возвращает роль текущего игрока если он в комнате с начатой игрой

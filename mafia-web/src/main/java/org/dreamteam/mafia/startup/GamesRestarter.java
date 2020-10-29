@@ -1,7 +1,7 @@
 package org.dreamteam.mafia.startup;
 
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.enums.GameStatusEnum;
+import org.dreamteam.mafia.entities.RoomEntity;
+import org.dreamteam.mafia.model.GameStatusEnum;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.MessageService;
@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Класс, обеспечивающий перезапуск  потоков игр при перезапуске предложений
+ */
 @Component
 public class GamesRestarter implements
         ApplicationListener<ContextRefreshedEvent> {
@@ -34,11 +37,10 @@ public class GamesRestarter implements
         this.durationsService = durationsService;
     }
 
-
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        final List<RoomDAO> rooms = roomRepository.findRoomDAOByGameStatus(GameStatusEnum.IN_PROGRESS);
-        for (RoomDAO room : rooms) {
+        final List<RoomEntity> rooms = roomRepository.findRoomDAOByGameStatus(GameStatusEnum.IN_PROGRESS);
+        for (RoomEntity room : rooms) {
             GameHost gameHost = new GameHost(room, roomRepository, messageService, gameService,
                                              durationsService
             );

@@ -1,16 +1,16 @@
 package org.dreamteam.mafia.service.implementation;
 
 import org.dreamteam.mafia.constants.SockConst;
-import org.dreamteam.mafia.dao.MessageDAO;
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
-import org.dreamteam.mafia.dao.enums.DestinationEnum;
 import org.dreamteam.mafia.dto.CharacterUpdateDTO;
 import org.dreamteam.mafia.dto.ChatMessageDTO;
 import org.dreamteam.mafia.dto.GameDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
+import org.dreamteam.mafia.entities.MessageEntity;
+import org.dreamteam.mafia.entities.RoomEntity;
+import org.dreamteam.mafia.entities.UserEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.model.CharacterStatusEnum;
+import org.dreamteam.mafia.model.DestinationEnum;
 import org.dreamteam.mafia.model.MessageDestinationDescriptor;
 import org.dreamteam.mafia.model.MessageRestorationDescriptor;
 import org.dreamteam.mafia.repository.api.MessageRepository;
@@ -52,12 +52,12 @@ public class SimpleMessageService implements MessageService {
 
     @Override
     public void sendMessage(String message) throws ClientErrorException {
-        final Optional<UserDAO> from = userService.getCurrentUserDAO();
+        final Optional<UserEntity> from = userService.getCurrentUserDAO();
         if (!from.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to send messages");
         }
         final MessageDestinationDescriptor destinationDescriptor = roomService.getCurrentDestination();
-        MessageDAO dao = new MessageDAO();
+        MessageEntity dao = new MessageEntity();
         dao.setText(message);
         dao.setUser(from.get());
         if (destinationDescriptor.getRoom().isPresent()) {
@@ -76,7 +76,7 @@ public class SimpleMessageService implements MessageService {
 
     @Override
     public void sendSystemMessage(GameDTO systemMessage, MessageDestinationDescriptor descriptor) {
-        MessageDAO dao = new MessageDAO();
+        MessageEntity dao = new MessageEntity();
         dao.setText(systemMessage.getMessage());
         if (descriptor.getRoom().isPresent()) {
             dao.setRoom(descriptor.getRoom().get());
@@ -95,14 +95,14 @@ public class SimpleMessageService implements MessageService {
 
     @Override
     public void sendVotingResultUpdate(
-            CharacterUpdateDTO dto, RoomDAO room) {
+            CharacterUpdateDTO dto, RoomEntity room) {
         messagingTemplate.convertAndSend(SockConst.SYS_WEB_CHARACTER_INFO_UPDATE + room.getRoomId(),
                                          dto);
     }
 
     @Override
     public List<ChatMessageDTO> getChatHistory() {
-        final Optional<UserDAO> from = userService.getCurrentUserDAO();
+        final Optional<UserEntity> from = userService.getCurrentUserDAO();
         if (!from.isPresent()) {
             throw new SecurityException("Non authorised user is not allowed to send messages");
         }
@@ -174,7 +174,7 @@ public class SimpleMessageService implements MessageService {
      * @param destinationDescriptor - описание цели сообщения: адреса и, возможно, его комната
      * @param message               - сообщение для передачи.
      */
-    private void sendByDestination(MessageDestinationDescriptor destinationDescriptor, MessageDAO message) {
+    private void sendByDestination(MessageDestinationDescriptor destinationDescriptor, MessageEntity message) {
         Long roomID = 0L;
         if (destinationDescriptor.getDestination() != DestinationEnum.COMMON) {
             roomID = destinationDescriptor.getRoom().orElseThrow(

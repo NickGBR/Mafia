@@ -1,8 +1,8 @@
 package org.dreamteam.mafia.service.implementation;
 
-import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dto.LoginDTO;
 import org.dreamteam.mafia.dto.RegistrationDTO;
+import org.dreamteam.mafia.entities.UserEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.UserRepository;
@@ -49,12 +49,12 @@ public class SpringSecurityBasedUserService implements UserService {
         if (!registrationDTO.getPassword().equals(registrationDTO.getPasswordConfirmation())) {
             throw new ClientErrorException(ClientErrorCode.PASSWORD_MISMATCH, "Password mismatch!");
         }
-        Optional<UserDAO> sameLoginDao = repository.findByLogin(login);
+        Optional<UserEntity> sameLoginDao = repository.findByLogin(login);
         if (sameLoginDao.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.USER_ALREADY_EXISTS,
                                            "Login is already in the database");
         }
-        UserDAO user = new UserDAO();
+        UserEntity user = new UserEntity();
         user.setLogin(login);
         user.setPasswordHash(encoder.encode(registrationDTO.getPassword()));
         user.setIsAdmin(false);
@@ -65,7 +65,7 @@ public class SpringSecurityBasedUserService implements UserService {
 
     @Override
     public SignedJsonWebToken loginUser(LoginDTO loginDTO) throws ClientErrorException {
-        Optional<UserDAO> userDAO = repository.findByLogin(loginDTO.getLogin());
+        Optional<UserEntity> userDAO = repository.findByLogin(loginDTO.getLogin());
         if (userDAO.isPresent()) {
             if (!encoder.matches(loginDTO.getPassword(), userDAO.get().getPasswordHash())) {
                 throw new ClientErrorException(ClientErrorCode.INCORRECT_PASSWORD,
@@ -81,16 +81,16 @@ public class SpringSecurityBasedUserService implements UserService {
 
     @Override
     public Optional<User> getCurrentUser() {
-        Optional<UserDAO> userDAO = getCurrentUserDAO();
+        Optional<UserEntity> userDAO = getCurrentUserDAO();
         return userDAO.map(User::new);
     }
 
     @Override
-    public Optional<UserDAO> getCurrentUserDAO() {
+    public Optional<UserEntity> getCurrentUserDAO() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
             String currentUserName = authentication.getName();
-            Optional<UserDAO> userDAO = repository.findByLogin(currentUserName);
+            Optional<UserEntity> userDAO = repository.findByLogin(currentUserName);
             if (userDAO.isPresent()) {
                 return userDAO;
             } else {

@@ -4,8 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dreamteam.mafia.dao.enums.CharacterEnum;
+import org.dreamteam.mafia.model.CharacterEnum;
 
+/**
+ * Описание персонажа в игре для отображения в клиенте
+ */
 @Getter
 @Setter
 @AllArgsConstructor

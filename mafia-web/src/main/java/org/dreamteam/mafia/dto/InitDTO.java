@@ -3,11 +3,15 @@ package org.dreamteam.mafia.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dreamteam.mafia.dao.enums.CharacterEnum;
-import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
+import org.dreamteam.mafia.model.CharacterEnum;
+import org.dreamteam.mafia.model.GamePhaseEnum;
 
 import java.io.Serializable;
 
+/**
+ * Описание текущего контекста игрока для его восстановления, отправляемое клиенту
+ * после перезагрузки последнего
+ */
 @Getter
 @Setter
 @NoArgsConstructor

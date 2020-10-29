@@ -1,11 +1,11 @@
 package org.dreamteam.mafia.service.implementation;
 
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
+import org.dreamteam.mafia.entities.RoomEntity;
+import org.dreamteam.mafia.entities.UserEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.model.GameStatusEnum;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.service.api.UserService;
 import org.dreamteam.mafia.util.ClientErrorCode;
@@ -29,7 +29,7 @@ public class SimpleRoomServiceTest {
     @Mock
     UserService mockUserService;
     @Mock
-    Set<UserDAO> users;
+    Set<UserEntity> users;
     RoomCreationDTO publicDto, privateDto;
     @InjectMocks
     private SimpleRoomService testedService;
@@ -59,7 +59,7 @@ public class SimpleRoomServiceTest {
 
     @Test
     public void createRoomPublic() {
-        UserDAO dao = new UserDAO();
+        UserEntity dao = new UserEntity();
         Mockito.when(mockUserService.getCurrentUserDAO()).thenReturn(Optional.of(dao));
         Mockito.when(mockRepository.findRoomDAOByUserListContains(dao)).thenReturn(Optional.empty());
         try {
@@ -67,25 +67,25 @@ public class SimpleRoomServiceTest {
         } catch (ClientErrorException e) {
             Assert.fail("Thrown an exception, when user is authorised and not in a room");
         }
-        ArgumentCaptor<RoomDAO> captor = ArgumentCaptor.forClass(RoomDAO.class);
+        ArgumentCaptor<RoomEntity> captor = ArgumentCaptor.forClass(RoomEntity.class);
         Mockito.verify(mockRepository).save(captor.capture());
-        RoomDAO roomDAO = captor.getValue();
-        Assert.assertEquals("Created DAO has a wrong name", publicDto.getName(), roomDAO.getName());
+        RoomEntity roomEntity = captor.getValue();
+        Assert.assertEquals("Created DAO has a wrong name", publicDto.getName(), roomEntity.getName());
         Assert.assertEquals("Created DAO has a wrong description", publicDto.getDescription(),
-                            roomDAO.getDescription());
+                            roomEntity.getDescription());
         Assert.assertEquals("Created DAO has a wrong password hash", publicDto.getPassword(),
-                            roomDAO.getPasswordHash());
-        Assert.assertEquals("Created DAO has a wrong mafia amount", publicDto.getMafia(), (long) roomDAO.getMafia());
+                            roomEntity.getPasswordHash());
+        Assert.assertEquals("Created DAO has a wrong mafia amount", publicDto.getMafia(), (long) roomEntity.getMafia());
         Assert.assertEquals("Created DAO has a wrong players amount", publicDto.getMaxPlayers(),
-                            (long) roomDAO.getMaxUsersAmount());
-        Assert.assertEquals("Created DAO has a wrong Don setting", publicDto.isDon(), roomDAO.getDon());
-        Assert.assertEquals("Created DAO has a wrong Sheriff setting", publicDto.isSheriff(), roomDAO.getSheriff());
+                            (long) roomEntity.getMaxUsersAmount());
+        Assert.assertEquals("Created DAO has a wrong Don setting", publicDto.isDon(), roomEntity.getDon());
+        Assert.assertEquals("Created DAO has a wrong Sheriff setting", publicDto.isSheriff(), roomEntity.getSheriff());
         Mockito.verify(mockEncoder, Mockito.never()).encode(Mockito.anyString());
     }
 
     @Test
     public void createRoomPrivate() {
-        UserDAO dao = new UserDAO();
+        UserEntity dao = new UserEntity();
         Mockito.when(mockUserService.getCurrentUserDAO()).thenReturn(Optional.of(dao));
         Mockito.when(mockRepository.findRoomDAOByUserListContains(dao)).thenReturn(Optional.empty());
         try {
@@ -93,19 +93,20 @@ public class SimpleRoomServiceTest {
         } catch (ClientErrorException e) {
             Assert.fail("Thrown an exception, when user is authorised and not in a room");
         }
-        ArgumentCaptor<RoomDAO> captor = ArgumentCaptor.forClass(RoomDAO.class);
+        ArgumentCaptor<RoomEntity> captor = ArgumentCaptor.forClass(RoomEntity.class);
         Mockito.verify(mockRepository).save(captor.capture());
-        RoomDAO roomDAO = captor.getValue();
-        Assert.assertEquals("Created DAO has a wrong name", privateDto.getName(), roomDAO.getName());
+        RoomEntity roomEntity = captor.getValue();
+        Assert.assertEquals("Created DAO has a wrong name", privateDto.getName(), roomEntity.getName());
         Assert.assertEquals("Created DAO has a wrong description", privateDto.getDescription(),
-                            roomDAO.getDescription());
+                            roomEntity.getDescription());
         Assert.assertEquals("Created DAO has a wrong password hash", privateDto.getPassword(),
-                            roomDAO.getPasswordHash());
-        Assert.assertEquals("Created DAO has a wrong mafia amount", privateDto.getMafia(), (long) roomDAO.getMafia());
+                            roomEntity.getPasswordHash());
+        Assert.assertEquals("Created DAO has a wrong mafia amount", privateDto.getMafia(),
+                            (long) roomEntity.getMafia());
         Assert.assertEquals("Created DAO has a wrong players amount", privateDto.getMaxPlayers(),
-                            (long) roomDAO.getMaxUsersAmount());
-        Assert.assertEquals("Created DAO has a wrong Don setting", privateDto.isDon(), roomDAO.getDon());
-        Assert.assertEquals("Created DAO has a wrong Sheriff setting", privateDto.isSheriff(), roomDAO.getSheriff());
+                            (long) roomEntity.getMaxUsersAmount());
+        Assert.assertEquals("Created DAO has a wrong Don setting", privateDto.isDon(), roomEntity.getDon());
+        Assert.assertEquals("Created DAO has a wrong Sheriff setting", privateDto.isSheriff(), roomEntity.getSheriff());
         Mockito.verify(mockEncoder, Mockito.times(1)).encode(Mockito.anyString());
     }
 
@@ -123,9 +124,9 @@ public class SimpleRoomServiceTest {
 
     @Test
     public void createRoomAlreadyInRoom() {
-        UserDAO dao = new UserDAO();
+        UserEntity dao = new UserEntity();
         Mockito.when(mockUserService.getCurrentUserDAO()).thenReturn(Optional.of(dao));
-        Mockito.when(mockRepository.findRoomDAOByUserListContains(dao)).thenReturn(Optional.of(new RoomDAO()));
+        Mockito.when(mockRepository.findRoomDAOByUserListContains(dao)).thenReturn(Optional.of(new RoomEntity()));
         try {
             testedService.createRoom(publicDto);
             Assert.fail("Created a room, when current user is already in another room");
@@ -136,7 +137,7 @@ public class SimpleRoomServiceTest {
 
     @Test
     public void getAvailableRooms() {
-        RoomDAO daoPrivate = new RoomDAO();
+        RoomEntity daoPrivate = new RoomEntity();
         daoPrivate.setRoomId(42L);
         daoPrivate.setName("Test private room");
         daoPrivate.setDescription("Test private room description");
@@ -144,7 +145,7 @@ public class SimpleRoomServiceTest {
         daoPrivate.setUserList(users);
         Mockito.when(users.size()).thenReturn(42);
         daoPrivate.setMaxUsersAmount(43);
-        RoomDAO daoPublic = new RoomDAO();
+        RoomEntity daoPublic = new RoomEntity();
         daoPublic.setRoomId(42L);
         daoPublic.setName("Test public room");
         daoPublic.setDescription("Test public room description");

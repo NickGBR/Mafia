@@ -2,8 +2,7 @@ package org.dreamteam.mafia.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.enums.DestinationEnum;
+import org.dreamteam.mafia.entities.RoomEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +17,13 @@ import java.util.Optional;
 public class MessageRestorationDescriptor {
 
     private final List<DestinationEnum> destinations;
-    private RoomDAO room = null;
+    private RoomEntity room = null;
 
     public MessageRestorationDescriptor() {
         destinations = new ArrayList<>();
     }
 
-    public Optional<RoomDAO> getRoom() {
+    public Optional<RoomEntity> getRoom() {
         return Optional.ofNullable(room);
     }
 }

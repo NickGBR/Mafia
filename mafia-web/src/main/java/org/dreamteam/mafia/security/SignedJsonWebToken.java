@@ -4,8 +4,8 @@ import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Подписанный JWT. Является токеном, но никого не аутентифицирует до верификации подписии
@@ -16,7 +16,7 @@ public class SignedJsonWebToken extends AbstractAuthenticationToken {
     private final String login;
 
     public SignedJsonWebToken(String token) {
-        super(Collections.EMPTY_LIST);
+        super(new ArrayList<>());
         this.token = token;
         this.login = null;
     }

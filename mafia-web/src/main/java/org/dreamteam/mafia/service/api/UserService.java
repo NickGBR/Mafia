@@ -1,8 +1,8 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dto.LoginDTO;
 import org.dreamteam.mafia.dto.RegistrationDTO;
+import org.dreamteam.mafia.entities.UserEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.security.SignedJsonWebToken;
@@ -49,5 +49,5 @@ public interface UserService {
      *
      * @return - БД-сущность авторизованного в настоящий момент пользователя или null, если пользователь еще не авторизован
      */
-    Optional<UserDAO> getCurrentUserDAO();
+    Optional<UserEntity> getCurrentUserDAO();
 }

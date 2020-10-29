@@ -1,18 +1,21 @@
-package org.dreamteam.mafia.dao;
+package org.dreamteam.mafia.entities;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dreamteam.mafia.dao.enums.DestinationEnum;
+import org.dreamteam.mafia.model.DestinationEnum;
 
 import javax.persistence.*;
 
+/**
+ * Объект соответствующий строке таблицы сообщений в БД
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "messages")
-public class MessageDAO {
+public class MessageEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +28,7 @@ public class MessageDAO {
             joinColumns = {@JoinColumn(name = "message_id")},
             inverseJoinColumns = {@JoinColumn(name = "room_id")}
     )
-    private RoomDAO room;
+    private RoomEntity room;
 
     @Column(name = "destination", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -37,7 +40,7 @@ public class MessageDAO {
             joinColumns = {@JoinColumn(name = "message_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id")}
     )
-    private UserDAO user;
+    private UserEntity user;
 
     @Column(name = "text", nullable = false)
     private String text;

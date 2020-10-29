@@ -1,10 +1,9 @@
-package org.dreamteam.mafia.dao;
+package org.dreamteam.mafia.entities;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dreamteam.mafia.dao.enums.GamePhaseEnum;
-import org.dreamteam.mafia.dao.enums.GameStatusEnum;
-import org.hibernate.annotations.Cascade;
+import org.dreamteam.mafia.model.GamePhaseEnum;
+import org.dreamteam.mafia.model.GameStatusEnum;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -12,13 +11,14 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Объект, соответствующий строке таблицы комнат в БД
+ */
 @Getter
 @Setter
 @Entity
 @Table(name = "rooms")
-
-
-public class RoomDAO {
+public class RoomEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id", unique = true, nullable = false)
@@ -56,16 +56,16 @@ public class RoomDAO {
     @Column(name = "don")
     private Boolean don;
 
-
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! REFRESH
     @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @NotFound(action = NotFoundAction.IGNORE)
-    private Set<UserDAO> userList;
+    private Set<UserEntity> userList;
 
     @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @NotFound(action = NotFoundAction.IGNORE)
-    private Set<MessageDAO> messageList;
-    public RoomDAO() {
+    private Set<MessageEntity> messageList;
+
+    public RoomEntity() {
         this.dayNumber = 0;
         this.gamePhase = GamePhaseEnum.CIVILIANS_DISCUSS_PHASE;
         this.gameStatus = GameStatusEnum.NOT_STARTED;
@@ -73,7 +73,7 @@ public class RoomDAO {
         this.userList = new HashSet<>();
     }
 
-    public RoomDAO(
+    public RoomEntity(
             String passwordHash, String roomName, Integer maxUsersAmount, GameStatusEnum gameStatus) {
         this.passwordHash = passwordHash;
         this.name = roomName;
@@ -81,11 +81,11 @@ public class RoomDAO {
         this.gameStatus = gameStatus;
     }
 
-    public void addUser(UserDAO user) {
+    public void addUser(UserEntity user) {
         this.userList.add(user);
     }
 
-    public void removeUser(UserDAO user) {
+    public void removeUser(UserEntity user) {
         this.userList.remove(user);
     }
 
@@ -105,7 +105,7 @@ public class RoomDAO {
         sb.append(", don=").append(don);
         sb.append(", users={ ");
         boolean first = true;
-        for (UserDAO user : userList) {
+        for (UserEntity user : userList) {
             if (!first) {
                 sb.append(", ");
             } else {

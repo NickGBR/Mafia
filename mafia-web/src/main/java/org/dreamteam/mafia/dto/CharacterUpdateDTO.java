@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
+import org.dreamteam.mafia.entities.UserEntity;
+import org.dreamteam.mafia.model.CharacterStatusEnum;
 
+/**
+ * Описание обновления состояния персонажа в игре для отправки клиенту
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,7 +19,7 @@ public class CharacterUpdateDTO {
     private String name = "";
     private Boolean isAlive = true;
 
-    public CharacterUpdateDTO(UserDAO dao) {
+    public CharacterUpdateDTO(UserEntity dao) {
         this.name = dao.getLogin();
         this.isAlive = dao.getCharacterStatus().equals(CharacterStatusEnum.ALIVE);
     }

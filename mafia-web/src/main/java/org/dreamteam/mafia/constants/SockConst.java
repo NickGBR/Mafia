@@ -1,13 +1,10 @@
 package org.dreamteam.mafia.constants;
 
+/**
+ *
+ */
 public class SockConst {
-    public static final String SYSTEM_END_POINT = "/system_message";
-    public static final String MAFIA_END_POINT = "/mafia_message";
-    public static final String CIV_END_POINT = "/civ_message";
-    public static final String ROOM_END_POINT = "/room_message";
-
     public static final String ROOM_WEB_CHAT = "/chat/room_messages/";
-
     public static final String MAFIA_WEB_CHAT = "/chat/message/send/mafia/";
     public static final String CIV_WEB_CHAT = "/chat/message/send/civilians/";
     public static final String SYS_WEB_CHAT = "/chat/system_messages/";
@@ -21,34 +18,14 @@ public class SockConst {
     public static final String SYS_GAME_STARTED_INFO = "/chat/system_message/game_started_message/";
     public static final String SYS_WEB_CHARACTER_INFO_UPDATE = "/chat/system_message/game/character_update/";
 
-    public static final String REQUEST_GET_ADD_USER_TO_ROOM = "api/GET/addUserToRoom";
     public static final String REQUEST_VOTE_FOR_USER = "/voteForUser";
-
-    public static final String REQUEST_GET_ROOM_ADMIN_NAME = "api/GET/get_room_admin_name";
-    public static final String REQUEST_GET_MESSAGES = "api/GET/getMessages";
-    public static final String REQUEST_GET_ROOMS = "api/GET/getRooms";
-    public static final String REQUEST_GET_USERS = "api/GET/getRoomUsers";
-    public static final String REQUEST_POST_CHECK_USER = "api/POST/checkUser";
-    public static final String REQUEST_POST_CHECK_ROOM = "api/POST/checkRoom";
-
-    public static final String REQUEST_POST_MESSAGE = "/send";
-
-
-    public static final String REQUEST_GET_CHANGE_READY_STATUS = "api/POST/changeReadyStatus";
-    public static final String REQUEST_GET_ROOM_READY_STATUS = "api/GET/getRoomReadyStatus";
-
+    public static final String REQUEST_SEND_MESSAGE = "/send";
+    public static final String REQUEST_LOAD_MESSAGES = "/restore";
     /**
      * Использоуется для проверки роли персонажа,
      * шериф првоеряет, явлеяется ли персонаж доном,
      * дон проверяет явлеся ли указанный персонаж шерифом.
      */
     public static final String REQUEST_GET_OTHER_ROLE_INFO = "/checkRole";
-
-
     public static final String REQUEST_GET_START_GAME_INFO = "/startGame";
-
-
-
-
-
 }

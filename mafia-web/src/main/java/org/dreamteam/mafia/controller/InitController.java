@@ -1,10 +1,9 @@
 package org.dreamteam.mafia.controller;
 
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.enums.GameStatusEnum;
 import org.dreamteam.mafia.dto.InitDTO;
-import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.model.GameStatusEnum;
+import org.dreamteam.mafia.model.Room;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.service.api.RoomService;
 import org.dreamteam.mafia.service.api.UserService;
@@ -42,21 +41,20 @@ public class InitController {
             dto.setName(user.get().getName());
             dto.setIsInRoom(roomService.isCurrentlyInRoom());
             if (dto.getIsInRoom()) {
-                final RoomDisplayDTO currentRoom = roomService.getCurrentRoom();
-                final RoomDAO roomDAO = userService.getCurrentUserDAO().get().getRoom();
-                dto.setIsGameStarted(roomDAO.getGameStatus().equals(GameStatusEnum.IN_PROGRESS));
+                final Room currentRoom = roomService.getCurrentRoom();
+                dto.setIsGameStarted(currentRoom.getStatus().equals(GameStatusEnum.IN_PROGRESS));
                 dto.setRoomID(String.valueOf(currentRoom.getId()));
                 dto.setRoomName(currentRoom.getName());
                 dto.setIsAdmin(roomService.isCurrentUserAdmin());
-                dto.setRole(userService.getCurrentUserDAO().get().getCharacter());
+                dto.setRole(user.get().getCharacter());
                 dto.setIsReady(user.get().isReady());
                 dto.setMaxUserAmount(currentRoom.getMaxUserAmount());
-                dto.setMafiaAmount(roomDAO.getMafia());
-                dto.setHasSheriff(roomDAO.getSheriff());
-                dto.setHasDon(roomDAO.getDon());
+                dto.setMafiaAmount(currentRoom.getMafiaAmount());
+                dto.setHasSheriff(currentRoom.getHasSheriff());
+                dto.setHasDon(currentRoom.getHasDon());
                 dto.setIsRoomReady(roomService.isRoomReady());
                 if (dto.getIsGameStarted()) {
-                    dto.setGamePhase(roomDAO.getGamePhase());
+                    dto.setGamePhase(currentRoom.getPhase());
                     dto.setIsAlive(user.get().getIsAlive());
                 }
             }

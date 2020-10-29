@@ -1,10 +1,10 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dto.CharacterUpdateDTO;
 import org.dreamteam.mafia.dto.ChatMessageDTO;
 import org.dreamteam.mafia.dto.GameDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
+import org.dreamteam.mafia.entities.RoomEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.MessageDestinationDescriptor;
 
@@ -32,7 +32,7 @@ public interface MessageService {
      */
     void sendSystemMessage(GameDTO systemMessage, MessageDestinationDescriptor descriptor) throws ClientErrorException;
 
-    void sendVotingResultUpdate(CharacterUpdateDTO dto, RoomDAO room);
+    void sendVotingResultUpdate(CharacterUpdateDTO dto, RoomEntity room);
 
     /**
      * Возвращает историю чата для текущего игрока.

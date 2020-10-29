@@ -3,7 +3,7 @@ package org.dreamteam.mafia.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dreamteam.mafia.dao.RoomDAO;
+import org.dreamteam.mafia.model.Room;
 
 /**
  * Описание комнаты, отправляемое в клиент для ее отображения
@@ -22,16 +22,16 @@ public class RoomDisplayDTO {
     private Boolean hasSheriff;
     private Boolean hasDon;
 
-    public RoomDisplayDTO(RoomDAO dao) {
-        this.setName(dao.getName());
-        this.setId(dao.getRoomId());
-        this.setDescription(dao.getDescription());
-        this.setMaxUserAmount(dao.getMaxUsersAmount());
-        this.setPrivateRoom(!dao.getPasswordHash().equals(""));
-        this.setCurrPlayers(dao.getUserList().size());
-        this.setMafiaAmount(dao.getMafia());
-        this.setHasSheriff(dao.getSheriff());
-        this.setHasDon(dao.getDon());
+    public RoomDisplayDTO(Room room) {
+        this.setName(room.getName());
+        this.setId(room.getId());
+        this.setDescription(room.getDescription());
+        this.setMaxUserAmount(room.getMaxUserAmount());
+        this.setPrivateRoom(room.getPrivateRoom());
+        this.setCurrPlayers(room.getCurrPlayers());
+        this.setMafiaAmount(room.getMafiaAmount());
+        this.setHasSheriff(room.getHasSheriff());
+        this.setHasDon(room.getHasDon());
     }
 
     @Override

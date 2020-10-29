@@ -1,6 +1,6 @@
 package org.dreamteam.mafia.security;
 
-import org.dreamteam.mafia.dao.UserDAO;
+import org.dreamteam.mafia.entities.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +16,7 @@ public class SecurityUserDetails implements UserDetails {
     private final String password;
     private final String login;
 
-    public SecurityUserDetails(UserDAO dao) {
+    public SecurityUserDetails(UserEntity dao) {
         this.login = dao.getLogin();
         this.password = dao.getPasswordHash();
     }

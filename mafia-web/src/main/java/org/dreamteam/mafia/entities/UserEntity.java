@@ -1,26 +1,25 @@
-package org.dreamteam.mafia.dao;
+package org.dreamteam.mafia.entities;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dreamteam.mafia.dao.enums.CharacterEnum;
-import org.dreamteam.mafia.dao.enums.CharacterStatusEnum;
+import org.dreamteam.mafia.model.CharacterEnum;
+import org.dreamteam.mafia.model.CharacterStatusEnum;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.util.HashSet;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Объект, связанный с таблицей пользователей в БД
+ * Объект, соответствующий строке таблицы пользователей в БД
  */
 @Getter
 @Setter
 @Entity
 @Table(name = "users")
-public class UserDAO {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +40,7 @@ public class UserDAO {
             inverseJoinColumns = {@JoinColumn(name = "room_id")}
     )
     @NotFound(action = NotFoundAction.IGNORE)
-    private RoomDAO room;
+    private RoomEntity room;
 
     @Column(name = "is_ready")
     private Boolean isReady;
@@ -65,9 +64,9 @@ public class UserDAO {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @NotFound(action = NotFoundAction.IGNORE)
-    private Set<MessageDAO> messageList;
+    private Set<MessageEntity> messageList;
 
-    public UserDAO() {
+    public UserEntity() {
         login = "";
         passwordHash = "";
         isReady = false;
@@ -79,7 +78,7 @@ public class UserDAO {
         hasVoted = false;
     }
 
-    public UserDAO(String login, String passwordHash) {
+    public UserEntity(String login, String passwordHash) {
         this.login = login;
         this.passwordHash = passwordHash;
         this.isAdmin = false;
@@ -99,8 +98,8 @@ public class UserDAO {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        UserDAO userDAO = (UserDAO) o;
-        return login.equals(userDAO.login);
+        UserEntity userEntity = (UserEntity) o;
+        return login.equals(userEntity.login);
     }
 
     @Override

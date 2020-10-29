@@ -1,14 +1,14 @@
 package org.dreamteam.mafia.repository.api;
 
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dao.enums.GameStatusEnum;
+import org.dreamteam.mafia.entities.RoomEntity;
+import org.dreamteam.mafia.entities.UserEntity;
+import org.dreamteam.mafia.model.GameStatusEnum;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface RoomRepository extends CrudRepository<RoomDAO, Long> {
+public interface RoomRepository extends CrudRepository<RoomEntity, Long> {
 
     /**
      * Поиск комнат согласно игровым состояниям.
@@ -16,7 +16,7 @@ public interface RoomRepository extends CrudRepository<RoomDAO, Long> {
      * @param gameStatusEnum состояние игры в комнате: NOT_STARTED, IN_PROGRESS, COMPLETED, DELETED
      * @return список комнат
      */
-    List<RoomDAO> findRoomDAOByGameStatus(GameStatusEnum gameStatusEnum);
+    List<RoomEntity> findRoomDAOByGameStatus(GameStatusEnum gameStatusEnum);
 
     /**
      * Возвращает комнату, в которой находится указанный пользователь
@@ -24,6 +24,6 @@ public interface RoomRepository extends CrudRepository<RoomDAO, Long> {
      * @param user - пользователь, для которого нужна найти комнату
      * @return - комнату пользователя или пустой Optional, если пользователь не находится в комнате
      */
-    Optional<RoomDAO> findRoomDAOByUserListContains(UserDAO user);
+    Optional<RoomEntity> findRoomDAOByUserListContains(UserEntity user);
 
 }

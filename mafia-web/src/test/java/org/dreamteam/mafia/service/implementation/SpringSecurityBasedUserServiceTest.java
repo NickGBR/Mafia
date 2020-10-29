@@ -1,7 +1,7 @@
 package org.dreamteam.mafia.service.implementation;
 
-import org.dreamteam.mafia.dao.UserDAO;
 import org.dreamteam.mafia.dto.RegistrationDTO;
+import org.dreamteam.mafia.entities.UserEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.repository.api.UserRepository;
@@ -36,14 +36,14 @@ public class SpringSecurityBasedUserServiceTest {
     TokenService mockTokenService;
 
     RegistrationDTO dtoNormal, dtoPasswordMismatch;
-    UserDAO daoNormal;
+    UserEntity daoNormal;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         Mockito.when(mockEncoder.encode(Mockito.anyString())).thenAnswer(i -> i.getArguments()[0]);
 
-        daoNormal = new UserDAO();
+        daoNormal = new UserEntity();
         daoNormal.setLogin("a");
         daoNormal.setPasswordHash("b");
 
@@ -109,7 +109,7 @@ public class SpringSecurityBasedUserServiceTest {
         } catch (ClientErrorException e) {
             Assert.fail("Failed to register valid user");
         }
-        Mockito.verify(mockRepository, Mockito.times(1)).save(Mockito.any(UserDAO.class));
+        Mockito.verify(mockRepository, Mockito.times(1)).save(Mockito.any(UserEntity.class));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class SpringSecurityBasedUserServiceTest {
         } catch (ClientErrorException e) {
             Assert.assertEquals(ClientErrorCode.PASSWORD_MISMATCH, e.getCode());
         }
-        Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(UserDAO.class));
+        Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(UserEntity.class));
     }
 
     @Test
@@ -133,7 +133,7 @@ public class SpringSecurityBasedUserServiceTest {
         } catch (ClientErrorException e) {
             Assert.assertEquals(ClientErrorCode.USER_ALREADY_EXISTS, e.getCode());
         }
-        Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(UserDAO.class));
+        Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(UserEntity.class));
     }
 
     @Test

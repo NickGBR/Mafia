@@ -121,20 +121,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Starter  для бота -->
-        <dependency>
-            <groupId>org.telegram</groupId>
-            <artifactId>telegrambots-spring-boot-starter</artifactId>
-            <version>4.9.1</version>
-        </dependency>
-        <!-- Библиотека для работы с ботом -->
-        <dependency>
-            <groupId>org.telegram</groupId>
-            <artifactId>telegrambots</artifactId>
-            <version>4.9.1</version>
-        </dependency>
-
-
     </dependencies>
 
     <build>

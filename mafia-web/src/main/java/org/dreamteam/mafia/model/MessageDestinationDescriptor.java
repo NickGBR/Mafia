@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.enums.DestinationEnum;
+import org.dreamteam.mafia.entities.RoomEntity;
 
 import java.util.Optional;
 
@@ -20,9 +19,9 @@ import java.util.Optional;
 public class MessageDestinationDescriptor {
 
     private DestinationEnum destination;
-    private RoomDAO room = null;
+    private RoomEntity room = null;
 
-    public Optional<RoomDAO> getRoom() {
+    public Optional<RoomEntity> getRoom() {
         return Optional.ofNullable(room);
     }
 }

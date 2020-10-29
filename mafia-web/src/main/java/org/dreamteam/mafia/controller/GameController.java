@@ -1,9 +1,10 @@
 package org.dreamteam.mafia.controller;
 
 import org.dreamteam.mafia.constants.SockConst;
-import org.dreamteam.mafia.dao.enums.CharacterEnum;
 import org.dreamteam.mafia.dto.CharacterDisplayDTO;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.model.CharacterEnum;
+import org.dreamteam.mafia.model.User;
 import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.MessageService;
 import org.dreamteam.mafia.service.api.UserService;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/game")
@@ -38,11 +40,14 @@ public class GameController {
         gameService.countVotesAgainst(login);
     }
 
-    @RequestMapping(value = "/checkRole", method = RequestMethod.GET)
+    @RequestMapping(value = SockConst.REQUEST_GET_OTHER_ROLE_INFO, method = RequestMethod.GET)
     public Boolean getRoleInfo(@RequestParam String login) throws ClientErrorException {
-        if (userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.DON)) {
+        final Optional<User> currentUser = userService.getCurrentUser();
+        if (currentUser.orElseThrow(() -> new SecurityException("Unauthorised user can't check others roles"))
+                .getCharacter().equals(CharacterEnum.DON)) {
             return gameService.isSheriff(login);
-        } else if (userService.getCurrentUserDAO().get().getCharacter().equals(CharacterEnum.SHERIFF)) {
+        } else if (currentUser.orElseThrow(() -> new SecurityException("Unauthorised user can't check others roles"))
+                .getCharacter().equals(CharacterEnum.SHERIFF)) {
             return gameService.isMafia(login);
         }
         throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS,

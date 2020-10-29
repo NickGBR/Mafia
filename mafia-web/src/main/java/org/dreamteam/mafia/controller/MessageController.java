@@ -20,13 +20,12 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @PostMapping(SockConst.REQUEST_POST_MESSAGE)
+    @PostMapping(SockConst.REQUEST_SEND_MESSAGE)
     public void sendMessage(@RequestBody String message) throws ClientErrorException {
         messageService.sendMessage(message);
     }
 
-
-    @GetMapping("/restore")
+    @GetMapping(SockConst.REQUEST_LOAD_MESSAGES)
     public List<ChatMessageDTO> sendMessage() throws ClientErrorException {
         return messageService.getChatHistory();
     }

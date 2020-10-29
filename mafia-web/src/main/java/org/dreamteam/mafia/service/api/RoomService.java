@@ -1,13 +1,14 @@
 package org.dreamteam.mafia.service.api;
 
-import org.dreamteam.mafia.dao.RoomDAO;
 import org.dreamteam.mafia.dto.JoinRoomDTO;
 import org.dreamteam.mafia.dto.RoomCreationDTO;
 import org.dreamteam.mafia.dto.RoomDisplayDTO;
 import org.dreamteam.mafia.dto.UserDisplayDTO;
+import org.dreamteam.mafia.entities.RoomEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
 import org.dreamteam.mafia.model.MessageDestinationDescriptor;
 import org.dreamteam.mafia.model.MessageRestorationDescriptor;
+import org.dreamteam.mafia.model.Room;
 
 import java.util.List;
 
@@ -71,10 +72,11 @@ public interface RoomService {
     /**
      * Покидает текущую комнату, если текущий игрок находится в комнате
      *
+     * @return - описание покинутой комнаты
      * @throws ClientErrorException - если текущий пользователь не находится в комнате
      *                              или игра уже началась
      */
-    void leaveRoom() throws ClientErrorException;
+    Room leaveRoom() throws ClientErrorException;
 
     /**
      * Возвращает все незаполненные (доступные для присоединения) комнаты в приложении
@@ -127,10 +129,10 @@ public interface RoomService {
     /**
      * Возвращает описание текущей комнаты для клиента
      *
-     * @return -  описание комнаты в формате пригодном для отправки клиенту
+     * @return -  описание комнаты
      * @throws ClientErrorException - если пользователь не находится в комнате.
      */
-    RoomDisplayDTO getCurrentRoom() throws ClientErrorException;
+    Room getCurrentRoom() throws ClientErrorException;
 
     /**
      * Возвращает описание текущей комнаты для других сервисов
@@ -138,5 +140,5 @@ public interface RoomService {
      * @return -  описание комнаты, связанное с базой
      * @throws ClientErrorException - если пользователь не находится в комнате.
      */
-    RoomDAO getCurrentRoomDAO() throws ClientErrorException;
+    RoomEntity getCurrentRoomDAO() throws ClientErrorException;
 }

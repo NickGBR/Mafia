@@ -1,10 +1,10 @@
 package org.dreamteam.mafia.service.implementation;
 
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dao.enums.*;
 import org.dreamteam.mafia.dto.CharacterDisplayDTO;
+import org.dreamteam.mafia.entities.RoomEntity;
+import org.dreamteam.mafia.entities.UserEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
+import org.dreamteam.mafia.model.*;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.repository.api.UserRepository;
 import org.dreamteam.mafia.service.api.GameService;
@@ -16,9 +16,6 @@ import org.dreamteam.mafia.util.ClientErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,13 +24,10 @@ import java.util.stream.Collectors;
 @Service("GameService")
 public class GameServiceImpl implements GameService {
 
-    @Qualifier("Task")
-    private final ThreadPoolTaskScheduler taskScheduler;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final MessageService messageService;
     private final UserService userService;
-    private final SimpMessagingTemplate messagingTemplate;
     private final GamePhaseDurationsService durationsService;
 
     private final Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
@@ -44,15 +38,11 @@ public class GameServiceImpl implements GameService {
             RoomRepository roomRepository,
             MessageService messageService,
             UserService userService,
-            SimpMessagingTemplate messagingTemplate,
-            ThreadPoolTaskScheduler taskScheduler,
             GamePhaseDurationsService durationsService) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.messageService = messageService;
         this.userService = userService;
-        this.messagingTemplate = messagingTemplate;
-        this.taskScheduler = taskScheduler;
         this.durationsService = durationsService;
     }
 
@@ -61,14 +51,14 @@ public class GameServiceImpl implements GameService {
 
         Long roomId = userService.getCurrentUserDAO().get().getRoom().getRoomId();
 
-        Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
+        Optional<UserEntity> currentUserDAO = userService.getCurrentUserDAO();
         if (!currentUserDAO.isPresent()) {
             throw new SecurityException("User doesn't exist in a database");
         }
         if (currentUserDAO.get().getRoom() == null) {
             throw new ClientErrorException(ClientErrorCode.NOT_IN_ROOM, "User is not im the room");
         }
-        RoomDAO room = currentUserDAO.get().getRoom();
+        RoomEntity room = currentUserDAO.get().getRoom();
         if (!currentUserDAO.get().getIsAdmin()) {
             throw new ClientErrorException((ClientErrorCode.NOT_ENOUGH_RIGHTS), "User isn't admin");
         }
@@ -84,13 +74,13 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public boolean isSheriff(String login) throws ClientErrorException {
-        Optional<UserDAO> userDAO = userRepository.findByLogin(login);
+        Optional<UserEntity> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
                     + "\' doesn't exist in a database");
         }
 
-        Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
+        Optional<UserEntity> currentUserDAO = userService.getCurrentUserDAO();
         if (!currentUserDAO.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
         }
@@ -105,22 +95,22 @@ public class GameServiceImpl implements GameService {
             throw new ClientErrorException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
         }
 
-        if (!currentUserDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.DON)) {
+        if (!currentUserDAO.get().getCharacter().equals(CharacterEnum.DON)) {
             throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS, "Permission denied");
         }
 
-        return userDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.SHERIFF);
+        return userDAO.get().getCharacter().equals(CharacterEnum.SHERIFF);
     }
 
     @Override
     public boolean isMafia(String login) throws ClientErrorException {
-        Optional<UserDAO> userDAO = userRepository.findByLogin(login);
+        Optional<UserEntity> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
                     + "\' doesn't exist in a database");
         }
 
-        Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
+        Optional<UserEntity> currentUserDAO = userService.getCurrentUserDAO();
         if (!currentUserDAO.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
         }
@@ -135,23 +125,23 @@ public class GameServiceImpl implements GameService {
             throw new ClientErrorException(ClientErrorCode.WRONG_GAME_PHASE, "Wrong game phase");
         }
 
-        if (!currentUserDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.SHERIFF)) {
+        if (!currentUserDAO.get().getCharacter().equals(CharacterEnum.SHERIFF)) {
             throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS, "Permission denied");
         }
 
-        return userDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.DON) ||
-                userDAO.get().getCharacter().equals(org.dreamteam.mafia.dao.enums.CharacterEnum.MAFIA);
+        return userDAO.get().getCharacter().equals(CharacterEnum.DON) ||
+                userDAO.get().getCharacter().equals(CharacterEnum.MAFIA);
     }
 
     @Override
     public void countVotesAgainst(String login) throws ClientErrorException {
-        Optional<UserDAO> userDAO = userRepository.findByLogin(login);
+        Optional<UserEntity> userDAO = userRepository.findByLogin(login);
         if (!userDAO.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User \'" + login
                     + "\' doesn't exist in a database");
         }
 
-        Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
+        Optional<UserEntity> currentUserDAO = userService.getCurrentUserDAO();
         if (!currentUserDAO.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
         }
@@ -181,7 +171,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void setRolesToUsers(RoomDAO room) {
+    public void setRolesToUsers(RoomEntity room) {
         ArrayList<CharacterEnum> roles = new ArrayList<>();
 
         int mafiaAmount = room.getMafia();
@@ -202,7 +192,7 @@ public class GameServiceImpl implements GameService {
         }
         Collections.shuffle(roles);
         int roleIndex = 0;
-        for (UserDAO user : room.getUserList()) {
+        for (UserEntity user : room.getUserList()) {
             user.setCharacter(roles.get(roleIndex));
             roleIndex++;
         }
@@ -210,7 +200,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public List<CharacterDisplayDTO> getCharacterInGame() throws ClientErrorException {
-        Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
+        Optional<UserEntity> currentUserDAO = userService.getCurrentUserDAO();
         if (!currentUserDAO.isPresent()) {
             throw new ClientErrorException(ClientErrorCode.USER_NOT_EXISTS, "User doesn't exist in a database");
         }
@@ -244,17 +234,17 @@ public class GameServiceImpl implements GameService {
         return dtoList;
     }
 
-    public GameEndStatus isMafiaVictoryInRoom(RoomDAO room) {
+    public GameEndStatus isMafiaVictoryInRoom(RoomEntity room) {
         List<CharacterEnum> mafiaRoles = new ArrayList<>();
         mafiaRoles.add(CharacterEnum.DON);
         mafiaRoles.add(CharacterEnum.MAFIA);
         List<CharacterEnum> civilianRoles = new ArrayList<>();
         civilianRoles.add(CharacterEnum.CITIZEN);
         civilianRoles.add(CharacterEnum.SHERIFF);
-        Long mafiaCount = userRepository.countDistinctByCharacterInAndAndCharacterStatusAndRoom(
+        Long mafiaCount = userRepository.countDistinctByCharacterInAndCharacterStatusAndRoom(
                 mafiaRoles, CharacterStatusEnum.ALIVE, room
         );
-        Long civilianCount = userRepository.countDistinctByCharacterInAndAndCharacterStatusAndRoom(
+        Long civilianCount = userRepository.countDistinctByCharacterInAndCharacterStatusAndRoom(
                 civilianRoles, CharacterStatusEnum.ALIVE, room
         );
 
@@ -270,7 +260,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public CharacterEnum getRole() throws ClientErrorException {
-        Optional<UserDAO> currentUserDAO = userService.getCurrentUserDAO();
+        Optional<UserEntity> currentUserDAO = userService.getCurrentUserDAO();
         if (!currentUserDAO.isPresent()) {
             throw new SecurityException("User doesn't exist in a database");
         }

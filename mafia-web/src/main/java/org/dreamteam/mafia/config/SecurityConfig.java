@@ -35,8 +35,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final RequestMatcher SECURED_URLS = new AndRequestMatcher(
             new NegatedRequestMatcher(PUBLIC_API_URLS),
             new AntPathRequestMatcher("/api/**"));
-    // Доступные любым пользователям URL
-    private static final RequestMatcher PUBLIC_URLS = new NegatedRequestMatcher(SECURED_URLS);
     private final TokenAuthenticationProvider provider;
 
     @Autowired

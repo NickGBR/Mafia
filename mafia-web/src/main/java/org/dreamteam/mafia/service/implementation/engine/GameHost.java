@@ -1,15 +1,12 @@
 package org.dreamteam.mafia.service.implementation.engine;
 
 import lombok.SneakyThrows;
-import org.dreamteam.mafia.constants.GameConst;
-import org.dreamteam.mafia.dao.RoomDAO;
-import org.dreamteam.mafia.dao.UserDAO;
-import org.dreamteam.mafia.dao.enums.*;
 import org.dreamteam.mafia.dto.CharacterUpdateDTO;
 import org.dreamteam.mafia.dto.GameDTO;
-import org.dreamteam.mafia.dto.VotingResultDTO;
+import org.dreamteam.mafia.entities.RoomEntity;
+import org.dreamteam.mafia.entities.UserEntity;
 import org.dreamteam.mafia.exceptions.ClientErrorException;
-import org.dreamteam.mafia.model.MessageDestinationDescriptor;
+import org.dreamteam.mafia.model.*;
 import org.dreamteam.mafia.repository.api.RoomRepository;
 import org.dreamteam.mafia.service.api.GameService;
 import org.dreamteam.mafia.service.api.MessageService;
@@ -20,7 +17,7 @@ import java.util.*;
 
 public class GameHost implements Runnable {
     private final GameDTO gameDTO = new GameDTO();
-    private RoomDAO room;
+    private RoomEntity room;
     private final RoomRepository roomRepository;
     private int dayCounter;
     private final MessageService messageService;
@@ -29,7 +26,7 @@ public class GameHost implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(GameHost.class);
 
     public GameHost(
-            RoomDAO room, RoomRepository roomRepository, MessageService messageService,
+            RoomEntity room, RoomRepository roomRepository, MessageService messageService,
             GameService gameService, GamePhaseDurationsService durationsService) {
         this.room = room;
         this.roomRepository = roomRepository;
@@ -230,16 +227,9 @@ public class GameHost implements Runnable {
         room.setGamePhase(gameDTO.getGamePhase());
     }
 
-    private boolean isFinalDay(int day) {
-        if (day == GameConst.DURATION) {
-            return true;
-        }
-        return false;
-    }
-
-    private RoomDAO completeRoom() {
+    private RoomEntity completeRoom() {
         room.setGameStatus(GameStatusEnum.COMPLETED);
-        for (UserDAO user : room.getUserList()) {
+        for (UserEntity user : room.getUserList()) {
             user.setCharacterStatus(CharacterStatusEnum.ALIVE);
             user.setCharacter(CharacterEnum.CITIZEN);
             user.setIsReady(false);
@@ -251,21 +241,21 @@ public class GameHost implements Runnable {
 
     private void getVotingResult() throws ClientErrorException, InterruptedException {
 
-        ArrayList<VotingResultDTO> result = new ArrayList<>();
+        ArrayList<VotingResult> result = new ArrayList<>();
 
         // Записываем результаты голосования.
-        for (UserDAO userDAO : room.getUserList()) {
-            VotingResultDTO votingResult = new VotingResultDTO();
-            votingResult.setLogin(userDAO.getLogin());
-            votingResult.setResult(userDAO.getVotesAgainst());
+        for (UserEntity userEntity : room.getUserList()) {
+            VotingResult votingResult = new VotingResult();
+            votingResult.setLogin(userEntity.getLogin());
+            votingResult.setResult(userEntity.getVotesAgainst());
             result.add(votingResult);
         }
 
         // Сортируем результат голосования.
-        result.sort(Collections.reverseOrder(Comparator.comparing(VotingResultDTO::getResult)));
+        result.sort(Collections.reverseOrder(Comparator.comparing(VotingResult::getResult)));
 
         if (!checkTie(result)) {
-            final UserDAO victim = KillUser(result);
+            final UserEntity victim = KillUser(result);
             messageService.sendVotingResultUpdate(new CharacterUpdateDTO(victim), room);
             Thread.sleep(durations.get("GRACE_DURATION") * 1000);
         } else {
@@ -278,16 +268,16 @@ public class GameHost implements Runnable {
      * Проверияем на ничью
      */
 
-    private boolean checkTie(ArrayList<VotingResultDTO> result) throws ClientErrorException {
+    private boolean checkTie(ArrayList<VotingResult> result) throws ClientErrorException {
         if (result.get(0).getResult().intValue() == result.get(1).getResult().intValue()) {
             return true;
         }
         return false;
     }
 
-    private UserDAO KillUser(ArrayList<VotingResultDTO> result) throws ClientErrorException {
+    private UserEntity KillUser(ArrayList<VotingResult> result) throws ClientErrorException {
         String login = result.get(0).getLogin();
-        final Optional<UserDAO> victim = room.getUserList().stream()
+        final Optional<UserEntity> victim = room.getUserList().stream()
                 .filter(
                         (dao) -> dao.getLogin().equals(login))
                 .findFirst();
@@ -305,10 +295,10 @@ public class GameHost implements Runnable {
      *
      * @param result список пользователей комнаты, для обновления.
      */
-    private void refreshVotingResult(ArrayList<VotingResultDTO> result) {
-        for (UserDAO userDAO : room.getUserList()) {
-            userDAO.setVotesAgainst(0);
-            userDAO.setHasVoted(false);
+    private void refreshVotingResult(ArrayList<VotingResult> result) {
+        for (UserEntity userEntity : room.getUserList()) {
+            userEntity.setVotesAgainst(0);
+            userEntity.setHasVoted(false);
         }
     }
 }
