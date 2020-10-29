@@ -10,7 +10,17 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>org.dreamteam.mafia</groupId>
     <artifactId>mafia-web</artifactId>
+    <version>0.2.0-ALPHA</version>
+
+    <developers>
+        <developer>
+            <name>Dreamteam 42</name>
+            <organization>Innopolis Univeristy.</organization>
+            <organizationUrl>https://www.innopolis.university</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
