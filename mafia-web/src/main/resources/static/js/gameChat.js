@@ -360,7 +360,7 @@ function voteForUser() {
     };
 
     sendRequest("GET", sockConst.REQUEST_GET_VOTE_FOR_USER + "?login=" + login,
-        "", callback, [3, 7, 15, 17]);//3 7 /15/ 17
+        "", callback, [3, 6, 7, 9, 15, 17]);//3 7 /15/ 17
 }
 
 function showEndGameScreen(message) {

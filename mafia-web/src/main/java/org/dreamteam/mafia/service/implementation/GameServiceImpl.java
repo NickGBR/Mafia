@@ -157,6 +157,19 @@ public class GameServiceImpl implements GameService {
             throw new ClientErrorException(ClientErrorCode.CHARACTER_IS_DEAD, "Character is out of game!");
         }
 
+        if (!userDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.CIVILIANS_VOTE_PHASE)
+                && !userDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.MAFIA_VOTE_PHASE)) {
+            throw new ClientErrorException(ClientErrorCode.WRONG_GAME_PHASE, "Can't vote outside voting size");
+        }
+
+        if (userDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.MAFIA_VOTE_PHASE)) {
+            if (!userDAO.get().getCharacter().equals(CharacterEnum.DON)
+                    && !userDAO.get().getCharacter().equals(CharacterEnum.MAFIA)) {
+                throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS,
+                                               "Non-mafia can't vote in mafia voting phase");
+            }
+        }
+
         if (currentUserDAO.get().getHasVoted()) {
             throw new ClientErrorException(ClientErrorCode.USER_ALREADY_VOTED, "User doesn't exist in a database");
         }

@@ -80,6 +80,7 @@ function onError(error) {
  */
 function initCurrentRoomInfo() {
 
+    document.getElementById("roomName").innerText = roomName;
     document.getElementById("room-description")
         .innerText = generateDescription(init);
     let firstNode = document.getElementById("user_entry_1");
