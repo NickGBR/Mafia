@@ -162,9 +162,9 @@ public class GameServiceImpl implements GameService {
             throw new ClientErrorException(ClientErrorCode.WRONG_GAME_PHASE, "Can't vote outside voting size");
         }
 
-        if (userDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.MAFIA_VOTE_PHASE)) {
-            if (!userDAO.get().getCharacter().equals(CharacterEnum.DON)
-                    && !userDAO.get().getCharacter().equals(CharacterEnum.MAFIA)) {
+        if (currentUserDAO.get().getRoom().getGamePhase().equals(GamePhaseEnum.MAFIA_VOTE_PHASE)) {
+            if (!currentUserDAO.get().getCharacter().equals(CharacterEnum.DON)
+                    && !currentUserDAO.get().getCharacter().equals(CharacterEnum.MAFIA)) {
                 throw new ClientErrorException(ClientErrorCode.NOT_ENOUGH_RIGHTS,
                                                "Non-mafia can't vote in mafia voting phase");
             }

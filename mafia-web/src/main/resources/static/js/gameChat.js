@@ -366,6 +366,7 @@ function voteForUser() {
 function showEndGameScreen(message) {
     showModalMessage("Игра окончена",
         message,
+
         function () {
             window.location.href = "roomList.html";
         });

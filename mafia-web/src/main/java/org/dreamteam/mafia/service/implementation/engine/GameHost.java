@@ -49,7 +49,7 @@ public class GameHost implements Runnable {
                     dayCounter++;
                     civiliansDiscussPhase(durations.get("CIVILIAN_DISCUSS_PHASE_DURATION"));
                     if (dayCounter == 1) {
-                        goToPhase(GamePhaseEnum.MAFIA_VOTE_PHASE);
+                        goToPhase(GamePhaseEnum.MAFIA_DISCUSS_PHASE);
                     } else {
                         goToPhase(GamePhaseEnum.CIVILIANS_VOTE_PHASE);
                     }
@@ -59,6 +59,7 @@ public class GameHost implements Runnable {
                     civiliansVotePhase(durations.get("CIVILIAN_VOTING_PHASE_DURATION"));
                     room = roomRepository.findById(room.getRoomId()).get();
                     getVotingResult();
+                    room = roomRepository.save(room);
                     goToPhase(GamePhaseEnum.MAFIA_DISCUSS_PHASE);
                     break;
 
@@ -71,6 +72,7 @@ public class GameHost implements Runnable {
                     mafiaVotePhase(durations.get("MAFIA_VOTING_PHASE_DURATION"));
                     room = roomRepository.findById(room.getRoomId()).get();
                     getVotingResult();
+                    room = roomRepository.save(room);
                     goToPhase(GamePhaseEnum.DON_PHASE);
                     break;
 
