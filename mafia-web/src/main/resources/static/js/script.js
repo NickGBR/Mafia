@@ -10,7 +10,7 @@ let isGameActive = false;
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
     // или имитировать их другими средствами
-    const socket = new SockJS("http://localhost:8080/chat-messaging");
+    const socket = new SockJS(sockConst.SOCK_CONNECT);
     console.log("Connected successfully");
     stompClient = Stomp.over(socket);
     // Получем токен достпа для конкретного пользователя.

@@ -5,6 +5,8 @@ const sockConst = {
     CIV_END_POINT: '/app/civ_message',
     ROOM_END_POINT: '/app/room_message',
 
+    SOCK_CONNECT: 'https://text-nick.herokuapp.com/chat-messaging',//'http://localhost:5000/chat-messaging'
+
     ROOM_WEB_CHAT: '/chat/room_messages/',
 
     MAFIA_WEB_CHAT: '/chat/message/send/mafia/',

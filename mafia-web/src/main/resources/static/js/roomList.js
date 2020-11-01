@@ -9,7 +9,7 @@ let selectedEntry = null;
 function connect() {
     // Подключается через SockJS. Он сам решит использовать ли WebSocket
     // или имитировать их другими средствами
-    const socket = new SockJS("http://localhost:8080/chat-messaging");
+    const socket = new SockJS(sockConst.SOCK_CONNECT);
     console.log("Connected successfully");
     stompClient = Stomp.over(socket);
     // Получаем токен достпа для конкретного пользователя.
@@ -146,8 +146,6 @@ function createRoom() {
 function onError(error) {
     console.log("Не удалось установить подключение: " + error);
     showModalMessage("Ошибка", "Клиент потерял соединение с сервером");
-    document.getElementById("room_input").disabled = true;
-    document.getElementById("set_room_button").disabled = true;
 }
 
 
